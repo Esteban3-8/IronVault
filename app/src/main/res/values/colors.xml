@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo principal y contenedores -->
+    <color name="bg_main">#14151A</color>
+    <color name="bg_secondary">#1F2127</color>
+    <color name="bg_dark_card">#20222A</color>
+    <color name="border_color">#35373E</color>
+
+    <!-- Marca e Interacciones (Naranjas) -->
+    <color name="orange_primary">#E08238</color>
+    <color name="orange_button">#C97D3E</color>
+
+    <!-- Estados y Verdes -->
+    <color name="green_accent">#8FC954</color>
+
+    <!-- Textos -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#5A5C62</color>
+    <color name="text_muted">#6B7280</color>
+</resources>

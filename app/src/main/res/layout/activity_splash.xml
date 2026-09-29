@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#13151B">
+
+    <!-- Ícono del Escudo -->
+    <ImageView
+        android:id="@+id/imgShieldLogo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        app:layout_constraintBottom_toTopOf="@id/layoutBrandTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- Título IronVault -->
+    <LinearLayout
+        android:id="@+id/layoutBrandTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/txtSubtitleManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imgShieldLogo">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_bold"
+            android:text="Iron"
+            android:textColor="#FFFFFF"
+            android:textSize="34sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_bold"
+            android:text="Vault"
+            android:textColor="#C97D3E"
+            android:textSize="34sp" />
+    </LinearLayout>
+
+    <!-- Subtítulo "SECURE PASSWORD MANAGER" -->
+    <TextView
+        android:id="@+id/txtSubtitleManager"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/inter_bold"
+        android:gravity="center"
+        android:letterSpacing="0.05"
+        android:text="SECURE PASSWORD\nMANAGER"
+        android:textColor="#9CA3AF"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toTopOf="@id/progressBarLoading"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutBrandTitle" />
+
+    <!-- Progress Bar estilizada -->
+    <ProgressBar
+        android:id="@+id/progressBarLoading"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="60dp"
+        android:indeterminateDrawable="@drawable/custom_progress_bar"
+        app:layout_constraintBottom_toTopOf="@id/txtLoadingMsg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtSubtitleManager" />
+
+    <!-- Mensaje "Desbloqueando tu bóveda..." -->
+    <TextView
+        android:id="@+id/txtLoadingMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/inter_bold"
+        android:gravity="center"
+        android:text="Desbloqueando tu bóveda..."
+        android:textColor="#9CA3AF"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toTopOf="@id/txtVersion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progressBarLoading" />
+
+    <!-- Versión "IronVault v1.0.0" abajo del todo -->
+    <TextView
+        android:id="@+id/txtVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/inter_bold"
+        android:text="IronVault v1.0.0"
+        android:textColor="#4B5563"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

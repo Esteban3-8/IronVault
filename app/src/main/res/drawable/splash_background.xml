@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo oscuro general (#13151B) -->
+    <item>
+        <color android:color="#13151B" />
+    </item>
+
+    <!-- Ícono del escudo centrado usando tu recurso logo -->
+    <item
+        android:width="120dp"
+        android:height="120dp"
+        android:gravity="center"
+        android:drawable="@drawable/logo" />
+</layer-list>

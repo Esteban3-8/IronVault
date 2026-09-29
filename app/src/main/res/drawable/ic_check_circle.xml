@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Círculo de fondo verde oscuro -->
+    <path
+        android:fillColor="#1D2A18"
+        android:pathData="M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2 Z" />
+
+    <!-- Chulito verde brillante centrado -->
+    <path
+        android:fillColor="#8FC954"
+        android:pathData="M10,15.17 L6.83,12 L5.77,13.06 L10,17.29 L19,8.29 L17.94,7.23 Z" />
+</vector>
