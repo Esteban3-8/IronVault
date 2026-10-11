@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"> <!-- CORREGIDO: Ahora es un rectángulo -->
+
+    <!-- Color de fondo oscuro que tenías (gris azulado) -->
+    <solid android:color="#2B2E3B" />
+
+    <!-- CORREGIDO: Esquinas redondeadas para que sea un cuadrado suave -->
+    <corners android:radius="12dp" />
+
+    <!-- Puedes agregar un tamaño fijo para asegurar que sea cuadrado en el XML -->
+    <size
+        android:width="44dp"
+        android:height="44dp" />
+</shape>

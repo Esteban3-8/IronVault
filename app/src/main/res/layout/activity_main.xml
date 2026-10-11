@@ -235,26 +235,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/layoutStats" />
 
-            <TextView
-                android:id="@+id/tvSeeAll"
+            <ImageView
+                android:id="@+id/ivPieza"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="Ver todas"
-                android:textColor="#E8873E"
-                android:textSize="13sp"
-                app:layout_constraintBottom_toBottomOf="@id/tvPasswordsHeader"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvPasswordsHeader" />
-
-            <!-- RecyclerView para listar las contraseñas -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvPasswords"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:nestedScrollingEnabled="false"
+                android:src="@drawable/pieza"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvPasswordsHeader" />
+
+            <!-- RecyclerView para listar las contraseñas debajo de la imagen -->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

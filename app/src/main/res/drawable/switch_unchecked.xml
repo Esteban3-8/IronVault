@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="52dp"
+    android:height="32dp"
+    android:viewportWidth="52"
+    android:viewportHeight="32">
+
+    <!-- Píldora de fondo apagado -->
+    <path
+        android:fillColor="#374151"
+        android:pathData="M16,0h20c8.837,0 16,7.163 16,16s-7.163,16 -16,16H16C7.163,32 0,24.837 0,16S7.163,0 16,0z"/>
+
+    <!-- Círculo blanco ubicado a la izquierda -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,4c6.627,0 12,5.373 12,12s-5.373,12 -12,12s-12,-5.373 -12,-12s5.373,-12 12,-12z"/>
+</vector>

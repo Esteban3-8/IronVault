@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:fillViewport="true"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <!-- Barra superior -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/flecha"
+                app:tint="#FFFFFF" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Nueva contraseña"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="Guarda un nuevo acceso en tu bóveda"
+                    android:textColor="#9CA3AF"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Icono central -->
+        <FrameLayout
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_card_rounded" />
+
+        <!-- Servicio o plataforma -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Servicio o plataforma"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_card_password_clean"
+            android:fontFamily="sans-serif"
+            android:hint="Ej. Netflix"
+            android:paddingHorizontal="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#6B7280"
+            android:textSize="14sp" />
+
+        <!-- Usuario o correo -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Usuario o correo"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_card_password_clean"
+            android:fontFamily="sans-serif"
+            android:hint="nombre@correo.com"
+            android:paddingHorizontal="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#6B7280"
+            android:textSize="14sp" />
+
+        <!-- Contraseña -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Contraseña"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_card_password_clean">
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/layoutIcons"
+                android:background="@null"
+                android:fontFamily="sans-serif"
+                android:paddingHorizontal="16dp"
+                android:text="P@ssw0rd123!"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <!-- Iconos de la derecha -->
+            <LinearLayout
+                android:id="@+id/layoutIcons"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ojo"
+                    app:tint="#9CA3AF" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/llave"
+                    app:tint="#E28743" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Barra de Fortaleza Actualizada -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_strength_bar_container">
+
+                <!-- Porción Activa (Verde Lima) -->
+                <View
+                    android:layout_width="220dp"
+                    android:layout_height="match_parent"
+                    android:background="#8FC954" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:fontFamily="sans-serif-medium"
+                android:text="Fortaleza Alta"
+                android:textColor="#8FC954"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- URL del servicio -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="URL del servicio (opcional)"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_card_password_clean"
+            android:fontFamily="sans-serif"
+            android:hint="https://"
+            android:paddingHorizontal="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#6B7280"
+            android:textSize="14sp" />
+
+        <!-- Categoría -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Categoría"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_card_password_clean"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:id="@+id/ivCatIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/categoria" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/ivCatIcon"
+                android:layout_marginStart="12dp"
+                android:fontFamily="sans-serif"
+                android:text="Seleccionar categoría"
+                android:textColor="#9CA3AF"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/senal" />
+        </RelativeLayout>
+
+        <!-- Notas adicionales -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Notas adicionales (opcional)"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_card_password_clean"
+            android:fontFamily="sans-serif"
+            android:gravity="top|start"
+            android:hint="Escribe una nota..."
+            android:padding="16dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#6B7280"
+            android:textSize="14sp" />
+
+        <!-- Botón Guardar -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnSaveCredential"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_button_orange"
+            android:fontFamily="sans-serif-medium"
+            android:text="Guardar credencial"
+            android:textAllCaps="false"
+            android:textColor="#121212"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="sans-serif"
+            android:text="Tu contraseña se guarda cifrada en la bóveda."
+            android:textColor="#6B7280"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+</ScrollView>
