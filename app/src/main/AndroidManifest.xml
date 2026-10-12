@@ -51,6 +51,9 @@
         <activity
             android:name=".UnlockVaultActivity"
             android:exported="false" />
+        <activity
+            android:name=".SecurityActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
