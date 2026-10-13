@@ -5,6 +5,9 @@
     <color name="bg_secondary">#1F2127</color>
     <color name="bg_dark_card">#20222A</color>
     <color name="border_color">#35373E</color>
+    <color name="bg_icon_box">#2A2C34</color>
+    <color name="bg_option_card">#1C1D24</color>
+    <color name="border_option_card">#3A3C44</color>
 
     <!-- Marca e Interacciones (Naranjas) -->
     <color name="orange_primary">#E08238</color>
