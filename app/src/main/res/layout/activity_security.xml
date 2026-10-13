@@ -407,5 +407,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardHistory" />
 
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/flecha"
+        app:layout_constraintBottom_toBottomOf="@id/tvSecurityTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvSecurityTitle" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
