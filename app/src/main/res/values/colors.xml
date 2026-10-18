@@ -22,4 +22,11 @@
     <color name="text_muted">#6B7280</color>
     <color name="bg_sheet">#121620</color>
     <color name="bg_button_cancel">#282A30</color>
+
+    <color name="history_row">#1A1F29</color>
+    <color name="history_icon_ok">#222836</color>
+    <color name="history_icon_fail">#2B2225</color>
+    <color name="history_chip_ok">#2D2218</color>
+    <color name="history_chip_fail">#321D21</color>
+    <color name="history_red">#E55353</color>
 </resources>
