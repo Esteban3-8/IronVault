@@ -20,4 +20,6 @@
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#5A5C62</color>
     <color name="text_muted">#6B7280</color>
+    <color name="bg_sheet">#121620</color>
+    <color name="bg_button_cancel">#282A30</color>
 </resources>
