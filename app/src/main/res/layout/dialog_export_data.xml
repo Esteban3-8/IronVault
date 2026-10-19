@@ -94,7 +94,7 @@
                     android:fontFamily="@font/inter_bold"
                     android:gravity="center"
                     android:text="Cancelar"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/text_soft"
                     android:textSize="14sp" />
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
