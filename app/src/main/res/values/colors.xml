@@ -5,6 +5,9 @@
     <color name="bg_secondary">#1F2127</color>
     <color name="bg_dark_card">#20222A</color>
     <color name="border_color">#35373E</color>
+    <color name="bg_icon_box">#2A2C34</color>
+    <color name="bg_option_card">#1C1D24</color>
+    <color name="border_option_card">#3A3C44</color>
 
     <!-- Marca e Interacciones (Naranjas) -->
     <color name="orange_primary">#E08238</color>
@@ -17,4 +20,25 @@
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#5A5C62</color>
     <color name="text_muted">#6B7280</color>
+    <color name="bg_sheet">#121620</color>
+    <color name="bg_button_cancel">#282A30</color>
+
+    <color name="history_row">#1A1F29</color>
+    <color name="history_icon_ok">#222836</color>
+    <color name="history_icon_fail">#2B2225</color>
+    <color name="history_chip_ok">#2D2218</color>
+    <color name="history_chip_fail">#321D21</color>
+    <color name="history_red">#E55353</color>
+    <color name="text_soft">#D1D5DB</color>
+
+    <!-- Colores apartado categoria -->
+    <color name="cat_section">#EA580C</color>
+    <!-- Fondos de el recuadro de los logos -->
+    <color name="cat_other_bg">#3310B981</color> <!-- Verde -->
+    <color name="cat_social_bg">#33EA580C</color> <!-- Naranja -->
+    <color name="cat_mail_bg">#332563EB</color> <!-- Azul -->
+    <color name="cat_games_bg">#337C3AED</color> <!-- Morado -->
+    <color name="cat_bank_bg">#33059669</color> <!-- Verde2 -->
+    <color name="cat_shop_bg">#33D97706</color> <!-- Amarillo -->
+    <color name="cat_edu_bg">#33EC4899</color> <!-- Rosado -->
 </resources>

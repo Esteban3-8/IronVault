@@ -16,61 +16,76 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
-
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
-
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
-
         <activity
             android:name=".BusinessRulesActivity"
             android:exported="false" />
-
-        <activity android:name=".GuestModeActivity"
-            android:exported="false"/>
-
-        <activity android:name=".ForgotPasswordActivity"
-            android:exported="false"/>
-
+        <activity
+            android:name=".GuestModeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
         <activity
             android:name=".MasterPasswordActivity"
             android:exported="false" />
-
         <activity
             android:name=".UnlockVaultActivity"
             android:exported="false" />
 
-        <!-- Actividad de Detalle añadida correctamente -->
+        <!-- Actividades agregadas por ti -->
         <activity
             android:name=".CredentialDetailActivity"
             android:exported="false" />
-
         <activity
             android:name=".EditCredentialActivity"
             android:exported="false" />
-
         <activity
             android:name=".NuevaCredencialActivity"
             android:exported="false" />
-
         <activity
             android:name=".PasswordGeneratorActivity"
             android:exported="false" />
 
+        <!-- Actividades agregadas por tu equipo -->
+        <activity
+            android:name=".SecurityActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChangeMasterKeyActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".AccessHistoryActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".VaultSecurityActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PrincipalPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

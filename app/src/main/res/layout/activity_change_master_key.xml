@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:padding="24dp"
+    tools:context=".ChangeMasterKeyActivity">
+
+    <!-- Flecha atrás -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="Volver"
+        android:src="@drawable/flecha"
+        app:layout_constraintBottom_toBottomOf="@id/tvChangeKeyTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvChangeKeyTitle" />
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/tvChangeKeyTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/inter_bold"
+        android:text="Cambiar clave maestra"
+        android:textColor="@color/text_primary"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Ícono de la llave -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardKey"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="20dp"
+        app:cardBackgroundColor="#1F222B"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvChangeKeyTitle">
+
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:src="@drawable/clave" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Subtítulo -->
+    <TextView
+        android:id="@+id/tvChangeKeySubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Por seguridad, primero confirma\ntu clave actual."
+        android:textAlignment="center"
+        android:textColor="@color/text_muted"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardKey" />
+
+    <!-- Aviso rojo -->
+    <LinearLayout
+        android:id="@+id/layoutWarning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_warning_border"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvChangeKeySubtitle">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="10dp"
+            android:src="@android:drawable/stat_notify_error"
+            app:tint="#FCA5A5" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="Si la olvidas, NO se podrá recuperar bajo ningún motivo."
+            android:textColor="#FCA5A5"
+            android:textSize="11.5sp" />
+    </LinearLayout>
+
+    <!-- Campo: contraseña actual -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardCurrentPassword"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="16dp"
+        app:cardBackgroundColor="#1B1D22"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#2C303B"
+        app:strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutWarning">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="16dp">
+
+            <EditText
+                android:id="@+id/etCurrentPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/ivToggleCurrentPassword"
+                android:autofillHints="password"
+                android:background="@null"
+                android:fontFamily="sans-serif-medium"
+                android:hint="Contraseña actual"
+                android:inputType="textPassword"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#7A7A7A"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/ivToggleCurrentPassword"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="Mostrar contraseña"
+                android:src="@drawable/ojo" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Campo: nueva clave maestra -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardNewPassword"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="12dp"
+        app:cardBackgroundColor="#1B1D22"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#2C303B"
+        app:strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardCurrentPassword">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="16dp">
+
+            <EditText
+                android:id="@+id/etNewPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/ivToggleNewPassword"
+                android:autofillHints="password"
+                android:background="@null"
+                android:fontFamily="sans-serif-medium"
+                android:hint="Nueva clave maestra"
+                android:inputType="textPassword"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#7A7A7A"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/ivToggleNewPassword"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="Mostrar contraseña"
+                android:src="@drawable/ojo" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Campo: confirmación -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardConfirmPassword"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="12dp"
+        app:cardBackgroundColor="#1B1D22"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#2C303B"
+        app:strokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardNewPassword">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="16dp">
+
+            <EditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/ivToggleConfirmPassword"
+                android:autofillHints="password"
+                android:background="@null"
+                android:fontFamily="sans-serif-medium"
+                android:hint="Confirmacion nueva clave maestra"
+                android:inputType="textPassword"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#7A7A7A"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/ivToggleConfirmPassword"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="Mostrar contraseña"
+                android:src="@drawable/ojo" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Barra de fortaleza -->
+    <LinearLayout
+        android:id="@+id/layoutStrengthBars"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardConfirmPassword">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="3.5dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@color/green_accent" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="3.5dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@color/green_accent" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="3.5dp"
+            android:layout_weight="1"
+            android:background="#3A3F4B" />
+    </LinearLayout>
+
+    <!-- Botón -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnSaveNewKey"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/bg_primary_button"
+        android:fontFamily="@font/inter_bold"
+        android:text="Guardar nueva clave"
+        android:textAllCaps="false"
+        android:textColor="@color/bg_main"
+        android:textSize="14sp"
+        app:backgroundTint="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutStrengthBars" />
+
+    <!-- Texto inferior -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Todas tus contraseñas guardadas se volverán a cifrar\ncon la nueva clave."
+        android:textAlignment="center"
+        android:textColor="@color/text_muted"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnSaveNewKey" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
