@@ -24,16 +24,16 @@
         android:fontFamily="@font/inter_bold"
         android:text="Categoría"
         android:textColor="@color/text_primary"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <!-- Barra de búsqueda (fija) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardSearch"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="40dp"
         android:layout_marginTop="14dp"
         app:cardBackgroundColor="#1B1D22"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
         app:strokeColor="#2C303B"
         app:strokeWidth="1dp">
@@ -46,8 +46,8 @@
             android:paddingHorizontal="16dp">
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:src="@drawable/lupa"
                 app:tint="#6B7280" />
 
@@ -63,7 +63,7 @@
                 android:inputType="text"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#6B7280"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -87,7 +87,7 @@
                 android:fontFamily="@font/inter_bold"
                 android:text="FRECUENTES"
                 android:textColor="@color/cat_section"
-                android:textSize="10sp" />
+                android:textSize="9sp" />
 
             <LinearLayout
                 android:id="@+id/rowOther"
@@ -100,17 +100,16 @@
                 android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:cardBackgroundColor="@color/cat_other_bg"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
-
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cat_lupa" />
                 </com.google.android.material.card.MaterialCardView>
@@ -118,11 +117,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/inter_bold"
                     android:text="Otras Claves"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- CUENTAS PERSONALES -->
@@ -133,7 +132,7 @@
                 android:fontFamily="@font/inter_bold"
                 android:text="CUENTAS PERSONALES"
                 android:textColor="@color/cat_section"
-                android:textSize="10sp" />
+                android:textSize="9sp" />
 
             <LinearLayout
                 android:id="@+id/rowSocial"
@@ -145,16 +144,16 @@
                 android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:cardBackgroundColor="@color/cat_social_bg"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cat_social" />
                 </com.google.android.material.card.MaterialCardView>
@@ -162,11 +161,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/inter_bold"
                     android:text="Redes Sociales"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -179,16 +178,16 @@
                 android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:cardBackgroundColor="@color/cat_mail_bg"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cat_mail" />
                 </com.google.android.material.card.MaterialCardView>
@@ -196,11 +195,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/inter_bold"
                     android:text="Correos"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -213,16 +212,16 @@
                 android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:cardBackgroundColor="@color/cat_games_bg"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cat_games" />
                 </com.google.android.material.card.MaterialCardView>
@@ -230,11 +229,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/inter_bold"
                     android:text="Videojuegos"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- FINANZAS Y SERVICIOS -->
@@ -245,7 +244,7 @@
                 android:fontFamily="@font/inter_bold"
                 android:text="FINANZAS Y SERVICIOS"
                 android:textColor="@color/cat_section"
-                android:textSize="10sp" />
+                android:textSize="9sp" />
 
             <LinearLayout
                 android:id="@+id/rowBank"
@@ -257,16 +256,16 @@
                 android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:cardBackgroundColor="@color/cat_bank_bg"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cat_bank" />
                 </com.google.android.material.card.MaterialCardView>
@@ -274,11 +273,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/inter_bold"
                     android:text="Bancos"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -291,16 +290,16 @@
                 android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:cardBackgroundColor="@color/cat_shop_bg"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cat_shop" />
                 </com.google.android.material.card.MaterialCardView>
@@ -308,11 +307,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/inter_bold"
                     android:text="Compras"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- TRABAJO Y EDUCACIÓN -->
@@ -323,7 +322,7 @@
                 android:fontFamily="@font/inter_bold"
                 android:text="TRABAJO Y EDUCACIÓN"
                 android:textColor="@color/cat_section"
-                android:textSize="10sp" />
+                android:textSize="9sp" />
 
             <LinearLayout
                 android:id="@+id/rowEdu"
@@ -335,16 +334,16 @@
                 android:padding="4dp">
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:cardBackgroundColor="@color/cat_edu_bg"
-                    app:cardCornerRadius="12dp"
+                    app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cat_edu" />
                 </com.google.android.material.card.MaterialCardView>
@@ -352,11 +351,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/inter_bold"
                     android:text="Educación"
                     android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
