@@ -17,9 +17,12 @@ class GuestModeActivity : AppCompatActivity() {
             finish()
         }
 
-        // 2. Botón: Entiendo, continuar sin cuenta
+        // 2. Botón: Entiendo, continuar sin cuenta (entra directo a la bóveda)
         val btnContinueGuest = findViewById<AppCompatButton>(R.id.btnContinueGuest)
         btnContinueGuest.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
             finish()
         }
 

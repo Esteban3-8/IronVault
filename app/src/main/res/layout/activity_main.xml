@@ -321,9 +321,12 @@
 
         <!-- Ítem Inactivo: Llave -->
         <LinearLayout
+            android:id="@+id/btnNavKey"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal">
 
