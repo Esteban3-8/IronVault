@@ -45,12 +45,32 @@
 
         <activity android:name=".ForgotPasswordActivity"
             android:exported="false"/>
+
         <activity
             android:name=".MasterPasswordActivity"
             android:exported="false" />
+
         <activity
             android:name=".UnlockVaultActivity"
             android:exported="false" />
+
+        <!-- Actividad de Detalle añadida correctamente -->
+        <activity
+            android:name=".CredentialDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".EditCredentialActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".NuevaCredencialActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".PasswordGeneratorActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

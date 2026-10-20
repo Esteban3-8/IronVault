@@ -18,7 +18,7 @@ class UnlockVaultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unlock_vault)
 
-        // Referencias de UI actualizadas a tus IDs y tipos del XML
+        // Referencias de UI
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         val etMasterPassword = findViewById<EditText>(R.id.etMasterPassword)
         val ivToggleMasterPassword = findViewById<ImageView>(R.id.ivToggleMasterPassword)
@@ -50,13 +50,14 @@ class UnlockVaultActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // TODO: Aquí validas la contraseña con tu base de datos local (Room / SQLite) o SharedPreferences
             Toast.makeText(this, "¡Bóveda desbloqueada con éxito!", Toast.LENGTH_SHORT).show()
 
-            // Ejemplo para pasar a tu pantalla principal (Dashboard / Home):
-            // val intent = Intent(this, MainActivity::class.java)
-            // startActivity(intent)
-            // finish()
+            // Navegar a la pantalla principal (Home / MainActivity)
+            val intent = Intent(this, MainActivity::class.java)
+            // Agregamos los flags para limpiar la pila de actividades
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
         }
     }
 }

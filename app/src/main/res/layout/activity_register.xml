@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:fontFamily="@font/inter_bold"
+            android:fontFamily="sans-serif-medium"
             android:text="Crea tu cuenta"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
@@ -49,8 +49,6 @@
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
         <!-- Campo: Nombre completo -->
-
-        <!-- Campo: Correo + Botón Verificar -->
         <EditText
             android:id="@+id/etFullName"
             android:layout_width="match_parent"
@@ -63,9 +61,9 @@
             android:textColor="#FFFFFF"
             android:textColorHint="#6B7280"
             android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-            tools:layout_editor_absoluteX="24dp" />
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
 
+        <!-- Campo: Correo + Botón Verificar -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutEmailContainer"
             android:layout_width="match_parent"
@@ -88,16 +86,17 @@
                 app:layout_constraintEnd_toStartOf="@id/btnVerify"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <!-- Botón Verificar con borde naranja exacto -->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnVerify"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:background="@drawable/bg_secondary_button"
-                android:fontFamily="@font/inter_bold"
+                android:background="@drawable/bg_button_orange_border"
+                android:fontFamily="sans-serif-medium"
                 android:paddingHorizontal="16dp"
                 android:text="Verificar"
                 android:textAllCaps="false"
-                android:textColor="#EE823B"
+                android:textColor="#E08A3C"
                 android:textSize="12sp"
                 app:backgroundTint="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -129,6 +128,7 @@
                 android:textColor="#8FC954"
                 android:textSize="12sp" />
         </LinearLayout>
+
         <!-- Campo: Contraseña -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutPasswordContainer"
@@ -198,7 +198,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:fontFamily="@font/inter_bold"
+            android:fontFamily="sans-serif-medium"
             android:text="Media - Añade un símbolo"
             android:textColor="#8FC954"
             android:textSize="11sp"
@@ -230,14 +230,14 @@
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/etConfirmPassword">
 
-
             <CheckBox
                 android:id="@+id/cbTerms"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:button="@drawable/custom_checkbox"
-                app:buttonTint="#EE823B"
+                app:buttonTint="#E08A3C"
                 app:useMaterialThemeColors="false" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -249,9 +249,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_bold"
+                android:fontFamily="sans-serif-medium"
                 android:text="Términos"
-                android:textColor="#EE823B"
+                android:textColor="#E08A3C"
                 android:textSize="13sp" />
 
             <TextView
@@ -264,9 +264,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_bold"
+                android:fontFamily="sans-serif-medium"
                 android:text="Política de Privacidad"
-                android:textColor="#EE823B"
+                android:textColor="#E08A3C"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -277,7 +277,7 @@
             android:layout_height="56dp"
             android:layout_marginTop="24dp"
             android:background="@drawable/bg_primary_button"
-            android:fontFamily="@font/inter_bold"
+            android:fontFamily="sans-serif-medium"
             android:text="Crear cuenta"
             android:textAllCaps="false"
             android:textColor="#14151A"
