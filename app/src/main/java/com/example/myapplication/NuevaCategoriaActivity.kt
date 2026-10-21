@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Color
 import com.google.android.material.bottomsheet.BottomSheetDialog
-
+import android.widget.TextView
 
 class NuevaCategoriaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +33,30 @@ class NuevaCategoriaActivity : AppCompatActivity() {
             dialog.setContentView(view)
             (view.parent as View).setBackgroundColor(Color.TRANSPARENT)
             view.findViewById<View>(R.id.btnApply).setOnClickListener { dialog.dismiss() }
+            val colors = view.findViewById<View>(R.id.containerColors)
+            val icons = view.findViewById<View>(R.id.containerIcons)
+            val tvColor = view.findViewById<TextView>(R.id.tvTabColor)
+            val tvIcon = view.findViewById<TextView>(R.id.tvTabIcon)
+            val lineColor = view.findViewById<View>(R.id.lineColor)
+            val lineIcon = view.findViewById<View>(R.id.lineIcon)
+
+            fun mostrarColor(esColor: Boolean) {
+                colors.visibility = if (esColor) View.VISIBLE else View.GONE
+                icons.visibility = if (esColor) View.GONE else View.VISIBLE
+                val on = getColor(R.color.orange_primary)
+                val off = getColor(R.color.text_muted)
+                val lineOff = getColor(R.color.border_color)
+                tvColor.setTextColor(if (esColor) on else off)
+                tvIcon.setTextColor(if (esColor) off else on)
+                lineColor.setBackgroundColor(if (esColor) on else lineOff)
+                lineIcon.setBackgroundColor(if (esColor) lineOff else on)
+                lineColor.layoutParams.height = if (esColor) 6 else 3
+                lineIcon.layoutParams.height = if (esColor) 3 else 6
+                lineColor.requestLayout(); lineIcon.requestLayout()
+            }
+
+            view.findViewById<View>(R.id.tabColor).setOnClickListener { mostrarColor(true) }
+            view.findViewById<View>(R.id.tabIcon).setOnClickListener { mostrarColor(false) }
             dialog.show()
         }
     }

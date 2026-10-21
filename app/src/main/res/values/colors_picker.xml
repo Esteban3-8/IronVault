@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pick_red">#F44336</color>
+    <color name="pick_orange">#FF7A00</color>
+    <color name="pick_amber">#EAB308</color>
+    <color name="pick_yellow">#FACC15</color>
+    <color name="pick_lime">#84CC16</color>
+    <color name="pick_green">#10B981</color>
+
+    <color name="pick_emerald">#10B981</color>
+    <color name="pick_cyan">#06B6D4</color>
+    <color name="pick_sky">#0EA5E9</color>
+    <color name="pick_blue">#3B82F6</color>
+    <color name="pick_indigo">#6366F1</color>
+    <color name="pick_violet">#8B5CF6</color>
+
+    <color name="pick_purple">#A855F7</color>
+    <color name="pick_fuchsia">#D946EF</color>
+    <color name="pick_pink">#EC4899</color>
+    <color name="pick_rose">#F43F5E</color>
+    <color name="pick_slate">#64748B</color>
+    <color name="pick_dark">#334155</color>
+
+    <style name="ColorDot">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/bg_color_dot</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>
