@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    android:background="@drawable/bg_icon_panel"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <!-- Vista previa del ícono -->
+    <FrameLayout
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_icon_selector">
+
+        <ImageView
+            android:id="@+id/ivPreview"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:contentDescription="Vista previa"
+            android:src="@drawable/ic_pick_lock"
+            app:tint="@color/orange_primary" />
+    </FrameLayout>
+
+    <!-- Tabs -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/tabColor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="Color"
+                android:textColor="@color/text_muted"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/border_color" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabIcon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="Ícono"
+                android:textColor="@color/orange_primary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/orange_primary" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Cuadrícula de íconos -->
+    <GridLayout
+        android:id="@+id/gridIcons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:columnCount="5">
+
+        <!-- Fila 1 -->
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_share" android:contentDescription="Compartir" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_work" android:contentDescription="Trabajo" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_desktop" android:contentDescription="Escritorio" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_card" android:contentDescription="Tarjeta" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_mail" android:contentDescription="Correo" />
+
+        <!-- Fila 2 -->
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_savings" android:contentDescription="Ahorros" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_games" android:contentDescription="Juegos" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_block" android:contentDescription="Bloqueo" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_public" android:contentDescription="Web" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_school" android:contentDescription="Educación" />
+
+        <!-- Fila 3 -->
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_home" android:contentDescription="Casa" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_cloud" android:contentDescription="Nube" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_server" android:contentDescription="Servidor" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_bitcoin" android:contentDescription="Cripto" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_wifi" android:contentDescription="WiFi" />
+
+        <!-- Fila 4 -->
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_phone" android:contentDescription="Teléfono" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_laptop" android:contentDescription="Portátil" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_key" android:contentDescription="Llave" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_lock" android:contentDescription="Candado" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_chat" android:contentDescription="Chat" />
+
+        <!-- Fila 5 -->
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_file" android:contentDescription="Archivo" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_folder" android:contentDescription="Carpeta" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_code" android:contentDescription="Código" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_database" android:contentDescription="Base de datos" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_music" android:contentDescription="Música" />
+
+        <!-- Fila 6 -->
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_person" android:contentDescription="Persona" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_group" android:contentDescription="Grupo" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_pentagon" android:contentDescription="Forma" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_sun" android:contentDescription="Sol" />
+        <ImageView style="@style/PickIcon" android:layout_width="0dp" android:layout_height="48dp" android:layout_columnWeight="1" android:src="@drawable/ic_pick_apps" android:contentDescription="Apps" />
+    </GridLayout>
+
+    <!-- Aplicar -->
+    <TextView
+        android:id="@+id/btnApply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="24dp"
+        android:padding="8dp"
+        android:text="Aplicar"
+        android:textColor="@color/orange_primary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -5,6 +5,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
+import com.google.android.material.bottomsheet.BottomSheetDialog
+
 
 class NuevaCategoriaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,6 +25,15 @@ class NuevaCategoriaActivity : AppCompatActivity() {
             arrow.setImageResource(
                 if (abierto) R.drawable.ic_chevron_down else R.drawable.ic_chevron_up
             )
+        }
+
+        findViewById<View>(R.id.btnIcon).setOnClickListener {
+            val dialog = BottomSheetDialog(this)
+            val view = layoutInflater.inflate(R.layout.dialog_icon_category, null)
+            dialog.setContentView(view)
+            (view.parent as View).setBackgroundColor(Color.TRANSPARENT)
+            view.findViewById<View>(R.id.btnApply).setOnClickListener { dialog.dismiss() }
+            dialog.show()
         }
     }
 }
