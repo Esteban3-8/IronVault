@@ -65,7 +65,7 @@
         <!-- Actividades agregadas por tu equipo -->
         <activity
             android:name=".SecurityActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".ChangeMasterKeyActivity"
             android:exported="false"
@@ -80,7 +80,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".VaultSecurityActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".PrincipalPasswordActivity"

@@ -69,9 +69,10 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // ── Seguridad y bóveda ────────────────────────────────────
-        // Navega a SecurityActivity (ya tiene lógica implementada).
+        // Navega a VaultSecurityActivity: contraseña principal,
+        // biometría, exportar y borrado de datos.
         findViewById<MaterialCardView>(R.id.cardSecurity).setOnClickListener {
-            startActivity(Intent(this, SecurityActivity::class.java))
+            startActivity(Intent(this, VaultSecurityActivity::class.java))
         }
 
         // ── Categorías ────────────────────────────────────────────
