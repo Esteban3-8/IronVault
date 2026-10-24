@@ -72,7 +72,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".AccessHistoryActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"
@@ -80,7 +80,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".VaultSecurityActivity"
-            android:exported="false"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".PrincipalPasswordActivity"

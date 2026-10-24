@@ -47,12 +47,13 @@
                 android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/tvBiometricCountdown"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:text="Coloca tu dedo en el sensor\npara desbloquear IronVault"
+                android:text="Este diálogo se cerrará en 5 segundos"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp" />
 
