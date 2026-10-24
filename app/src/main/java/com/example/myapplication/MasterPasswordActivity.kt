@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -77,6 +78,13 @@ class MasterPasswordActivity : AppCompatActivity() {
             }
 
             Toast.makeText(this, "¡Bóveda creada con éxito!", Toast.LENGTH_SHORT).show()
+
+            // NAVEGACIÓN A LA HOME (MainActivity)
+            val intent = Intent(this, MainActivity::class.java)
+            // Limpia la pila para que no pueda volver atrás con el botón físico de Android
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
         }
     }
 

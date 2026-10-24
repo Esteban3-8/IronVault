@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="40dp"
         android:orientation="vertical">
 
         <!-- Barra superior -->
@@ -73,6 +74,7 @@
             android:textSize="12sp" />
 
         <EditText
+            android:id="@+id/etService"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
@@ -95,6 +97,7 @@
             android:textSize="12sp" />
 
         <EditText
+            android:id="@+id/etUser"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
@@ -122,19 +125,23 @@
             android:layout_marginBottom="6dp"
             android:background="@drawable/bg_card_password_clean">
 
+            <!-- Iconos de la derecha -->
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="11dp"
+                android:layout_marginBottom="0dp"
                 android:layout_toStartOf="@id/layoutIcons"
                 android:background="@null"
                 android:fontFamily="sans-serif"
+                android:inputType="textPassword"
                 android:paddingHorizontal="16dp"
                 android:text="P@ssw0rd123!"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp" />
 
-            <!-- Iconos de la derecha -->
             <LinearLayout
                 android:id="@+id/layoutIcons"
                 android:layout_width="wrap_content"
@@ -145,6 +152,7 @@
                 android:paddingEnd="12dp">
 
                 <ImageView
+                    android:id="@+id/btnTogglePassword"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="16dp"
@@ -152,6 +160,7 @@
                     app:tint="#9CA3AF" />
 
                 <ImageView
+                    android:id="@+id/btnGeneratePassword"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/llave"
@@ -200,6 +209,7 @@
             android:textSize="12sp" />
 
         <EditText
+            android:id="@+id/etUrl"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
@@ -222,6 +232,7 @@
             android:textSize="12sp" />
 
         <RelativeLayout
+            android:id="@+id/btnSelectCategory"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
@@ -236,11 +247,12 @@
                 android:src="@drawable/categoria" />
 
             <TextView
+                android:id="@+id/tvCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toEndOf="@id/ivCatIcon"
                 android:layout_marginStart="12dp"
+                android:layout_toEndOf="@id/ivCatIcon"
                 android:fontFamily="sans-serif"
                 android:text="Seleccionar categoría"
                 android:textColor="#9CA3AF"
@@ -265,6 +277,7 @@
             android:textSize="12sp" />
 
         <EditText
+            android:id="@+id/etNotes"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_marginBottom="24dp"
