@@ -56,7 +56,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".AccessHistoryActivity"
-            android:exported="false"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"
