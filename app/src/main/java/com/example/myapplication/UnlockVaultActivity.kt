@@ -6,6 +6,7 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
@@ -18,30 +19,55 @@ class UnlockVaultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unlock_vault)
 
-        // Referencias de UI
-        val btnBack = findViewById<ImageView>(R.id.btnBack)
-        val etMasterPassword = findViewById<EditText>(R.id.etMasterPassword)
-        val ivToggleMasterPassword = findViewById<ImageView>(R.id.ivToggleMasterPassword)
-        val btnUnlockVault = findViewById<MaterialCardView>(R.id.btnUnlockVault)
+        // ── Leer el motivo de bloqueo ─────────────────────────────
+        // CONCEPTO: Intent Extras
+        // La pantalla anterior nos pasó un dato con putExtra("lock_reason", motivo).
+        // Lo leemos aquí con getStringExtra("lock_reason").
+        // Si no viene ningún extra (acceso normal), devuelve null.
+        val lockReason = intent.getStringExtra("lock_reason")
 
-        // 1. Botón para regresar
-        btnBack.setOnClickListener {
-            finish()
+        // Según el motivo, mostramos un mensaje distinto en el subtítulo
+        // y un Toast al abrir para notificar al usuario qué pasó.
+        val tvSubtitle = findViewById<TextView>(R.id.tvSubtitle)
+
+        when (lockReason) {
+            "manual" -> {
+                // El usuario tocó "Bloquear bóveda ahora"
+                tvSubtitle.text = "La bóveda ha sido bloqueada.\nIngresa tu clave maestra para continuar."
+                Toast.makeText(this, "🔒 Bóveda bloqueada", Toast.LENGTH_SHORT).show()
+            }
+            "auto" -> {
+                // El tiempo de inactividad se agotó
+                tvSubtitle.text = "La bóveda se bloqueó automáticamente por inactividad.\nIngresa tu clave maestra para continuar."
+                Toast.makeText(this, "🔒 Bóveda bloqueada por inactividad", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                // Acceso normal sin bloqueo previo
+                tvSubtitle.text = "Ya iniciaste sesión. Ahora ingresa la llave que protege tu bóveda."
+            }
         }
 
-        // 2. Mostrar u Ocultar la contraseña maestra con el icono del ojo
+        // Referencias de UI
+        val btnBack                = findViewById<ImageView>(R.id.btnBack)
+        val etMasterPassword       = findViewById<EditText>(R.id.etMasterPassword)
+        val ivToggleMasterPassword = findViewById<ImageView>(R.id.ivToggleMasterPassword)
+        val btnUnlockVault         = findViewById<MaterialCardView>(R.id.btnUnlockVault)
+
+        // Botón atrás
+        btnBack.setOnClickListener { finish() }
+
+        // Mostrar / ocultar contraseña
         ivToggleMasterPassword.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
             val selection = etMasterPassword.selectionStart
-            if (isPasswordVisible) {
-                etMasterPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
-            } else {
-                etMasterPassword.transformationMethod = PasswordTransformationMethod.getInstance()
-            }
+            etMasterPassword.transformationMethod = if (isPasswordVisible)
+                HideReturnsTransformationMethod.getInstance()
+            else
+                PasswordTransformationMethod.getInstance()
             etMasterPassword.setSelection(selection)
         }
 
-        // 3. Botón para desbloquear / iniciar la bóveda
+        // Desbloquear bóveda
         btnUnlockVault.setOnClickListener {
             val password = etMasterPassword.text.toString().trim()
 
@@ -52,9 +78,7 @@ class UnlockVaultActivity : AppCompatActivity() {
 
             Toast.makeText(this, "¡Bóveda desbloqueada con éxito!", Toast.LENGTH_SHORT).show()
 
-            // Navegar a la pantalla principal (Home / MainActivity)
             val intent = Intent(this, MainActivity::class.java)
-            // Agregamos los flags para limpiar la pila de actividades
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
