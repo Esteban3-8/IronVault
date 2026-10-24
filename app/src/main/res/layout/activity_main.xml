@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#14151A">
+    android:background="#14151A"
+    tools:context=".MainActivity">
 
     <!-- ScrollView para el contenido principal -->
     <ScrollView
@@ -244,8 +246,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvPasswordsHeader" />
 
-            <!-- RecyclerView para listar las contraseñas debajo de la imagen -->
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
@@ -306,9 +306,12 @@
 
         <!-- Ítem Inactivo: Candado -->
         <LinearLayout
+            android:id="@+id/btnNavLock"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -339,9 +342,12 @@
 
         <!-- Ítem Inactivo: Ajustes -->
         <LinearLayout
+            android:id="@+id/btnNavSettings"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal">
 

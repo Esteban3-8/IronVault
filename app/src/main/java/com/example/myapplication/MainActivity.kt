@@ -27,18 +27,37 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // 3. Clic en el perfil (Círculo L)
+        // 3. Clic en el perfil (Círculo L) -> Lleva a Detalle o Perfil
         val cardProfile = findViewById<MaterialCardView>(R.id.cardProfile)
         cardProfile?.setOnClickListener {
             val intent = Intent(this, CredentialDetailActivity::class.java)
             startActivity(intent)
         }
 
-        // 4. Clic en la LLAVE de la barra inferior -> Abre Generador de contraseñas
+        // ─────────────────────────────────────────────────────────────
+        // 4. BARRA DE NAVEGACIÓN INFERIOR
+        // ─────────────────────────────────────────────────────────────
+
+        // Clic en el CANDADO -> Abre la pantalla de Seguridad (SecurityActivity)
+        val btnNavLock = findViewById<LinearLayout>(R.id.btnNavLock)
+        btnNavLock?.setOnClickListener {
+            val intent = Intent(this, SecurityActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Clic en la LLAVE -> Abre el Generador de contraseñas (PasswordGeneratorActivity)
         val btnNavKey = findViewById<LinearLayout>(R.id.btnNavKey)
         btnNavKey?.setOnClickListener {
             val intent = Intent(this, PasswordGeneratorActivity::class.java)
             startActivity(intent)
         }
+
+        // Clic en el ENGRANAJE/CONFIGURACIÓN -> Abre la pantalla de Ajustes (SettingsActivity)
+        val btnNavSettings = findViewById<LinearLayout>(R.id.btnNavSettings)
+        btnNavSettings?.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 }
