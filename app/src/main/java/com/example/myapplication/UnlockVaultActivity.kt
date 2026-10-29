@@ -48,22 +48,25 @@ class UnlockVaultActivity : AppCompatActivity() {
         }
 
         // Referencias de UI
-        val btnBack                = findViewById<ImageView>(R.id.btnBack)
-        val etMasterPassword       = findViewById<EditText>(R.id.etMasterPassword)
+        val btnBack                  = findViewById<ImageView>(R.id.btnBack)
+        val etMasterPassword         = findViewById<EditText>(R.id.etMasterPassword)
         val ivToggleMasterPassword = findViewById<ImageView>(R.id.ivToggleMasterPassword)
-        val btnUnlockVault         = findViewById<MaterialCardView>(R.id.btnUnlockVault)
+        val btnUnlockVault           = findViewById<MaterialCardView>(R.id.btnUnlockVault)
 
         // Botón atrás
         btnBack.setOnClickListener { finish() }
 
-        // Mostrar / ocultar contraseña
+        // Mostrar / ocultar contraseña y cambiar icono del ojo
         ivToggleMasterPassword.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
             val selection = etMasterPassword.selectionStart
-            etMasterPassword.transformationMethod = if (isPasswordVisible)
-                HideReturnsTransformationMethod.getInstance()
-            else
-                PasswordTransformationMethod.getInstance()
+            if (isPasswordVisible) {
+                etMasterPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                ivToggleMasterPassword.setImageResource(R.drawable.ojo)
+            } else {
+                etMasterPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                ivToggleMasterPassword.setImageResource(R.drawable.ojo_cerrado)
+            }
             etMasterPassword.setSelection(selection)
         }
 

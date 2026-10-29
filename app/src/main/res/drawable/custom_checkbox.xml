@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Estado Seleccionado / Marcado -->
+
+    <!-- Estado Seleccionado / Marcado: Fondo naranja con esquinas redondeadas + Chulo blanco -->
     <item android:state_checked="true">
-        <shape android:shape="rectangle">
-            <solid android:color="#E08A3C" />
-            <corners android:radius="6dp" />
-            <size android:width="20dp" android:height="20dp" />
-        </shape>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#E08A3C" />
+                    <!-- ¡Aquí faltaban las esquinas redondeadas para el estado marcado! -->
+                    <corners android:radius="6dp" />
+                    <size android:width="20dp" android:height="20dp" />
+                </shape>
+            </item>
+            <item android:gravity="center" android:drawable="@drawable/ic_check" />
+        </layer-list>
     </item>
 
-    <!-- Estado Reposo / Desmarcado (Borde en color naranja) -->
+    <!-- Estado Reposo / Desmarcado: Solo el borde naranja con esquinas redondeadas -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@android:color/transparent" />

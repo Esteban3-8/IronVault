@@ -1,23 +1,33 @@
 package com.example.myapplication
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MasterPasswordActivity : AppCompatActivity() {
 
-    // Variables para controlar el estado de visibilidad de las contraseñas
     private var isNewPasswordVisible = false
     private var isConfirmPasswordVisible = false
+
+    private lateinit var bar1: View
+    private lateinit var bar2: View
+    private lateinit var bar3: View
+    private lateinit var tvStrengthHint: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,37 +40,68 @@ class MasterPasswordActivity : AppCompatActivity() {
         val etConfirmPassword = findViewById<EditText>(R.id.etConfirmPassword)
         val ivToggleConfirmPassword = findViewById<ImageView>(R.id.ivToggleConfirmPassword)
         val btnCreateVault = findViewById<MaterialCardView>(R.id.btnCreateVault)
+        tvStrengthHint = findViewById(R.id.tvStrengthHint)
 
-        // 1. Botón Volver / Atrás (Cierra esta pantalla y regresa a RegisterActivity)
+        // Referencias de las barras de seguridad del contenedor XML
+        val layoutStrengthBars = findViewById<LinearLayout>(R.id.layoutStrengthBars)
+        bar1 = layoutStrengthBars.getChildAt(0)
+        bar2 = layoutStrengthBars.getChildAt(1)
+        bar3 = layoutStrengthBars.getChildAt(2)
+
+        // Estado inicial de las barras y textos
+        resetearBarrasSeguridad()
+
+        // 1. Botón Volver
         btnBack.setOnClickListener {
             finish()
         }
 
-        // 2. Lógica para mostrar/ocultar "Nueva contraseña"
+        // 2. Mostrar/Ocultar contraseña nueva
         ivToggleNewPassword.setOnClickListener {
             isNewPasswordVisible = !isNewPasswordVisible
-            togglePasswordVisibility(etNewPassword, ivToggleNewPassword, isNewPasswordVisible)
+            val selection = etNewPassword.selectionStart
+            if (isNewPasswordVisible) {
+                etNewPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                ivToggleNewPassword.setImageResource(R.drawable.ojo)
+            } else {
+                etNewPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                ivToggleNewPassword.setImageResource(R.drawable.ojo_cerrado)
+            }
+            etNewPassword.setSelection(selection)
         }
 
-        // 3. Lógica para mostrar/ocultar "Confirma contraseña"
+        // 3. Mostrar/Ocultar confirmación
         ivToggleConfirmPassword.setOnClickListener {
             isConfirmPasswordVisible = !isConfirmPasswordVisible
-            togglePasswordVisibility(etConfirmPassword, ivToggleConfirmPassword, isConfirmPasswordVisible)
+            val selection = etConfirmPassword.selectionStart
+            if (isConfirmPasswordVisible) {
+                etConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                ivToggleConfirmPassword.setImageResource(R.drawable.ojo)
+            } else {
+                etConfirmPassword.transformationMethod = PasswordTransformationMethod.getInstance()
+                ivToggleConfirmPassword.setImageResource(R.drawable.ojo_cerrado)
+            }
+            etConfirmPassword.setSelection(selection)
         }
 
-        // 4. Validación de seguridad en tiempo real para las barras indicadoras
+        // 4. Control dinámico de seguridad letra por letra con onTextChanged
         etNewPassword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                updateSecurityBars(s.toString())
+                val pass = s.toString()
+                if (pass.isEmpty()) {
+                    resetearBarrasSeguridad()
+                } else {
+                    evaluarSeguridadContrasena(pass)
+                }
             }
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // 5. Botón Crear Bóveda
+        // 5. Botón Crear Bóveda y guardado en Firestore
         btnCreateVault.setOnClickListener {
-            val password = etNewPassword.text.toString()
-            val confirmPassword = etConfirmPassword.text.toString()
+            val password = etNewPassword.text.toString().trim()
+            val confirmPassword = etConfirmPassword.text.toString().trim()
 
             if (password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Por favor completa ambos campos", Toast.LENGTH_SHORT).show()
@@ -77,67 +118,75 @@ class MasterPasswordActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Toast.makeText(this, "¡Bóveda creada con éxito!", Toast.LENGTH_SHORT).show()
+            // Actualizar el estado de la bóveda en Firestore vinculado al usuario actual
+            val user = Firebase.auth.currentUser
+            if (user != null) {
+                val db = Firebase.firestore
+                val masterData = hashMapOf<String, Any>(
+                    "hasMasterPassword" to true,
+                    "masterPasswordSetupAt" to System.currentTimeMillis()
+                )
 
-            // NAVEGACIÓN A LA HOME (MainActivity)
-            val intent = Intent(this, MainActivity::class.java)
-            // Limpia la pila para que no pueda volver atrás con el botón físico de Android
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+                db.collection("users").document(user.uid)
+                    .update(masterData)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "¡Bóveda creada con éxito!", Toast.LENGTH_SHORT).show()
+
+                        // Pasar a la MainActivity limpiando la pila de actividades
+                        val intent = Intent(this, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al guardar la bóveda: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
-    private fun togglePasswordVisibility(editText: EditText, imageView: ImageView, isVisible: Boolean) {
-        val selection = editText.selectionStart
-        if (isVisible) {
-            editText.transformationMethod = HideReturnsTransformationMethod.getInstance()
-        } else {
-            editText.transformationMethod = PasswordTransformationMethod.getInstance()
-        }
-        editText.setSelection(selection)
+    private fun resetearBarrasSeguridad() {
+        val grisInactivo = Color.parseColor("#3A3F4B")
+        bar1.setBackgroundColor(grisInactivo)
+        bar2.setBackgroundColor(grisInactivo)
+        bar3.setBackgroundColor(grisInactivo)
+        tvStrengthHint.text = "Mínimo 6 caracteres"
+        tvStrengthHint.setTextColor(Color.parseColor("#9CA3AF"))
     }
 
-    private fun updateSecurityBars(password: String) {
-        val container = findViewById<LinearLayout>(R.id.layoutStrengthBars)
-        if (container == null) return
+    private fun evaluarSeguridadContrasena(password: String) {
+        val rojoDebil = Color.parseColor("#EF4444")     // Rojo para contraseñas menores a 6 caracteres
+        val amarilloMedio = Color.parseColor("#F59E0B") // Amarillo para nivel intermedio
+        val verdeFuerte = Color.parseColor("#8FC954")   // Verde original de IronVault
 
-        val bar1 = container.getChildAt(0)
-        val bar2 = container.getChildAt(1)
-        val bar3 = container.getChildAt(2)
-
-        val inactiveColor = android.graphics.Color.parseColor("#3A3F4B")
-        val activeColor = android.graphics.Color.parseColor("#8FC954") // Verde claro
-
-        val length = password.length
-        val hasUpper = password.any { it.isUpperCase() }
-        val hasNumber = password.any { it.isDigit() }
+        resetearBarrasSeguridad()
 
         when {
-            length == 0 -> {
-                bar1?.setBackgroundColor(inactiveColor)
-                bar2?.setBackgroundColor(inactiveColor)
-                bar3?.setBackgroundColor(inactiveColor)
+            password.length < 6 -> {
+                bar1.setBackgroundColor(rojoDebil)
+                tvStrengthHint.text = "Débil - Mínimo 6 caracteres"
+                tvStrengthHint.setTextColor(rojoDebil)
             }
-            length < 6 -> {
-                bar1?.setBackgroundColor(activeColor)
-                bar2?.setBackgroundColor(inactiveColor)
-                bar3?.setBackgroundColor(inactiveColor)
+            password.length >= 6 && !password.any { !it.isLetterOrDigit() } -> {
+                bar1.setBackgroundColor(amarilloMedio)
+                bar2.setBackgroundColor(amarilloMedio)
+                tvStrengthHint.text = "Media - Añade un símbolo"
+                tvStrengthHint.setTextColor(amarilloMedio)
             }
-            length >= 6 && (!hasUpper || !hasNumber) -> {
-                bar1?.setBackgroundColor(activeColor)
-                bar2?.setBackgroundColor(activeColor)
-                bar3?.setBackgroundColor(inactiveColor)
-            }
-            length >= 8 && hasUpper && hasNumber -> {
-                bar1?.setBackgroundColor(activeColor)
-                bar2?.setBackgroundColor(activeColor)
-                bar3?.setBackgroundColor(activeColor)
+            password.length >= 8 && password.any { !it.isLetterOrDigit() } -> {
+                bar1.setBackgroundColor(verdeFuerte)
+                bar2.setBackgroundColor(verdeFuerte)
+                bar3.setBackgroundColor(verdeFuerte)
+                tvStrengthHint.text = "Fuerte"
+                tvStrengthHint.setTextColor(verdeFuerte)
             }
             else -> {
-                bar1?.setBackgroundColor(activeColor)
-                bar2?.setBackgroundColor(activeColor)
-                bar3?.setBackgroundColor(inactiveColor)
+                bar1.setBackgroundColor(amarilloMedio)
+                bar2.setBackgroundColor(amarilloMedio)
+                tvStrengthHint.text = "Media"
+                tvStrengthHint.setTextColor(amarilloMedio)
             }
         }
     }

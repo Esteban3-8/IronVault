@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "342463103326",
+    "project_id": "ironvault-5089a",
+    "storage_bucket": "ironvault-5089a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342463103326:android:d9004ec6d3b1ac5ca28fcf",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0UJsNOtPa1OtyB0pgRgDNQiDGWQ-WS6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
