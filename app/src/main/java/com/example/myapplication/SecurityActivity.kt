@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,22 +23,12 @@ class SecurityActivity : AppCompatActivity() {
     }
 
     // ── Handler para el bloqueo automático ───────────────────────
-    // Handler es una clase de Android que permite ejecutar código
-    // después de un retraso (como un setTimeout en JavaScript).
-    // Looper.getMainLooper() indica que el código se ejecutará en
-    // el hilo principal (el único que puede tocar la interfaz).
     private val autoLockHandler = Handler(Looper.getMainLooper())
 
-    // Runnable es el bloque de código que se ejecutará cuando
-    // el temporizador llegue a 0. Lo guardamos en una variable
-    // para poder cancelarlo con removeCallbacks() si el usuario
-    // regresa a tiempo.
     private val autoLockRunnable = Runnable {
-        // El tiempo se agotó → bloquear la bóveda automáticamente
         bloquearBoveda(motivo = "auto")
     }
 
-    // Controla si el temporizador está activo para no iniciarlo dos veces
     private var autoLockScheduled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,18 +45,6 @@ class SecurityActivity : AppCompatActivity() {
         cargarValoresGuardados()
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  onPause() / onResume() — Ciclo de vida
-    //
-    //  CONCEPTO: Ciclo de vida de una Activity
-    //  onPause()  → se llama cuando la Activity pierde el foco:
-    //               el usuario cambia de app, apaga la pantalla, etc.
-    //               Aquí iniciamos el temporizador de bloqueo.
-    //
-    //  onResume() → se llama cuando la Activity vuelve al frente.
-    //               Si el temporizador no ha llegado a 0, lo cancelamos
-    //               (el usuario regresó a tiempo).
-    // ─────────────────────────────────────────────────────────────
     override fun onPause() {
         super.onPause()
         iniciarTemporizadorBloqueo()
@@ -73,7 +52,6 @@ class SecurityActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Cancelar el temporizador si el usuario regresó antes de que expirara
         if (autoLockScheduled) {
             autoLockHandler.removeCallbacks(autoLockRunnable)
             autoLockScheduled = false
@@ -82,22 +60,12 @@ class SecurityActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Limpiar el handler al destruir la Activity para evitar memory leaks
         autoLockHandler.removeCallbacks(autoLockRunnable)
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  iniciarTemporizadorBloqueo()
-    //  Lee el tiempo configurado en SharedPreferences, lo convierte
-    //  a milisegundos y programa el Runnable de bloqueo.
-    //
-    //  Handler.postDelayed(runnable, milisegundos) → ejecuta el
-    //  runnable después del tiempo indicado en ms.
-    // ─────────────────────────────────────────────────────────────
     private fun iniciarTemporizadorBloqueo() {
         val valorGuardado = prefs.getString("auto_lock", "5 minutos") ?: "5 minutos"
 
-        // Convertimos el texto guardado a milisegundos
         val delayMs = when (valorGuardado) {
             "15 segundos" -> 15_000L
             "30 segundos" -> 30_000L
@@ -105,48 +73,29 @@ class SecurityActivity : AppCompatActivity() {
             "3 minutos"   -> 3 * 60_000L
             "5 minutos"   -> 5 * 60_000L
             "10 minutos"  -> 10 * 60_000L
-            else          -> 5 * 60_000L  // fallback: 5 minutos
+            else          -> 5 * 60_000L
         }
 
-        // Programamos el Runnable para que se ejecute después de "delayMs"
         autoLockHandler.postDelayed(autoLockRunnable, delayMs)
         autoLockScheduled = true
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  bloquearBoveda()
-    //  Navega a UnlockVaultActivity pasando el motivo del bloqueo.
-    //
-    //  CONCEPTO: Intent Extras
-    //  Los extras son datos que puedes adjuntar a un Intent para
-    //  pasarlos a la pantalla destino, como parámetros de función.
-    //  intent.putExtra("clave", valor) → adjunta un dato
-    //  En la pantalla destino: intent.getStringExtra("clave") → lo lee
-    // ─────────────────────────────────────────────────────────────
     private fun bloquearBoveda(motivo: String) {
         val intent = Intent(this, UnlockVaultActivity::class.java)
-
-        // Adjuntamos el motivo del bloqueo para que UnlockVaultActivity
-        // muestre el mensaje adecuado al aparecer
         intent.putExtra("lock_reason", motivo)
-
-        // FLAG_ACTIVITY_NEW_TASK + CLEAR_TASK: limpia toda la pila
-        // de pantallas para que el usuario no pueda volver atrás
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
 
     private fun configurarBotones() {
 
-        findViewById<android.widget.ImageView>(R.id.btnBack).setOnClickListener {
+        // Botón de retroceso (si existiera en el layout)
+        findViewById<android.widget.ImageView?>(R.id.btnBack)?.setOnClickListener {
             finish()
         }
 
         // ── Botón BLOQUEAR BÓVEDA AHORA ──────────────────────────
-        // Pasamos motivo "manual" para que UnlockVaultActivity
-        // muestre "La bóveda ha sido bloqueada"
         findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLockNow).setOnClickListener {
-            // Cancelamos el timer automático (ya no hace falta, vamos a bloquear ya)
             autoLockHandler.removeCallbacks(autoLockRunnable)
             bloquearBoveda(motivo = "manual")
         }
@@ -165,6 +114,30 @@ class SecurityActivity : AppCompatActivity() {
 
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardHistory).setOnClickListener {
             startActivity(Intent(this, AccessHistoryActivity::class.java))
+        }
+
+        // ── BARRA DE NAVEGACIÓN INFERIOR (Menú Píldora) ──────────
+
+        // 1. Ir a Inicio (MainActivity)
+        findViewById<LinearLayout>(R.id.btnNavHome).setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
+
+        // 2. Ir al Generador de Contraseñas / Llaves
+        findViewById<LinearLayout>(R.id.btnNavKey).setOnClickListener {
+            val intent = Intent(this, PasswordGeneratorActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        // 3. Ir a Ajustes
+        findViewById<LinearLayout>(R.id.btnNavSettings).setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 

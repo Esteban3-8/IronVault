@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -14,9 +15,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -40,7 +38,7 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
         val tvSubTitle = view.findViewById<TextView>(R.id.tvSubTitle)
         tvTimer = view.findViewById<TextView>(R.id.tvTimer)
 
-        // 1. Mostrar el correo real del usuario enmascarado arriba
+        // 1. Mostrar el correo recibido por argumentos enmascarado arriba
         mostrarCorreoEnmascarado(tvSubTitle)
 
         // 2. Iniciar la cuenta regresiva en 1 minuto y 30 segundos (90,000 ms)
@@ -53,7 +51,6 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
-        // Referencias a los 6 EditText del diseño XML
         val editTexts = arrayOf(
             view.findViewById<EditText>(R.id.etDigit1),
             view.findViewById<EditText>(R.id.etDigit2),
@@ -106,7 +103,7 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
                     val codigoIngresado = editTexts.joinToString("") { it.text.toString() }
                     if (codigoIngresado.length == 6) {
                         Handler(Looper.getMainLooper()).postDelayed({
-                            validarCodigoOTPConFirestore(codigoIngresado)
+                            validarCodigoOTPLocal(codigoIngresado)
                         }, 400)
                     }
                 }
@@ -115,8 +112,7 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun mostrarCorreoEnmascarado(tvSubTitle: TextView?) {
-        val user = Firebase.auth.currentUser
-        val email = user?.email ?: ""
+        val email = arguments?.getString("arg_email") ?: ""
 
         if (email.contains("@")) {
             val partes = email.split("@")
@@ -153,32 +149,20 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun reenviarNuevoCodigo() {
-        val userId = Firebase.auth.currentUser?.uid ?: return
-        val email = Firebase.auth.currentUser?.email ?: return
+        val sharedPrefs = requireActivity().getSharedPreferences("IronVaultPrefs", Context.MODE_PRIVATE)
+        val email = sharedPrefs.getString("user_email", "") ?: return
 
         val nuevoOtp = (100000..999999).random().toString()
-        val nuevoTiempo = System.currentTimeMillis()
+        sharedPrefs.edit().putString("temp_otp", nuevoOtp).apply()
 
-        val updates = hashMapOf<String, Any>(
-            "otpCode" to nuevoOtp,
-            "otpCreatedAt" to nuevoTiempo
-        )
-
-        Firebase.firestore.collection("users").document(userId)
-            .update(updates)
-            .addOnSuccessListener {
-                enviarCorreoHttp(email, nuevoOtp) { enviado ->
-                    if (enviado) {
-                        Toast.makeText(context, "Nuevo código enviado a tu correo", Toast.LENGTH_SHORT).show()
-                        iniciarCronometro(180000)
-                    } else {
-                        Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show()
-                    }
-                }
+        enviarCorreoHttp(email, nuevoOtp) { enviado ->
+            if (enviado) {
+                Toast.makeText(context, "Nuevo código enviado a tu correo", Toast.LENGTH_SHORT).show()
+                iniciarCronometro(90000)
+            } else {
+                Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show()
             }
-            .addOnFailureListener {
-                Toast.makeText(context, "Error al actualizar código", Toast.LENGTH_SHORT).show()
-            }
+        }
     }
 
     private fun enviarCorreoHttp(email: String, code: String, onResult: (Boolean) -> Unit) {
@@ -194,14 +178,17 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
 
                 val conn = URL(urlStr).openConnection() as HttpURLConnection
                 conn.requestMethod = "GET"
+                conn.instanceFollowRedirects = true
                 conn.connectTimeout = 15000
                 conn.readTimeout = 15000
 
-                val respuesta = conn.inputStream.bufferedReader().readText()
+                val responseCode = conn.responseCode
                 conn.disconnect()
 
+                val exito = responseCode == HttpURLConnection.HTTP_OK
+
                 activity?.runOnUiThread {
-                    onResult(respuesta.trim() == "ok")
+                    onResult(exito)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -212,39 +199,21 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
         }.start()
     }
 
-    private fun validarCodigoOTPConFirestore(codigoIngresado: String) {
-        val userId = Firebase.auth.currentUser?.uid ?: return
-        val db = Firebase.firestore
+    private fun validarCodigoOTPLocal(codigoIngresado: String) {
+        val sharedPrefs = requireActivity().getSharedPreferences("IronVaultPrefs", Context.MODE_PRIVATE)
+        val otpGuardado = sharedPrefs.getString("temp_otp", "")
 
-        db.collection("users").document(userId).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val otpGuardado = document.getString("otpCode")
-                    val otpCreatedAt = document.getLong("otpCreatedAt") ?: 0L
-                    val tiempoActual = System.currentTimeMillis()
-                    val limiteExpiracion = 5 * 60 * 1000 // 5 minutos
+        if (codigoIngresado == otpGuardado) {
+            Toast.makeText(context, "¡Cuenta verificada exitosamente!", Toast.LENGTH_SHORT).show()
 
-                    if (tiempoActual - otpCreatedAt > limiteExpiracion) {
-                        Toast.makeText(context, "El código ha expirado. Solicita uno nuevo.", Toast.LENGTH_LONG).show()
-                        return@addOnSuccessListener
-                    }
+            parentFragmentManager.setFragmentResult("verifyKey", Bundle().apply {
+                putBoolean("emailVerified", true)
+            })
 
-                    if (codigoIngresado == otpGuardado) {
-                        Toast.makeText(context, "¡Cuenta verificada exitosamente!", Toast.LENGTH_SHORT).show()
-
-                        parentFragmentManager.setFragmentResult("verifyKey", Bundle().apply {
-                            putBoolean("emailVerified", true)
-                        })
-
-                        dismiss()
-                    } else {
-                        Toast.makeText(context, "El código ingresado es incorrecto", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Error al verificar código: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+            dismiss()
+        } else {
+            Toast.makeText(context, "El código ingresado es incorrecto", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {

@@ -56,7 +56,7 @@
                     android:textSize="20sp" />
             </LinearLayout>
 
-            <!-- Círculo de Perfil (Letra L) -->
+            <!-- Círculo de Perfil (Inicial dinámica) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardProfile"
                 android:layout_width="42dp"
@@ -69,11 +69,12 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
+                    android:id="@+id/tvUserInitial"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="sans-serif-medium"
-                    android:text="L"
+                    android:text="E"
                     android:textColor="#E8873E"
                     android:textSize="16sp" />
             </com.google.android.material.card.MaterialCardView>
@@ -237,12 +238,39 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/layoutStats" />
 
-            <ImageView
-                android:id="@+id/ivPieza"
+            <TextView
+                android:id="@+id/tvVerTodas"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Ver todas"
+                android:textColor="#C97D3E"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="@id/tvPasswordsHeader"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvPasswordsHeader" />
+
+            <!-- Contenedor dinámico donde se cargarán las tarjetas de contraseñas -->
+            <LinearLayout
+                android:id="@+id/containerCredentials"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:src="@drawable/pieza"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvPasswordsHeader" />
+
+            <!-- Indicador de carga mientras responde Firestore -->
+            <ProgressBar
+                android:id="@+id/progressBarLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:indeterminateTint="#E8873E"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvPasswordsHeader" />
 

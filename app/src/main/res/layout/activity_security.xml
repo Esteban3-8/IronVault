@@ -8,7 +8,6 @@
     android:background="@color/bg_main"
     tools:context=".SecurityActivity">
 
-
     <TextView
         android:id="@+id/tvSecurityTitle"
         android:layout_width="wrap_content"
@@ -105,7 +104,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnLockNow" />
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardChangeKey"
         android:layout_width="0dp"
@@ -127,11 +125,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp"
-            app:cardBackgroundColor="@color/bg_option_card"
-            app:strokeColor="@color/border_option_card"
-            app:strokeWidth="1dp">
-
+            android:padding="16dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="40dp"
@@ -330,7 +324,6 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="24dp"
         app:cardBackgroundColor="@color/bg_option_card"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
@@ -398,7 +391,7 @@
         android:id="@+id/tvLastUnlock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="sans-serif-medium"
         android:text="Última vez desbloqueada: hoy, 7:32 p. m."
         android:textColor="@color/text_muted"
@@ -407,15 +400,91 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardHistory" />
 
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="20dp"
-        android:src="@drawable/flecha"
-        app:layout_constraintBottom_toBottomOf="@id/tvSecurityTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvSecurityTitle" />
+    <!-- Barra de Navegación Inferior Flotante (Estilo Píldora) -->
+    <LinearLayout
+        android:id="@+id/bottomNavContainer"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
+        <!-- Ítem Inactivo: Inicio (Casita) -->
+        <LinearLayout
+            android:id="@+id/btnNavHome"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home"
+                app:tint="#8C909C" />
+        </LinearLayout>
+
+        <!-- Ítem ACTIVO: Candado (Seguridad) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_nav_pill_active"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_lock"
+                app:tint="#E8873E" />
+        </LinearLayout>
+
+        <!-- Ítem Inactivo: Llave -->
+        <LinearLayout
+            android:id="@+id/btnNavKey"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_key"
+                app:tint="#8C909C" />
+        </LinearLayout>
+
+        <!-- Ítem Inactivo: Ajustes -->
+        <LinearLayout
+            android:id="@+id/btnNavSettings"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings"
+                app:tint="#8C909C" />
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

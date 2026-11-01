@@ -6,26 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_main"
-    android:paddingStart="20dp"
-    android:paddingTop="24dp"
-    android:paddingEnd="20dp"
     tools:context=".SettingsActivity">
 
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:contentDescription="Volver"
-        android:src="@drawable/flecha"
-        app:layout_constraintBottom_toBottomOf="@id/tvSettingsTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvSettingsTitle" />
-
+    <!-- Título de Configuración -->
     <TextView
         android:id="@+id/tvSettingsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="@font/inter_bold"
         android:text="Configuración"
         android:textColor="@color/text_primary"
@@ -34,21 +22,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- ScrollView con el contenido deslizable -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="20dp"
         android:scrollbars="none"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSettingsTitle">
 
+        <!-- LinearLayout interno con 200dp de espacio inferior libre -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="20dp">
+            android:paddingBottom="200dp">
 
             <!-- Avatar -->
             <com.google.android.material.card.MaterialCardView
@@ -277,10 +269,8 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_chip_orange"
                         android:fontFamily="@font/inter_bold"
-                        android:paddingStart="12dp"
-                        android:paddingTop="6dp"
-                        android:paddingEnd="12dp"
-                        android:paddingBottom="6dp"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
                         android:text="Español"
                         android:textColor="@color/orange_primary"
                         android:textSize="12sp" />
@@ -444,5 +434,93 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <!-- Barra de Navegación Inferior Flotante -->
+    <LinearLayout
+        android:id="@+id/bottomNavContainer"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!-- Ítem: Inicio (Casita) -->
+        <LinearLayout
+            android:id="@+id/btnNavHome"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home"
+                app:tint="#8C909C" />
+        </LinearLayout>
+
+        <!-- Ítem: Candado (Seguridad) -->
+        <LinearLayout
+            android:id="@+id/btnNavLock"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_lock"
+                app:tint="#8C909C" />
+        </LinearLayout>
+
+        <!-- Ítem: Llave (Generador) -->
+        <LinearLayout
+            android:id="@+id/btnNavKey"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_key"
+                app:tint="#8C909C" />
+        </LinearLayout>
+
+        <!-- Ítem ACTIVO: Ajustes (Rueda dentada con su ID correspondiente btnNavSettings) -->
+        <LinearLayout
+            android:id="@+id/btnNavSettings"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_nav_pill_active"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings"
+                app:tint="#E8873E" />
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

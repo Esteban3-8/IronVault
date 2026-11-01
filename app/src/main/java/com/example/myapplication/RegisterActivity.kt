@@ -38,12 +38,10 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var btnCreateAccount: AppCompatButton
     private lateinit var layoutEmailVerified: View
 
-    // Vistas para los mensajes de error
     private lateinit var tvFullNameError: TextView
     private lateinit var tvEmailError: TextView
     private lateinit var tvConfirmPasswordError: TextView
 
-    // Vistas para las barras de seguridad y el texto de ayuda
     private lateinit var bar1: View
     private lateinit var bar2: View
     private lateinit var bar3: View
@@ -57,7 +55,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        // Inicializar vistas con los IDs del XML
         btnBack = findViewById(R.id.btnBack)
         etFullName = findViewById(R.id.etFullName)
         etEmail = findViewById(R.id.etEmail)
@@ -70,7 +67,6 @@ class RegisterActivity : AppCompatActivity() {
         btnCreateAccount = findViewById(R.id.btnCreateAccount)
         layoutEmailVerified = findViewById(R.id.layoutEmailVerified)
 
-        // TextViews de error
         tvFullNameError = findViewById(R.id.tvFullNameError)
         tvEmailError = findViewById(R.id.tvEmailError)
         tvConfirmPasswordError = findViewById(R.id.tvConfirmPasswordError)
@@ -80,22 +76,16 @@ class RegisterActivity : AppCompatActivity() {
         tvConfirmPasswordError.visibility = View.GONE
         layoutEmailVerified.visibility = View.GONE
 
-        // Referencias de las barras de seguridad
         val layoutPasswordStrength = findViewById<LinearLayout>(R.id.layoutPasswordStrength)
         bar1 = layoutPasswordStrength.getChildAt(0)
         bar2 = layoutPasswordStrength.getChildAt(1)
         bar3 = layoutPasswordStrength.getChildAt(2)
         tvStrengthHint = findViewById(R.id.tvStrengthHint)
 
-        // Botón de retroceso
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
-        // Estado inicial
         resetearBarrasSeguridad()
 
-        // Icono de ojo para la contraseña principal
         ivTogglePassword.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
             if (isPasswordVisible) {
@@ -108,7 +98,6 @@ class RegisterActivity : AppCompatActivity() {
             etPassword.setSelection(etPassword.text.length)
         }
 
-        // Icono de ojo para confirmar contraseña
         ivToggleConfirmPassword.setOnClickListener {
             isConfirmPasswordVisible = !isConfirmPasswordVisible
             if (isConfirmPasswordVisible) {
@@ -121,48 +110,33 @@ class RegisterActivity : AppCompatActivity() {
             etConfirmPassword.setSelection(etConfirmPassword.text.length)
         }
 
-        // Control dinámico LETRA POR LETRA con onTextChanged
         etPassword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val pass = s.toString()
-                if (pass.isEmpty()) {
-                    resetearBarrasSeguridad()
-                } else {
-                    evaluarSeguridadContrasena(pass)
-                }
+                if (pass.isEmpty()) resetearBarrasSeguridad() else evaluarSeguridadContrasena(pass)
             }
-
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Limpiar errores al escribir
         etFullName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (s.toString().isNotEmpty()) tvFullNameError.visibility = View.GONE
-            }
+            override fun afterTextChanged(s: Editable?) { if (s.toString().isNotEmpty()) tvFullNameError.visibility = View.GONE }
         })
 
         etEmail.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (s.toString().isNotEmpty()) tvEmailError.visibility = View.GONE
-            }
+            override fun afterTextChanged(s: Editable?) { if (s.toString().isNotEmpty()) tvEmailError.visibility = View.GONE }
         })
 
         etConfirmPassword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (s.toString().isNotEmpty()) tvConfirmPasswordError.visibility = View.GONE
-            }
+            override fun afterTextChanged(s: Editable?) { if (s.toString().isNotEmpty()) tvConfirmPasswordError.visibility = View.GONE }
         })
 
-        // Botón Verificar Correo
         btnVerify.setOnClickListener {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
@@ -179,10 +153,11 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            registrarUsuarioProvisional(email, password)
+            btnVerify.isEnabled = false
+            Toast.makeText(this, "Enviando código...", Toast.LENGTH_SHORT).show()
+            enviarYGenerarOtpTemporal(email)
         }
 
-        // Resultado del BottomSheet de verificación
         supportFragmentManager.setFragmentResultListener("verifyKey", this) { _, bundle ->
             isEmailVerified = bundle.getBoolean("emailVerified", false)
             if (isEmailVerified) {
@@ -193,7 +168,6 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // Botón Crear Cuenta final
         btnCreateAccount.setOnClickListener {
             val nombre = etFullName.text.toString().trim()
             val email = etEmail.text.toString().trim()
@@ -241,10 +215,7 @@ class RegisterActivity : AppCompatActivity() {
 
             if (hayError) return@setOnClickListener
 
-            val sharedPreferences = getSharedPreferences("IronVaultPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("user_email", email).apply()
-
-            completarRegistroYContinuar(nombre)
+            crearCuentaDefinitivaEnFirebase(nombre, email, password)
         }
     }
 
@@ -258,10 +229,9 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun evaluarSeguridadContrasena(password: String) {
-        val rojoDebil = Color.parseColor("#EF4444")     // Rojo para contraseñas cortas o débiles
-        val amarilloMedio = Color.parseColor("#F59E0B") // Amarillo para nivel medio
-        val verdeFuerte = Color.parseColor("#8FC954")   // Verde original de IronVault
-
+        val rojoDebil = Color.parseColor("#EF4444")
+        val amarilloMedio = Color.parseColor("#F59E0B")
+        val verdeFuerte = Color.parseColor("#8FC954")
         resetearBarrasSeguridad()
 
         when {
@@ -292,44 +262,37 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun registrarUsuarioProvisional(email: String, pass: String) {
-        val auth = Firebase.auth
-        val db = Firebase.firestore
+    private fun enviarYGenerarOtpTemporal(email: String) {
         val otpCode = (100000..999999).random().toString()
-        val createdAt = System.currentTimeMillis()
 
-        auth.createUserWithEmailAndPassword(email, pass)
-            .addOnSuccessListener { result ->
-                val userId = result.user?.uid ?: return@addOnSuccessListener
-                val userData = hashMapOf(
-                    "email" to email,
-                    "otpCode" to otpCode,
-                    "otpCreatedAt" to createdAt,
-                    "verified" to false
-                )
+        val sharedPrefs = getSharedPreferences("IronVaultPrefs", Context.MODE_PRIVATE)
+        sharedPrefs.edit()
+            .putString("temp_otp", otpCode)
+            .putString("user_email", email)
+            .apply()
 
-                db.collection("users").document(userId).set(userData)
-                    .addOnSuccessListener {
-                        enviarCorreoHttp(email, otpCode) { enviado ->
-                            if (enviado) {
-                                Toast.makeText(this, "Código enviado a tu correo", Toast.LENGTH_SHORT).show()
-                                val bottomSheet = VerifyBottomSheet()
-                                bottomSheet.show(supportFragmentManager, "VerifyBottomSheet")
-                            } else {
-                                Toast.makeText(this, "Error al enviar el correo HTTP", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+        enviarCorreoHttp(email, otpCode) { enviado ->
+            if (enviado) {
+                Toast.makeText(this, "Código enviado a tu correo", Toast.LENGTH_SHORT).show()
+
+                val bottomSheet = VerifyBottomSheet().apply {
+                    arguments = Bundle().apply {
+                        putString("arg_email", email)
                     }
+                }
+                bottomSheet.show(supportFragmentManager, "VerifyBottomSheet")
+                btnVerify.isEnabled = true
+            } else {
+                Toast.makeText(this, "Error al enviar el correo. Revisa la URL o conexión.", Toast.LENGTH_LONG).show()
+                btnVerify.isEnabled = true
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        }
     }
 
     private fun enviarCorreoHttp(email: String, code: String, onResult: (Boolean) -> Unit) {
         Thread {
             try {
-                val baseUrl = "https://script.google.com/macros/s/AKfycbzlTcAipY61Fsg5duZgOpL1ofPg98WmMTJEeDJ1WTKXuyAeh3CRXhPCFQd6VDGUJlq0/exec"
+                val baseUrl = "https://script.google.com/macros/s/AKfycbxC_bCo3hVevwd2GkWH0kz_7OCbKYlHhnR049EDMTk4oOr4Z7hERLTbWksRHryT_iG4JQ/exec"
                 val token = "ironvault_secreto_2026"
                 val urlStr = baseUrl + "?email=" + URLEncoder.encode(email, "UTF-8") +
                         "&code=" + URLEncoder.encode(code, "UTF-8") +
@@ -337,11 +300,17 @@ class RegisterActivity : AppCompatActivity() {
 
                 val conn = URL(urlStr).openConnection() as HttpURLConnection
                 conn.requestMethod = "GET"
-                val respuesta = conn.inputStream.bufferedReader().readText()
+                conn.instanceFollowRedirects = true
+                conn.connectTimeout = 20000
+                conn.readTimeout = 20000
+
+                val responseCode = conn.responseCode
                 conn.disconnect()
 
+                val exito = responseCode == HttpURLConnection.HTTP_OK
+
                 runOnUiThread {
-                    onResult(respuesta.trim() == "ok")
+                    onResult(exito)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -352,27 +321,41 @@ class RegisterActivity : AppCompatActivity() {
         }.start()
     }
 
-    private fun completarRegistroYContinuar(fullName: String) {
-        val user = Firebase.auth.currentUser
-        if (user != null) {
-            val db = Firebase.firestore
-            val updates = hashMapOf<String, Any>(
-                "fullName" to fullName,
-                "completedRegistration" to true
-            )
+    private fun crearCuentaDefinitivaEnFirebase(fullName: String, email: String, pass: String) {
+        val auth = Firebase.auth
+        val db = Firebase.firestore
 
-            db.collection("users").document(user.uid)
-                .update(updates)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "¡Cuenta creada correctamente!", Toast.LENGTH_SHORT).show()
+        auth.createUserWithEmailAndPassword(email, pass)
+            .addOnSuccessListener { result ->
+                val userId = result.user?.uid ?: return@addOnSuccessListener
+                val userData = hashMapOf(
+                    "email" to email,
+                    "fullName" to fullName,
+                    "completedRegistration" to true,
+                    "verified" to true
+                )
 
-                    val intent = Intent(this, MasterPasswordActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                db.collection("users").document(userId).set(userData)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "¡Cuenta creada correctamente!", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, MasterPasswordActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al guardar perfil: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener { e ->
+                val exceptionMessage = e.message ?: ""
+
+                val mensajePersonalizado = if (exceptionMessage.contains("already in use", ignoreCase = true)) {
+                    "Este correo ya está registrado. Por favor, inicia sesión."
+                } else {
+                    "Error al crear cuenta: $exceptionMessage"
                 }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error al guardar perfil: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
+
+                Toast.makeText(this, mensajePersonalizado, Toast.LENGTH_LONG).show()
+            }
     }
 }

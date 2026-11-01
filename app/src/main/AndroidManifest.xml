@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permiso necesario para enviar el código OTP a través de Google Apps Script -->
+    <!-- Permiso necesario para conexión a internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -10,18 +10,20 @@
         android:label="IronVault"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.MyApplication">
 
-        <!-- Pantalla de carga inicial (Splash) -->
+        <!-- Pantalla de carga inicial (Splash) con su tema seguro -->
         <activity
             android:name=".SplashActivity"
+            android:theme="@style/Theme.App.Starting"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
@@ -40,9 +42,25 @@
         <activity
             android:name=".GuestModeActivity"
             android:exported="false" />
+
+        <!-- Pantalla para solicitar la recuperación por correo -->
         <activity
             android:name=".ForgotPasswordActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Pantalla de verificación de código OTP -->
+        <activity
+            android:name=".VerifyCodeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Pantalla para restablecer contraseña -->
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".MasterPasswordActivity"
             android:exported="false" />
@@ -50,7 +68,7 @@
             android:name=".UnlockVaultActivity"
             android:exported="false" />
 
-        <!-- Actividades agregadas por ti -->
+        <!-- Actividades de Credenciales -->
         <activity
             android:name=".CredentialDetailActivity"
             android:exported="false" />
@@ -64,10 +82,12 @@
             android:name=".PasswordGeneratorActivity"
             android:exported="false" />
 
-        <!-- Actividades agregadas por tu equipo -->
+        <!-- Actividad de seguridad -->
         <activity
             android:name=".SecurityActivity"
             android:exported="false" />
+
+        <!-- Actividades de ajustes y configuraciones -->
         <activity
             android:name=".ChangeMasterKeyActivity"
             android:exported="false"

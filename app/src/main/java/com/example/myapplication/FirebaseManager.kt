@@ -34,32 +34,41 @@ object FirebaseManager {
     }
 
     // ==========================================
-    // 2. SECCIÓN DE BASE DE DATOS (Firestore)
+    // 2. SECCIÓN DE BASE DE DATOS (Firestore con Cifrado Local E2EE)
     // ==========================================
 
     fun guardarCredencial(
         servicio: String,
         usuario: String,
-        pass: String,
+        passPlana: String,
         url: String,
         categoria: String,
         notas: String,
+        masterKeyBytes: ByteArray,
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-        val credencialMap = hashMapOf(
-            "service" to servicio,
-            "user" to usuario,
-            "password" to pass,
-            "url" to url,
-            "category" to categoria,
-            "notas" to notas,
-            "timestamp" to System.currentTimeMillis()
-        )
+        try {
+            // Ciframos la contraseña localmente antes de enviarla a Firebase
+            val passCifrada = EncryptionHelper.encrypt(passPlana, masterKeyBytes)
 
-        db.collection("credentials")
-            .add(credencialMap)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { e -> onError(e.message ?: "Error desconocido") }
+            val credencialMap = hashMapOf(
+                "service" to servicio,
+                "user" to usuario,
+                "password" to passCifrada,
+                "url" to url,
+                "category" to categoria,
+                "notas" to notas,
+                "timestamp" to System.currentTimeMillis()
+            )
+
+            db.collection("credentials")
+                .add(credencialMap)
+                .addOnSuccessListener { onSuccess() }
+                .addOnFailureListener { e -> onError(e.message ?: "Error desconocido") }
+
+        } catch (e: Exception) {
+            onError("Error al cifrar: ${e.message}")
+        }
     }
 }

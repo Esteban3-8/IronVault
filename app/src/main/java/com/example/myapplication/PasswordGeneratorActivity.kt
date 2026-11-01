@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
@@ -28,7 +29,7 @@ class PasswordGeneratorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_password_generator)
 
-        // 1. Botón para regresar con la flecha
+        // 1. Botón para regresar con la flecha (si aplica)
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         btnBack?.setOnClickListener {
             finish()
@@ -100,6 +101,32 @@ class PasswordGeneratorActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Genera una contraseña primero", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // ── BARRA DE NAVEGACIÓN INFERIOR (Menú Píldora) ──────────
+
+        // 1. Ir a Inicio (MainActivity)
+        findViewById<LinearLayout>(R.id.btnNavHome)?.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
+
+        // 2. Ir a Seguridad (SecurityActivity)
+        findViewById<LinearLayout>(R.id.btnNavLock)?.setOnClickListener {
+            val intent = Intent(this, SecurityActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        // 3. Botón Llave (Ya estás aquí)
+
+        // 4. Ir a Ajustes (SettingsActivity)
+        findViewById<LinearLayout>(R.id.btnNavSettings)?.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 

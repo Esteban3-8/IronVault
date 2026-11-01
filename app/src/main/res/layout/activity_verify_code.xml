@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#14151A"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="36dp">
+
+    <!-- Flecha de retroceso -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/flecha"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#FFFFFF" />
+
+    <!-- Contenido central -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4">
+
+        <!-- Tarjeta del icono -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            app:cardBackgroundColor="#1F222B"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:contentDescription="Icono de verificación"
+                android:src="@drawable/codigo"
+                app:tint="#F2A25C" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Confirmar código"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp" />
+
+        <!-- Subtítulo -->
+        <TextView
+            android:id="@+id/tvSubtitleEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="Código enviado a tu correo"
+            android:textColor="#6B7280"
+            android:textSize="13sp" />
+
+        <!-- Fila de las 6 cajitas para el código con ancho fijo seguro -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etDigit1"
+                android:layout_width="44dp"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="4dp"
+                android:background="@drawable/bg_security_badge_active"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
+
+            <EditText
+                android:id="@+id/etDigit2"
+                android:layout_width="44dp"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="4dp"
+                android:background="@drawable/bg_security_badge"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etDigit3"
+                android:layout_width="44dp"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="4dp"
+                android:background="@drawable/bg_security_badge"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etDigit4"
+                android:layout_width="44dp"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="4dp"
+                android:background="@drawable/bg_security_badge"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etDigit5"
+                android:layout_width="44dp"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="4dp"
+                android:background="@drawable/bg_security_badge"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etDigit6"
+                android:layout_width="44dp"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="4dp"
+                android:background="@drawable/bg_security_badge"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <!-- Reenviar código -->
+        <TextView
+            android:id="@+id/tvResendCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="¿No recibiste el código? Reenviar"
+            android:textColor="#E08A3C"
+            android:textSize="13sp" />
+
+        <!-- Botón Verificar -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnVerifyCode"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/bg_primary_button"
+            android:fontFamily="sans-serif-medium"
+            android:text="Verificar código"
+            android:textAllCaps="false"
+            android:textColor="#14151A"
+            android:textSize="14sp"
+            app:backgroundTint="@null" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
