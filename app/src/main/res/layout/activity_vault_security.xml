@@ -44,6 +44,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvVaultTitle">
 
+        <!-- Regla: tamaño - margen inicio - margen fin = 26dp efectivos en todos los íconos -->
+
         <!-- Contraseña principal -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMainPassword"
@@ -63,9 +65,17 @@
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:src="@drawable/ic_vault_key" />
+                    android:id="@+id/ivVaultKey"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="-1dp"
+                    android:layout_marginTop="-1dp"
+                    android:layout_marginEnd="-1dp"
+                    android:layout_marginBottom="-1dp"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/llave"
+                    app:tint="#E28743" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -95,6 +105,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_security_chevron" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -119,9 +130,15 @@
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:src="@drawable/ic_vault_fingerprint" />
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="-5dp"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginEnd="-5dp"
+                    android:layout_marginBottom="-5dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_vault_fingerprint"
+                    app:tint="#E28743" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -180,8 +197,13 @@
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="-2dp"
+                    android:layout_marginTop="-2dp"
+                    android:layout_marginEnd="-2dp"
+                    android:layout_marginBottom="-2dp"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_vault_export" />
 
                 <LinearLayout
@@ -212,6 +234,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_security_chevron" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -236,8 +259,13 @@
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="-2dp"
+                    android:layout_marginTop="-2dp"
+                    android:layout_marginEnd="-2dp"
+                    android:layout_marginBottom="-2dp"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_vault_delete" />
 
                 <LinearLayout
@@ -268,6 +296,7 @@
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
+                    android:importantForAccessibility="no"
                     android:src="@drawable/ic_security_chevron" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

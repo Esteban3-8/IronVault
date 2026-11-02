@@ -31,10 +31,12 @@
                     android:src="@drawable/bg_biometric_circle" />
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="34dp"
+                    android:layout_width="57dp"
+                    android:layout_height="51dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_biometric_waves" />
+                    android:src="@drawable/ic_biometric_waves"
+                    app:tint="#D8823B" />
+
             </FrameLayout>
 
             <TextView

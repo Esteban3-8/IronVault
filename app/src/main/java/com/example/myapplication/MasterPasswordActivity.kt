@@ -16,13 +16,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class MasterPasswordActivity : AppCompatActivity() {
 
-    private var isNewPasswordVisible = false
-    private var isConfirmPasswordVisible = false
+    // INICIAN EN TRUE PARA QUE LOS CAMPOS SE MUESTREN VISIBLES POR DEFECTO
+    private var isNewPasswordVisible = true
+    private var isConfirmPasswordVisible = true
 
     private lateinit var bar1: View
     private lateinit var bar2: View
@@ -33,7 +35,7 @@ class MasterPasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_master_password)
 
-        // Referencias de UI
+        // Referencias de UI sincronizadas exactamente con los IDs del XML
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         val etNewPassword = findViewById<EditText>(R.id.etNewPassword)
         val ivToggleNewPassword = findViewById<ImageView>(R.id.ivToggleNewPassword)
@@ -50,6 +52,18 @@ class MasterPasswordActivity : AppCompatActivity() {
 
         // Estado inicial de las barras y textos
         resetearBarrasSeguridad()
+
+        // =================================================================
+        // CONFIGURACIÓN INICIAL: CONTRASEÑAS VISIBLES Y OJO ABIERTO POR DEFECTO
+        // =================================================================
+        etNewPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+        ivToggleNewPassword.setImageResource(R.drawable.ojo)
+        etNewPassword.setSelection(etNewPassword.text.length)
+
+        etConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+        ivToggleConfirmPassword.setImageResource(R.drawable.ojo)
+        etConfirmPassword.setSelection(etConfirmPassword.text.length)
+        // =================================================================
 
         // 1. Botón Volver
         btnBack.setOnClickListener {
@@ -128,7 +142,7 @@ class MasterPasswordActivity : AppCompatActivity() {
                 )
 
                 db.collection("users").document(user.uid)
-                    .update(masterData)
+                    .set(masterData, SetOptions.merge())
                     .addOnSuccessListener {
                         Toast.makeText(this, "¡Bóveda creada con éxito!", Toast.LENGTH_SHORT).show()
 
@@ -157,9 +171,9 @@ class MasterPasswordActivity : AppCompatActivity() {
     }
 
     private fun evaluarSeguridadContrasena(password: String) {
-        val rojoDebil = Color.parseColor("#EF4444")     // Rojo para contraseñas menores a 6 caracteres
-        val amarilloMedio = Color.parseColor("#F59E0B") // Amarillo para nivel intermedio
-        val verdeFuerte = Color.parseColor("#8FC954")   // Verde original de IronVault
+        val rojoDebil = Color.parseColor("#EF4444")
+        val amarilloMedio = Color.parseColor("#F59E0B")
+        val verdeFuerte = Color.parseColor("#8FC954")
 
         resetearBarrasSeguridad()
 

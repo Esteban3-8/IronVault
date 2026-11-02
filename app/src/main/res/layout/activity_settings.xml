@@ -253,14 +253,6 @@
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="Idioma de la aplicación"
-                            android:textColor="@color/text_muted"
-                            android:textSize="11sp" />
                     </LinearLayout>
 
                     <TextView
@@ -429,6 +421,15 @@
                 android:layout_marginTop="12dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="IronVault • versión 2.4.1"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Idioma de la aplicación"
                 android:textColor="@color/text_muted"
                 android:textSize="11sp" />
 

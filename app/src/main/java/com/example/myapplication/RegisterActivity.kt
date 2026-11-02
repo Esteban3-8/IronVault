@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.google.firebase.auth.ktx.auth
@@ -42,13 +43,16 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var tvEmailError: TextView
     private lateinit var tvConfirmPasswordError: TextView
 
+    private lateinit var tvTermsClick: TextView
+    private lateinit var tvPrivacyClick: TextView
+
     private lateinit var bar1: View
     private lateinit var bar2: View
     private lateinit var bar3: View
     private lateinit var tvStrengthHint: TextView
 
-    private var isPasswordVisible = false
-    private var isConfirmPasswordVisible = false
+    private var isPasswordVisible = true
+    private var isConfirmPasswordVisible = true
     private var isEmailVerified = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +75,9 @@ class RegisterActivity : AppCompatActivity() {
         tvEmailError = findViewById(R.id.tvEmailError)
         tvConfirmPasswordError = findViewById(R.id.tvConfirmPasswordError)
 
+        tvTermsClick = findViewById(R.id.tvTermsClick)
+        tvPrivacyClick = findViewById(R.id.tvPrivacyClick)
+
         tvFullNameError.visibility = View.GONE
         tvEmailError.visibility = View.GONE
         tvConfirmPasswordError.visibility = View.GONE
@@ -85,6 +92,28 @@ class RegisterActivity : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
 
         resetearBarrasSeguridad()
+
+        etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+        ivTogglePassword.setImageResource(R.drawable.ojo)
+        etPassword.setSelection(etPassword.text.length)
+
+        etConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
+        ivToggleConfirmPassword.setImageResource(R.drawable.ojo)
+        etConfirmPassword.setSelection(etConfirmPassword.text.length)
+
+        tvTermsClick.setOnClickListener {
+            mostrarDialogoLegal(
+                "Términos y Condiciones",
+                "Bienvenido a IronVault. Al utilizar nuestra aplicación de bóveda de credenciales, aceptas proteger tu contraseña maestra, usar una conexión segura y entender que los datos de acceso se almacenan cifrados para tu máxima seguridad."
+            )
+        }
+
+        tvPrivacyClick.setOnClickListener {
+            mostrarDialogoLegal(
+                "Política de Privacidad",
+                "En IronVault valoramos tu privacidad. Tus credenciales y datos sensibles se procesan con altos estándares de seguridad y autenticación mediante Firebase. No compartimos tu información personal con terceros."
+            )
+        }
 
         ivTogglePassword.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
@@ -219,6 +248,28 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    private fun mostrarDialogoLegal(titulo: String, contenido: String) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_legal, null)
+        val tvTitle = dialogView.findViewById<TextView>(R.id.tvDialogTitle)
+        val tvMessage = dialogView.findViewById<TextView>(R.id.tvDialogMessage)
+        val btnClose = dialogView.findViewById<AppCompatButton>(R.id.btnCloseDialog)
+
+        tvTitle.text = titulo
+        tvMessage.text = contenido
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
     private fun resetearBarrasSeguridad() {
         val grisInactivo = Color.parseColor("#3A3F4B")
         bar1.setBackgroundColor(grisInactivo)
@@ -292,7 +343,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun enviarCorreoHttp(email: String, code: String, onResult: (Boolean) -> Unit) {
         Thread {
             try {
-                val baseUrl = "https://script.google.com/macros/s/AKfycbxC_bCo3hVevwd2GkWH0kz_7OCbKYlHhnR049EDMTk4oOr4Z7hERLTbWksRHryT_iG4JQ/exec"
+                val baseUrl = "https://script.google.com/macros/s/AKfycbyBVOes8JC04vuOc0FXUHmPQ_d9Po5TKSX9XNwISKlfj6LYJI8iw-I0SBXrxtPU-dzi/exec"
                 val token = "ironvault_secreto_2026"
                 val urlStr = baseUrl + "?email=" + URLEncoder.encode(email, "UTF-8") +
                         "&code=" + URLEncoder.encode(code, "UTF-8") +
@@ -338,7 +389,14 @@ class RegisterActivity : AppCompatActivity() {
                 db.collection("users").document(userId).set(userData)
                     .addOnSuccessListener {
                         Toast.makeText(this, "¡Cuenta creada correctamente!", Toast.LENGTH_SHORT).show()
+
+                        // ── GUARDAR SESIÓN PERSISTENTE PARA WELCOMEACTIVITY ──
+                        val settingsPrefs = getSharedPreferences("settings_prefs", MODE_PRIVATE)
+                        settingsPrefs.edit().putBoolean("is_logged_in", true).apply()
+                        // ----------------------------------------------------
+
                         val intent = Intent(this, MasterPasswordActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
                     }

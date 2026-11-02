@@ -9,12 +9,28 @@ import androidx.appcompat.app.AppCompatActivity
 class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // ── Verificación de sesión persistente ────────────────────
+        val prefs = getSharedPreferences("settings_prefs", MODE_PRIVATE)
+        val isLoggedIn = prefs.getBoolean("is_logged_in", false)
+
+        if (isLoggedIn) {
+            // Si la sesión está activa, saltamos la bienvenida y vamos directo a la app principal
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return
+        }
+
+        // Si no hay sesión activa, cargamos la pantalla de bienvenida con normalidad
         setContentView(R.layout.activity_welcome)
 
         val btnRegister = findViewById<Button>(R.id.btnRegister)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val txtAbout = findViewById<TextView>(R.id.txtAbout) // ¡Ahora apunta al TextView correcto!
         val tvGuestMode = findViewById<TextView>(R.id.tvGuestMode)
+
         // Ir a Registro
         btnRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)

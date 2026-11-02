@@ -16,6 +16,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 // ─────────────────────────────────────────────────────────────────
 //  SettingsActivity
@@ -23,6 +25,9 @@ import com.google.android.material.card.MaterialCardView
 //  idioma, tema, notificaciones y cerrar sesión.
 // ─────────────────────────────────────────────────────────────────
 class SettingsActivity : AppCompatActivity() {
+
+    // Bandera para evitar que los switches disparen eventos al cargar valores guardados
+    private var isInitialized = false
 
     // SharedPreferences para guardar las preferencias del usuario
     private val prefs by lazy {
@@ -35,7 +40,6 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         // ── WindowInsets ──────────────────────────────────────────
-        // Ajustamos los insets para mantener la compatibilidad con gestos EdgeToEdge
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(0, systemBars.top, 0, 0)
@@ -43,9 +47,11 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         configurarBotones()
+        cargarValoresGuardados() // Cargamos los valores PRIMERO antes de activar los listeners
         configurarSwitches()
         configurarNavegacionInferior()
-        cargarValoresGuardados()
+
+        isInitialized = true // Marcamos que la actividad ya cargó oficialmente
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -73,24 +79,43 @@ class SettingsActivity : AppCompatActivity() {
             mostrarDialogoIdioma()
         }
 
-        // ── Cerrar sesión ─────────────────────────────────────────
+        // ── Cerrar sesión con diseño oscuro personalizado ─────────
         findViewById<MaterialCardView>(R.id.btnLogout).setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Cerrar sesión")
-                .setMessage("¿Estás seguro de que quieres cerrar sesión?")
-                .setPositiveButton("Cerrar sesión") { _, _ ->
-                    val intent = Intent(this, WelcomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                }
-                .setNegativeButton("Cancelar", null)
-                .show()
+            val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_logout, null)
+
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
+
+            // Removemos el fondo blanco por defecto del sistema
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+            // Botón Cancelar
+            dialogView.findViewById<AppCompatButton>(R.id.btnCancel).setOnClickListener {
+                dialog.dismiss()
+            }
+
+            // Botón Confirmar Cierre de Sesión
+            dialogView.findViewById<AppCompatButton>(R.id.btnLogoutConfirm).setOnClickListener {
+                // 1. Desactivamos la bandera local de sesión
+                prefs.edit().putBoolean("is_logged_in", false).apply()
+
+                // 2. ¡Cerramos sesión oficialmente en Firebase Auth para limpiar el token!
+                Firebase.auth.signOut()
+
+                // 3. Redirigimos a WelcomeActivity limpiando todo el historial de pantallas
+                val intent = Intent(this, WelcomeActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
+
+            dialog.show()
         }
     }
 
     // ─────────────────────────────────────────────────────────────
     //  configurarNavegacionInferior()
-    //  Controla los clics en la barra flotante inferior para cambiar de pantalla
     // ─────────────────────────────────────────────────────────────
     private fun configurarNavegacionInferior() {
         // Ir a Inicio (MainActivity)
@@ -117,9 +142,9 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
-        // (Opcional por si se pulsa estando en ajustes)
+        // Botón de Ajustes en la barra inferior (Ya estás aquí)
         findViewById<LinearLayout>(R.id.btnNavSettings)?.setOnClickListener {
-            // Ya estás en configuración
+            // Sin acciones
         }
     }
 
@@ -128,12 +153,16 @@ class SettingsActivity : AppCompatActivity() {
     // ─────────────────────────────────────────────────────────────
     private fun configurarSwitches() {
         findViewById<SwitchCompat>(R.id.switchTheme).setOnCheckedChangeListener { _, isChecked ->
+            if (!isInitialized) return@setOnCheckedChangeListener // Ignora el cambio al iniciar la app
+
             prefs.edit().putBoolean("dark_theme", isChecked).apply()
             val mensaje = if (isChecked) "Tema oscuro activado" else "Tema oscuro desactivado"
             Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
         }
 
         findViewById<SwitchCompat>(R.id.switchNotifications).setOnCheckedChangeListener { _, isChecked ->
+            if (!isInitialized) return@setOnCheckedChangeListener // Ignora el cambio al iniciar la app
+
             prefs.edit().putBoolean("notifications", isChecked).apply()
             val mensaje = if (isChecked) "Notificaciones activadas" else "Notificaciones desactivadas"
             Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()

@@ -91,13 +91,16 @@
 
             <LinearLayout
                 android:id="@+id/rowOther"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@color/bg_option_card"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="32dp"
@@ -111,7 +114,11 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_cat_lupa" />
+                        android:src="@drawable/ic_cat_lupa"
+                        />
+
+
+
                 </com.google.android.material.card.MaterialCardView>
 
                 <TextView
@@ -136,12 +143,15 @@
 
             <LinearLayout
                 android:id="@+id/rowSocial"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="32dp"
@@ -170,12 +180,15 @@
 
             <LinearLayout
                 android:id="@+id/rowMail"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="32dp"
@@ -204,12 +217,15 @@
 
             <LinearLayout
                 android:id="@+id/rowGames"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="32dp"
@@ -248,12 +264,15 @@
 
             <LinearLayout
                 android:id="@+id/rowBank"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="32dp"
@@ -282,12 +301,15 @@
 
             <LinearLayout
                 android:id="@+id/rowShop"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="32dp"
@@ -326,12 +348,15 @@
 
             <LinearLayout
                 android:id="@+id/rowEdu"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="32dp"

@@ -64,7 +64,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
     }
 
     private fun enviarCorreoAppsScript(destinatarioEmail: String, codigoOtp: String, callback: (Boolean) -> Unit) {
-        // URL NUEVA con permisos públicos configurados correctamente
+        // URL específica del proyecto de recuperación de contraseña en Google Apps Script
         val webAppUrl = "https://script.google.com/macros/s/AKfycbxC_bCo3hVevwd2GkWH0kz_7OCbKYlHhnR049EDMTk4oOr4Z7hERLTbWksRHryT_iG4JQ/exec"
 
         val client = OkHttpClient()

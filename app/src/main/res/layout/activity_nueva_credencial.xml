@@ -61,7 +61,15 @@
             android:layout_height="64dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/bg_card_rounded" />
+            android:background="@drawable/bg_card_rounded"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/ivTopCategoryIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/categoria" />
+        </FrameLayout>
 
         <!-- Servicio o plataforma -->
         <TextView
@@ -125,7 +133,6 @@
             android:layout_marginBottom="6dp"
             android:background="@drawable/bg_card_password_clean">
 
-            <!-- Iconos de la derecha -->
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
@@ -164,11 +171,11 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/llave"
-                    app:tint="#E28743" />
+                    app:tint="#F2A25C" />
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- Barra de Fortaleza Actualizada -->
+        <!-- Barra de Fortaleza Dinámica -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -181,20 +188,21 @@
                 android:layout_marginBottom="6dp"
                 android:background="@drawable/bg_strength_bar_container">
 
-                <!-- Porción Activa (Verde Lima) -->
                 <View
-                    android:layout_width="220dp"
+                    android:id="@+id/viewStrengthBar"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:background="#8FC954" />
+                    android:background="#EF4444" />
             </FrameLayout>
 
             <TextView
+                android:id="@+id/tvStrengthHint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:fontFamily="sans-serif-medium"
-                android:text="Fortaleza Alta"
-                android:textColor="#8FC954"
+                android:text="Mínimo 6 caracteres"
+                android:textColor="#9CA3AF"
                 android:textSize="11sp" />
         </LinearLayout>
 
