@@ -21,7 +21,7 @@ import androidx.core.view.WindowInsetsCompat
 //  Permite al usuario cambiar su clave maestra. Requiere confirmar
 //  la clave actual antes de aceptar la nueva.
 // ─────────────────────────────────────────────────────────────────
-class ChangeMasterKeyActivity : AppCompatActivity() {
+class ChangeMasterKeyActivity : BaseActivity() { // 👈 Hereda de BaseActivity para el control de inactividad
 
     // ── SharedPreferences ────────────────────────────────────────
     // El mismo "bloc de notas" que usamos en SecurityActivity.
@@ -256,7 +256,7 @@ class ChangeMasterKeyActivity : AppCompatActivity() {
         return when {
             password.length >= 8 && tieneLetras && tieneNumeros && tieneSimbolos -> 3 // fuerte
             password.length >= 6 && (tieneLetras || tieneNumeros)                -> 2 // media
-            else                                                                  -> 1 // débil
+            else                                                                 -> 1 // débil
         }
     }
 

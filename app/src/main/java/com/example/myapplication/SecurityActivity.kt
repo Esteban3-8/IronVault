@@ -2,13 +2,10 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -16,20 +13,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 // ─────────────────────────────────────────────────────────────────
 //  SecurityActivity
 // ─────────────────────────────────────────────────────────────────
-class SecurityActivity : AppCompatActivity() {
+class SecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private val prefs by lazy {
         getSharedPreferences("security_prefs", MODE_PRIVATE)
     }
-
-    // ── Handler para el bloqueo automático ───────────────────────
-    private val autoLockHandler = Handler(Looper.getMainLooper())
-
-    private val autoLockRunnable = Runnable {
-        bloquearBoveda(motivo = "auto")
-    }
-
-    private var autoLockScheduled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,41 +31,6 @@ class SecurityActivity : AppCompatActivity() {
 
         configurarBotones()
         cargarValoresGuardados()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        iniciarTemporizadorBloqueo()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (autoLockScheduled) {
-            autoLockHandler.removeCallbacks(autoLockRunnable)
-            autoLockScheduled = false
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        autoLockHandler.removeCallbacks(autoLockRunnable)
-    }
-
-    private fun iniciarTemporizadorBloqueo() {
-        val valorGuardado = prefs.getString("auto_lock", "5 minutos") ?: "5 minutos"
-
-        val delayMs = when (valorGuardado) {
-            "15 segundos" -> 15_000L
-            "30 segundos" -> 30_000L
-            "1 minuto"    -> 60_000L
-            "3 minutos"   -> 3 * 60_000L
-            "5 minutos"   -> 5 * 60_000L
-            "10 minutos"  -> 10 * 60_000L
-            else          -> 5 * 60_000L
-        }
-
-        autoLockHandler.postDelayed(autoLockRunnable, delayMs)
-        autoLockScheduled = true
     }
 
     private fun bloquearBoveda(motivo: String) {
@@ -96,7 +49,6 @@ class SecurityActivity : AppCompatActivity() {
 
         // ── Botón BLOQUEAR BÓVEDA AHORA ──────────────────────────
         findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLockNow).setOnClickListener {
-            autoLockHandler.removeCallbacks(autoLockRunnable)
             bloquearBoveda(motivo = "manual")
         }
 

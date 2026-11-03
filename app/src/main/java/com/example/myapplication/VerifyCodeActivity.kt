@@ -11,13 +11,12 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
 import kotlin.random.Random
 
-class VerifyCodeActivity : AppCompatActivity() {
+class VerifyCodeActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private lateinit var digitFields: Array<EditText>
     private var userEmail: String = ""
@@ -132,7 +131,6 @@ class VerifyCodeActivity : AppCompatActivity() {
     }
 
     private fun enviarCorreoVerificacion(destinatarioEmail: String, codigoOtp: String) {
-        // NUEVA URL pública y correcta del proyecto IronVaultRecuperacion
         val webAppUrl = "https://script.google.com/macros/s/AKfycbxC_bCo3hVevwd2GkWH0kz_7OCbKYlHhnR049EDMTk4oOr4Z7hERLTbWksRHryT_iG4JQ/exec"
 
         val client = OkHttpClient()

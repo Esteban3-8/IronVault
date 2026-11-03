@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.ViewCompat
@@ -24,7 +23,7 @@ import com.google.firebase.ktx.Firebase
 //  Pantalla de configuración general: perfil, seguridad,
 //  idioma, tema, notificaciones y cerrar sesión.
 // ─────────────────────────────────────────────────────────────────
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     // Bandera para evitar que los switches disparen eventos al cargar valores guardados
     private var isInitialized = false

@@ -6,10 +6,9 @@ import android.text.method.PasswordTransformationMethod
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 
-class ResetPasswordActivity : AppCompatActivity() {
+class ResetPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private var isPasswordVisible1 = false
     private var isPasswordVisible2 = false

@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -23,7 +22,7 @@ import androidx.core.view.WindowInsetsCompat
 //  Similar a ChangeMasterKeyActivity pero con una barra de fortaleza
 //  diferente: un solo View que crece/decrece con layout_weight.
 // ─────────────────────────────────────────────────────────────────
-class PrincipalPasswordActivity : AppCompatActivity() {
+class PrincipalPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private val prefs by lazy {
         getSharedPreferences("security_prefs", MODE_PRIVATE)
@@ -120,24 +119,6 @@ class PrincipalPasswordActivity : AppCompatActivity() {
         campo.setSelection(campo.text.length)
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  configurarBarraFortaleza()
-    //  Esta pantalla tiene una barra diferente a ChangeMasterKeyActivity.
-    //  En lugar de 3 Views separadas, tiene UNA sola View ("viewStrengthFill")
-    //  dentro de un LinearLayout con weightSum="10".
-    //
-    //  CONCEPTO: layout_weight dinámico
-    //  El "peso" (weight) de un View determina cuánto espacio ocupa
-    //  dentro de su contenedor. Con weightSum="10":
-    //    · weight=3 → ocupa 30% del ancho (débil)
-    //    · weight=6 → ocupa 60% del ancho (medio)
-    //    · weight=10 → ocupa 100% del ancho (fuerte)
-    //
-    //  Para cambiar el weight por código necesitamos acceder a los
-    //  LayoutParams del View y modificar el campo "weight".
-    //  LayoutParams son los parámetros de posición/tamaño de una vista
-    //  dentro de su contenedor padre.
-    // ─────────────────────────────────────────────────────────────
     private fun configurarBarraFortaleza() {
         val etNew        = findViewById<EditText>(R.id.etNewPassword)
         val barraFill    = findViewById<View>(R.id.viewStrengthFill)
@@ -153,21 +134,10 @@ class PrincipalPasswordActivity : AppCompatActivity() {
             }
         })
 
-        // Inicializar la barra con el texto actual (si ya hay algo escrito)
         actualizarBarra(barraFill, tvLabel, evaluarFortaleza(etNew.text.toString()))
     }
 
-    // ─────────────────────────────────────────────────────────────
-    //  actualizarBarra()
-    //  Cambia el weight del View de relleno y actualiza color + texto.
-    //
-    //  LinearLayout.LayoutParams hereda de ViewGroup.LayoutParams y
-    //  agrega el campo "weight". Casteamos con "as" para acceder a él.
-    //  Después de cambiar los LayoutParams hay que llamar
-    //  requestLayout() para que Android redibuje la vista.
-    // ─────────────────────────────────────────────────────────────
     private fun actualizarBarra(barra: View, label: TextView, nivel: Int) {
-        // Obtenemos los LayoutParams actuales y los convertimos al tipo correcto
         val params = barra.layoutParams as android.widget.LinearLayout.LayoutParams
 
         when (nivel) {
@@ -197,7 +167,6 @@ class PrincipalPasswordActivity : AppCompatActivity() {
             }
         }
 
-        // Aplicamos los nuevos LayoutParams y pedimos redibujar
         barra.layoutParams = params
         barra.requestLayout()
     }
@@ -210,7 +179,7 @@ class PrincipalPasswordActivity : AppCompatActivity() {
         return when {
             password.length >= 8 && tieneLetras && tieneNumeros && tieneSimbolos -> 3
             password.length >= 6 && (tieneLetras || tieneNumeros)                -> 2
-            else                                                                  -> 1
+            else                                                                 -> 1
         }
     }
 }

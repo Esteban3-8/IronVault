@@ -11,12 +11,11 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private var isPasswordVisible = true // Inicia visible por defecto
 

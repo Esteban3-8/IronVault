@@ -9,13 +9,12 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var containerCredentials: LinearLayout
     private lateinit var progressBarLoading: ProgressBar
@@ -29,8 +28,6 @@ class MainActivity : AppCompatActivity() {
         // Vincular vistas de la interfaz
         containerCredentials = findViewById(R.id.containerCredentials)
         progressBarLoading = findViewById(R.id.progressBarLoading)
-
-        cargarListaCredenciales()
 
         // 1. Botón flotante (+) para ir a NuevaCredencialActivity
         val fabAdd = findViewById<MaterialCardView>(R.id.fabAdd)
@@ -65,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Recarga automáticamente la lista desde la subcolección de Firestore al volver al Home
+        // Carga única y limpia al iniciar o volver a la pantalla principal
         cargarListaCredenciales()
     }
 
@@ -75,9 +72,8 @@ class MainActivity : AppCompatActivity() {
         val userId = Firebase.auth.currentUser?.uid ?: return
         val inflater = LayoutInflater.from(this)
 
-        // 1. Mostrar el indicador de carga y limpiar vistas anteriores
+        // 1. Mostrar el indicador de carga inicial
         progressBarLoading.visibility = View.VISIBLE
-        containerCredentials.removeAllViews()
 
         // Consulta en la subcolección correcta: users/{userId}/credentials
         FirebaseFirestore.getInstance()
@@ -86,9 +82,12 @@ class MainActivity : AppCompatActivity() {
             .collection("credentials")
             .get()
             .addOnSuccessListener { documents ->
-                // 2. Ocultar la carga al recibir los datos exitosamente
+                // 2. Ocultar la carga, limpiar lista y vistas anteriores de forma estricta
                 progressBarLoading.visibility = View.GONE
                 VaultRepository.credentialList.clear()
+                containerCredentials.removeAllViews()
+
+                val tempCloudList = mutableListOf<Credential>()
 
                 for (document in documents) {
                     val servicio = document.getString("serviceName") ?: ""
@@ -102,10 +101,31 @@ class MainActivity : AppCompatActivity() {
                         password = pass,
                         strengthStatus = status
                     )
-                    VaultRepository.credentialList.add(cred)
+                    tempCloudList.add(cred)
                 }
 
-                // Dibuja una tarjeta por cada credencial almacenada
+                // Detección automática de contraseñas repetidas en bloque (compatible con val)
+                val passwordCounts = tempCloudList.groupingBy { it.password }.eachCount()
+
+                for (cred in tempCloudList) {
+                    val estadoFinal = if ((passwordCounts[cred.password] ?: 0) > 1) {
+                        "Repetida"
+                    } else {
+                        cred.strengthStatus
+                    }
+
+                    val credActualizada = Credential(
+                        serviceName = cred.serviceName,
+                        userOrEmail = cred.userOrEmail,
+                        password = cred.password,
+                        strengthStatus = estadoFinal,
+                        url = cred.url,
+                        notes = cred.notes
+                    )
+                    VaultRepository.credentialList.add(credActualizada)
+                }
+
+                // Dibuja una tarjeta por cada credencial almacenada sin duplicados
                 for (cred in VaultRepository.credentialList) {
                     val itemView = inflater.inflate(R.layout.item_credential, containerCredentials, false)
 
@@ -120,17 +140,26 @@ class MainActivity : AppCompatActivity() {
                     tvInitial.text = if (cred.serviceName.isNotEmpty()) cred.serviceName.substring(0, 1).uppercase() else "C"
                     tvStatus.text = cred.strengthStatus
 
-                    when (cred.strengthStatus) {
-                        "Segura" -> {
-                            tvStatus.setTextColor(Color.parseColor("#71C77D"))
+                    // Validación inteligente de colores basada en palabras clave del estado
+                    when {
+                        cred.strengthStatus.contains("Repetida", ignoreCase = true) -> {
+                            tvStatus.setTextColor(Color.parseColor("#9B9B9B")) // Gris / Plata
+                            vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
+                        }
+                        cred.strengthStatus.contains("Segura", ignoreCase = true) || cred.strengthStatus.contains("Alta", ignoreCase = true) -> {
+                            tvStatus.setTextColor(Color.parseColor("#71C77D")) // Verde
                             vDot?.setCardBackgroundColor(Color.parseColor("#71C77D"))
                         }
-                        "Débil" -> {
-                            tvStatus.setTextColor(Color.parseColor("#E26B6B"))
+                        cred.strengthStatus.contains("Débil", ignoreCase = true) -> {
+                            tvStatus.setTextColor(Color.parseColor("#E26B6B")) // Rojo
                             vDot?.setCardBackgroundColor(Color.parseColor("#E26B6B"))
                         }
+                        cred.strengthStatus.contains("Media", ignoreCase = true) -> {
+                            tvStatus.setTextColor(Color.parseColor("#E5C158")) // Amarillo / Naranja
+                            vDot?.setCardBackgroundColor(Color.parseColor("#E5C158"))
+                        }
                         else -> {
-                            tvStatus.setTextColor(Color.parseColor("#9B9B9B"))
+                            tvStatus.setTextColor(Color.parseColor("#9B9B9B")) // Gris por defecto
                             vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
                         }
                     }
@@ -161,14 +190,22 @@ class MainActivity : AppCompatActivity() {
                     tvInitial.text = if (cred.serviceName.isNotEmpty()) cred.serviceName.substring(0, 1).uppercase() else "C"
                     tvStatus.text = cred.strengthStatus
 
-                    when (cred.strengthStatus) {
-                        "Segura" -> {
+                    when {
+                        cred.strengthStatus.contains("Repetida", ignoreCase = true) -> {
+                            tvStatus.setTextColor(Color.parseColor("#9B9B9B"))
+                            vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
+                        }
+                        cred.strengthStatus.contains("Segura", ignoreCase = true) || cred.strengthStatus.contains("Alta", ignoreCase = true) -> {
                             tvStatus.setTextColor(Color.parseColor("#71C77D"))
                             vDot?.setCardBackgroundColor(Color.parseColor("#71C77D"))
                         }
-                        "Débil" -> {
+                        cred.strengthStatus.contains("Débil", ignoreCase = true) -> {
                             tvStatus.setTextColor(Color.parseColor("#E26B6B"))
                             vDot?.setCardBackgroundColor(Color.parseColor("#E26B6B"))
+                        }
+                        cred.strengthStatus.contains("Media", ignoreCase = true) -> {
+                            tvStatus.setTextColor(Color.parseColor("#E5C158"))
+                            vDot?.setCardBackgroundColor(Color.parseColor("#E5C158"))
                         }
                         else -> {
                             tvStatus.setTextColor(Color.parseColor("#9B9B9B"))

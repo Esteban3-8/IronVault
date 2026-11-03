@@ -5,7 +5,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -16,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 //  Por ahora los registros son estáticos (definidos en el XML).
 //  En el futuro se pueden cargar dinámicamente desde una base de datos.
 // ─────────────────────────────────────────────────────────────────
-class AccessHistoryActivity : AppCompatActivity() {
+class AccessHistoryActivity : BaseActivity() { // 👈 Hereda de BaseActivity para el control de inactividad
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

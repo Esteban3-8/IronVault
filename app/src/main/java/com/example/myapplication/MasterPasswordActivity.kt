@@ -13,14 +13,13 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class MasterPasswordActivity : AppCompatActivity() {
+class MasterPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     // INICIAN EN TRUE PARA QUE LOS CAMPOS SE MUESTREN VISIBLES POR DEFECTO
     private var isNewPasswordVisible = true

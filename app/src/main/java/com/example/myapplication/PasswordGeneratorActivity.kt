@@ -10,12 +10,11 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
 import java.security.SecureRandom
 
-class PasswordGeneratorActivity : AppCompatActivity() {
+class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private lateinit var tvPassword: TextView
     private lateinit var seekBarLength: SeekBar

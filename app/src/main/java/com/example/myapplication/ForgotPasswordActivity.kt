@@ -7,14 +7,13 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
 import kotlin.random.Random
 
-class ForgotPasswordActivity : AppCompatActivity() {
+class ForgotPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

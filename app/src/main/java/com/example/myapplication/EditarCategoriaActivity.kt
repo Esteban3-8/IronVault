@@ -6,10 +6,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class EditarCategoriaActivity : AppCompatActivity() {
+class EditarCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editar_categoria)

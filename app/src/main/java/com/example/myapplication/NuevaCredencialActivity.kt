@@ -18,18 +18,17 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
-class NuevaCredencialActivity : AppCompatActivity() {
+class NuevaCredencialActivity : BaseActivity() {
 
     private lateinit var etPassword: EditText
     private lateinit var tvCategory: TextView
     private lateinit var ivCatIcon: ImageView
-    private lateinit var ivTopCategoryIcon: ImageView // Icono del cuadro grande superior
+    private lateinit var ivTopCategoryIcon: ImageView
     private lateinit var etService: EditText
     private lateinit var etUser: EditText
     private lateinit var etUrl: EditText
@@ -38,16 +37,12 @@ class NuevaCredencialActivity : AppCompatActivity() {
     private lateinit var viewStrengthBar: View
     private lateinit var tvStrengthHint: TextView
 
-    // Variable para controlar si la contraseña se muestra u oculta (Inicia en TRUE por defecto)
     private var isPasswordVisible = true
-
-    // Sin categoría seleccionada al inicio (null). Al guardar se usa "Otras Claves" si sigue en null.
     private var selectedCategory: String? = null
 
-    private val colorSeleccionado = Color.parseColor("#F97316") // Naranja del tema
+    private val colorSeleccionado = Color.parseColor("#F97316")
     private val colorNormal = Color.parseColor("#FFFFFF")
 
-    // Launcher para recibir de vuelta la contraseña generada
     private val passwordGeneratorLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -64,7 +59,6 @@ class NuevaCredencialActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nueva_credencial)
 
-        // Vincular componentes de la interfaz
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         val btnGeneratePassword = findViewById<ImageView>(R.id.btnGeneratePassword)
         val btnSelectCategory = findViewById<RelativeLayout>(R.id.btnSelectCategory)
@@ -82,18 +76,15 @@ class NuevaCredencialActivity : AppCompatActivity() {
         viewStrengthBar = findViewById(R.id.viewStrengthBar)
         tvStrengthHint = findViewById(R.id.tvStrengthHint)
 
-        // CONFIGURACIÓN INICIAL: CONTRASEÑA VISIBLE Y OJO ABIERTO POR DEFECTO
         etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
         btnTogglePassword.setImageResource(R.drawable.ojo)
         etPassword.setSelection(etPassword.text.length)
         evaluarSeguridadContrasena(etPassword.text.toString())
 
-        // 1. Flecha de retroceso
         btnBack?.setOnClickListener {
             finish()
         }
 
-        // 2. Mostrar / ocultar contraseña
         btnTogglePassword.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
             val selection = etPassword.selectionStart
@@ -107,7 +98,6 @@ class NuevaCredencialActivity : AppCompatActivity() {
             etPassword.setSelection(selection)
         }
 
-        // 3. Seguridad de la contraseña letra por letra
         etPassword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -116,13 +106,11 @@ class NuevaCredencialActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // 4. Generador de contraseñas
         btnGeneratePassword?.setOnClickListener {
             val intent = Intent(this, PasswordGeneratorActivity::class.java)
             passwordGeneratorLauncher.launch(intent)
         }
 
-        // 5. Categoría -> BottomSheet
         btnSelectCategory?.setOnClickListener {
             val view = LayoutInflater.from(this).inflate(R.layout.dialog_category, null)
             val dialog = BottomSheetDialog(this)
@@ -139,7 +127,6 @@ class NuevaCredencialActivity : AppCompatActivity() {
             dialog.show()
         }
 
-        // 6. Guardar credencial
         btnSaveCredential?.setOnClickListener {
             val servicio = etService.text.toString().trim()
             val usuario = etUser.text.toString().trim()
@@ -152,15 +139,16 @@ class NuevaCredencialActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val fortaleza = tvStrengthHint.text.toString()
             val usuarioFinal = if (usuario.isEmpty()) "Sin usuario" else usuario
-            val categoriaFinal = selectedCategory ?: "Otras Claves" // Si no eligió ninguna
+            val categoriaFinal = selectedCategory ?: "Otras Claves"
+
+            val fortalezaFinal = tvStrengthHint.text.toString()
 
             val nuevaCredencial = Credential(
                 serviceName = servicio,
                 userOrEmail = usuarioFinal,
                 password = pass,
-                strengthStatus = fortaleza,
+                strengthStatus = fortalezaFinal,
                 url = url,
                 notes = notas
             )
@@ -172,7 +160,7 @@ class NuevaCredencialActivity : AppCompatActivity() {
                     "serviceName" to servicio,
                     "userOrEmail" to usuarioFinal,
                     "password" to pass,
-                    "strengthStatus" to fortaleza,
+                    "strengthStatus" to fortalezaFinal,
                     "url" to url,
                     "notes" to notas,
                     "category" to categoriaFinal
@@ -219,9 +207,6 @@ class NuevaCredencialActivity : AppCompatActivity() {
         }
     }
 
-    // Frecuentes: rectángulo pequeño (tamaño del contenido). Gris normal, naranja si está
-    //             seleccionada. El texto siempre queda blanco.
-    // Las demás:  sin fondo; si están seleccionadas, fondo naranja a todo el ancho y texto naranja.
     private fun resaltarFila(row: View, activa: Boolean, esFrecuente: Boolean) {
         val density = resources.displayMetrics.density
         val padH = (12 * density).toInt()
@@ -248,7 +233,6 @@ class NuevaCredencialActivity : AppCompatActivity() {
         }
     }
 
-    // Busca el primer TextView dentro de la fila (el nombre de la categoría)
     private fun encontrarTextView(view: View): TextView? {
         if (view is TextView) return view
         if (view is ViewGroup) {
@@ -264,8 +248,11 @@ class NuevaCredencialActivity : AppCompatActivity() {
         val rojoDebil = Color.parseColor("#EF4444")
         val amarilloMedio = Color.parseColor("#F59E0B")
         val verdeFuerte = Color.parseColor("#8FC954")
+        val grisRepetida = Color.parseColor("#9B9B9B")
 
         val params = viewStrengthBar.layoutParams as ViewGroup.LayoutParams
+
+        val esRepetida = password.isNotEmpty() && VaultRepository.credentialList.any { it.password == password }
 
         when {
             password.isEmpty() -> {
@@ -273,6 +260,13 @@ class NuevaCredencialActivity : AppCompatActivity() {
                 viewStrengthBar.layoutParams = params
                 tvStrengthHint.text = "Mínimo 6 caracteres"
                 tvStrengthHint.setTextColor(Color.parseColor("#9CA3AF"))
+            }
+            esRepetida -> {
+                params.width = (resources.displayMetrics.widthPixels * 0.50).toInt()
+                viewStrengthBar.layoutParams = params
+                viewStrengthBar.setBackgroundColor(grisRepetida)
+                tvStrengthHint.text = "Repetida"
+                tvStrengthHint.setTextColor(grisRepetida)
             }
             password.length < 6 -> {
                 params.width = (resources.displayMetrics.widthPixels * 0.33).toInt()

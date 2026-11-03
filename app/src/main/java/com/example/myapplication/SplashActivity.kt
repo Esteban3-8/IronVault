@@ -4,16 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class SplashActivity : AppCompatActivity() {
+class SplashActivity : BaseActivity() { // 👈 Hereda de BaseActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
+        // ── Leer el motivo de bloqueo si viene desde MainActivity por inactividad ──
+        val lockReason = intent.getStringExtra("lock_reason")
 
         Handler(Looper.getMainLooper()).postDelayed({
             val currentUser = Firebase.auth.currentUser
@@ -25,14 +26,15 @@ class SplashActivity : AppCompatActivity() {
                 Firebase.firestore.collection("users").document(userId).get()
                     .addOnSuccessListener { document ->
                         if (document != null && document.exists()) {
-                            // ¡El usuario existe y tiene datos! Va a desbloquear la bóveda
-                            val intent = Intent(this, UnlockVaultActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            // ¡El usuario existe! Mandamos a UnlockVaultActivity pasando el motivo de bloqueo
+                            val intent = Intent(this, UnlockVaultActivity::class.java).apply {
+                                putExtra("lock_reason", lockReason) // Mantiene "auto" si vino por inactividad
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
                             startActivity(intent)
                             finish()
                         } else {
                             // Firebase Auth dice que hay sesión, pero NO hay datos en Firestore
-                            // Cerramos sesión por seguridad y mandamos al registro/bienvenida
                             Firebase.auth.signOut()
                             irABienvenida()
                         }
@@ -47,7 +49,7 @@ class SplashActivity : AppCompatActivity() {
                 irABienvenida()
             }
 
-        }, 3000) // 3 segundos de Splash
+        }, 3000) // 3 segundos de Splash con la animación de carga
     }
 
     private fun irABienvenida() {

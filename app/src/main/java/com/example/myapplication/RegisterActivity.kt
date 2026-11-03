@@ -16,7 +16,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -25,7 +24,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private lateinit var btnBack: ImageView
     private lateinit var etFullName: EditText

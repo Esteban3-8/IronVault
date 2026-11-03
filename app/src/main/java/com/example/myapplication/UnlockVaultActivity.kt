@@ -8,13 +8,12 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class UnlockVaultActivity : AppCompatActivity() {
+class UnlockVaultActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     // INICIA EN TRUE PARA QUE LA CONTRASEÑA SEA VISIBLE POR DEFECTO
     private var isPasswordVisible = true
@@ -43,7 +42,7 @@ class UnlockVaultActivity : AppCompatActivity() {
         }
 
         // Referencias de UI
-        val btnBack              = findViewById<ImageView>(R.id.btnBack)
+        val btnBack             = findViewById<ImageView>(R.id.btnBack)
         val etMasterPassword     = findViewById<EditText>(R.id.etMasterPassword)
         val ivToggleMasterPassword = findViewById<ImageView>(R.id.ivToggleMasterPassword)
         val btnUnlockVault       = findViewById<MaterialCardView>(R.id.btnUnlockVault)
@@ -95,13 +94,17 @@ class UnlockVaultActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "¡Bóveda desbloqueada con éxito!", Toast.LENGTH_SHORT).show()
 
+                    // 🔑 CLAVE: Limpiamos el tiempo de inactividad aquí para romper el bucle
+                    // y permitir que el usuario navegue de forma normal en el Home.
+                    SessionManager.limpiarSesion(this)
+
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()
                 }
                 .addOnFailureListener {
-                    // Si la contraseña maestra es incorrecta, se bloquea el acceso
+                    // Si la contraseña maestra es incorrecta, se mantiene en la pantalla de desbloqueo
                     Toast.makeText(this, "Contraseña maestra incorrecta", Toast.LENGTH_LONG).show()
                 }
         }

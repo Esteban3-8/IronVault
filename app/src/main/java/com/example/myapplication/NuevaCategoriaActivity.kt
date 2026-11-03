@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Color
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.TextView
 
-class NuevaCategoriaActivity : AppCompatActivity() {
+class NuevaCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nueva_categoria)
