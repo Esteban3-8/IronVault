@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
@@ -66,28 +65,50 @@ class PrincipalPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivit
             val confirm = etConfirm.text.toString().trim()
 
             if (current.isEmpty() || nueva.isEmpty() || confirm.isEmpty()) {
-                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Campos vacíos",
+                    mensaje = "Por favor completa todos los campos",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
             val claveGuardada = prefs.getString("master_key", "") ?: ""
             if (claveGuardada.isNotEmpty() && current != claveGuardada) {
-                Toast.makeText(this, "La contraseña actual es incorrecta", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Contraseña incorrecta",
+                    mensaje = "La contraseña actual no es válida",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
             if (nueva != confirm) {
-                Toast.makeText(this, "Las contraseñas nuevas no coinciden", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Error de coincidencia",
+                    mensaje = "Las contraseñas nuevas no coinciden",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
             if (nueva.length < 8) {
-                Toast.makeText(this, "La clave debe tener al menos 8 caracteres", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Contraseña débil",
+                    mensaje = "La clave debe tener al menos 8 caracteres",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
             prefs.edit().putString("master_key", nueva).apply()
-            Toast.makeText(this, "¡Contraseña principal actualizada!", Toast.LENGTH_SHORT).show()
+
+            mostrarBannerPersonalizado(
+                titulo = "¡Actualizado!",
+                mensaje = "Contraseña principal actualizada con éxito",
+                iconoResId = R.drawable.logo
+            )
+
             finish()
         }
     }

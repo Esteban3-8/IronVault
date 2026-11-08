@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -31,7 +30,12 @@ class ForgotPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             val email = etEmail?.text.toString().trim()
 
             if (email.isEmpty()) {
-                etEmail?.error = "Ingresa tu correo electrónico"
+                mostrarBannerPersonalizado(
+                    titulo = "Campo requerido",
+                    mensaje = "Por favor ingresa tu correo electrónico",
+                    iconoResId = R.drawable.logo
+                )
+                etEmail?.requestFocus()
                 return@setOnClickListener
             }
 
@@ -40,11 +44,11 @@ class ForgotPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             // 1. Generamos el código aleatorio de 6 dígitos para la verificación OTP
             val codigoOtp = String.format("%06d", Random.nextInt(1000000))
 
-            Toast.makeText(
-                this,
-                "Enviando código de verificación...",
-                Toast.LENGTH_SHORT
-            ).show()
+            mostrarBannerPersonalizado(
+                titulo = "Enviando...",
+                mensaje = "Enviando código de verificación...",
+                iconoResId = R.drawable.logo
+            )
 
             // 2. Ejecutamos la petición asegurando la transición limpia
             enviarCorreoAppsScript(email, codigoOtp) { exito ->

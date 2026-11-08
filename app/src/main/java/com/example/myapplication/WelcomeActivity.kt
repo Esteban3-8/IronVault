@@ -4,8 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
 
-class WelcomeActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class WelcomeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -27,30 +28,28 @@ class WelcomeActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
         val btnRegister = findViewById<Button>(R.id.btnRegister)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
-        val txtAbout = findViewById<TextView>(R.id.txtAbout) // ¡Ahora apunta al TextView correcto!
+        val txtAbout = findViewById<TextView>(R.id.txtAbout)
         val tvGuestMode = findViewById<TextView>(R.id.tvGuestMode)
 
         // Ir a Registro
         btnRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
 
         // Ir a Iniciar Sesión
         btnLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         // Abrir Reglas de Negocio
         txtAbout.setOnClickListener {
-            val intent = Intent(this, BusinessRulesActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, BusinessRulesActivity::class.java))
         }
 
+        // Modo invitado: cerramos cualquier sesión de Firebase para no mezclar datos
         tvGuestMode.setOnClickListener {
-            val intent = Intent(this, GuestModeActivity::class.java)
-            startActivity(intent)
+            FirebaseAuth.getInstance().signOut()
+            startActivity(Intent(this, GuestModeActivity::class.java))
         }
     }
 }

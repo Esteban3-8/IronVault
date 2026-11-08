@@ -12,14 +12,13 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class MasterPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class MasterPasswordActivity : BaseActivity() {
 
     // INICIAN EN TRUE PARA QUE LOS CAMPOS SE MUESTREN VISIBLES POR DEFECTO
     private var isNewPasswordVisible = true
@@ -117,17 +116,44 @@ class MasterPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             val confirmPassword = etConfirmPassword.text.toString().trim()
 
             if (password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Por favor completa ambos campos", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Campos requeridos",
+                    mensaje = "Por favor completa ambos campos",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
             if (password != confirmPassword) {
-                Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Error de validación",
+                    mensaje = "Las contraseñas no coinciden",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
             if (password.length < 6) {
-                Toast.makeText(this, "La contraseña maestra debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Contraseña débil",
+                    mensaje = "Debe tener al menos 6 caracteres",
+                    iconoResId = R.drawable.logo
+                )
+                return@setOnClickListener
+            }
+
+            // ── Modo invitado: la clave se guarda solo en el dispositivo ──
+            if (GuestUtils.esInvitado(this)) {
+                GuestUtils.guardarClave(this, password)
+                mostrarBannerPersonalizado(
+                    titulo = "¡Bóveda creada!",
+                    mensaje = "Guardada en este dispositivo",
+                    iconoResId = R.drawable.logo
+                )
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
                 return@setOnClickListener
             }
 
@@ -143,7 +169,11 @@ class MasterPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
                 db.collection("users").document(user.uid)
                     .set(masterData, SetOptions.merge())
                     .addOnSuccessListener {
-                        Toast.makeText(this, "¡Bóveda creada con éxito!", Toast.LENGTH_SHORT).show()
+                        mostrarBannerPersonalizado(
+                            titulo = "¡Bóveda creada!",
+                            mensaje = "Configurada con éxito",
+                            iconoResId = R.drawable.logo
+                        )
 
                         // Pasar a la MainActivity limpiando la pila de actividades
                         val intent = Intent(this, MainActivity::class.java)
@@ -152,10 +182,18 @@ class MasterPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
                         finish()
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error al guardar la bóveda: ${e.message}", Toast.LENGTH_SHORT).show()
+                        mostrarBannerPersonalizado(
+                            titulo = "Error de sincronización",
+                            mensaje = "No se pudo guardar: ${e.message}",
+                            iconoResId = R.drawable.logo
+                        )
                     }
             } else {
-                Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Error de autenticación",
+                    mensaje = "Usuario no autenticado",
+                    iconoResId = R.drawable.logo
+                )
             }
         }
     }

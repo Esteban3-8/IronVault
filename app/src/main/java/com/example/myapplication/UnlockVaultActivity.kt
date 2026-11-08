@@ -7,19 +7,28 @@ import android.text.method.PasswordTransformationMethod
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class UnlockVaultActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class UnlockVaultActivity : BaseActivity() {
 
     // INICIA EN TRUE PARA QUE LA CONTRASEÑA SEA VISIBLE POR DEFECTO
     private var isPasswordVisible = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Invitado: no tiene clave maestra, vuelve directo a su bóveda
+        if (GuestUtils.esInvitado(this)) {
+            startActivity(Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_unlock_vault)
 
         // ── Leer el motivo de bloqueo ─────────────────────────────
@@ -30,11 +39,19 @@ class UnlockVaultActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         when (lockReason) {
             "manual" -> {
                 tvSubtitle.text = "La bóveda ha sido bloqueada.\nIngresa tu clave maestra para continuar."
-                Toast.makeText(this, "🔒 Bóveda bloqueada", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Bóveda bloqueada",
+                    mensaje = "Acceso bloqueado manualmente",
+                    iconoResId = R.drawable.logo
+                )
             }
             "auto" -> {
                 tvSubtitle.text = "La bóveda se bloqueó automáticamente por inactividad.\nIngresa tu clave maestra para continuar."
-                Toast.makeText(this, "🔒 Bóveda bloqueada por inactividad", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Bóveda bloqueada",
+                    mensaje = "Bloqueada por inactividad",
+                    iconoResId = R.drawable.logo
+                )
             }
             else -> {
                 tvSubtitle.text = "Ya iniciaste sesión. Ahora ingresa la llave que protege tu bóveda."
@@ -42,7 +59,7 @@ class UnlockVaultActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         }
 
         // Referencias de UI
-        val btnBack             = findViewById<ImageView>(R.id.btnBack)
+        val btnBack              = findViewById<ImageView>(R.id.btnBack)
         val etMasterPassword     = findViewById<EditText>(R.id.etMasterPassword)
         val ivToggleMasterPassword = findViewById<ImageView>(R.id.ivToggleMasterPassword)
         val btnUnlockVault       = findViewById<MaterialCardView>(R.id.btnUnlockVault)
@@ -72,18 +89,26 @@ class UnlockVaultActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             etMasterPassword.setSelection(selection)
         }
 
-        // Desbloquear bóveda con validación real en Firebase Auth
+        // Desbloquear bóveda
         btnUnlockVault.setOnClickListener {
             val password = etMasterPassword.text.toString().trim()
 
             if (password.isEmpty()) {
-                Toast.makeText(this, "Por favor ingresa tu contraseña maestra", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Campo requerido",
+                    mensaje = "Por favor ingresa tu contraseña maestra",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
             val user = Firebase.auth.currentUser
             if (user == null || user.email == null) {
-                Toast.makeText(this, "Error de sesión. Por favor inicia sesión nuevamente.", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Error de sesión",
+                    mensaje = "Por favor inicia sesión nuevamente.",
+                    iconoResId = R.drawable.logo
+                )
                 return@setOnClickListener
             }
 
@@ -92,20 +117,28 @@ class UnlockVaultActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
             user.reauthenticate(credential)
                 .addOnSuccessListener {
-                    Toast.makeText(this, "¡Bóveda desbloqueada con éxito!", Toast.LENGTH_SHORT).show()
+                    mostrarBannerPersonalizado(
+                        titulo = "¡Bóveda desbloqueada!",
+                        mensaje = "Acceso concedido con éxito",
+                        iconoResId = R.drawable.logo
+                    )
 
-                    // 🔑 CLAVE: Limpiamos el tiempo de inactividad aquí para romper el bucle
+                    // CLAVE: Limpiamos el tiempo de inactividad aquí para romper el bucle
                     // y permitir que el usuario navegue de forma normal en el Home.
                     SessionManager.limpiarSesion(this)
 
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
                     startActivity(intent)
                     finish()
                 }
                 .addOnFailureListener {
-                    // Si la contraseña maestra es incorrecta, se mantiene en la pantalla de desbloqueo
-                    Toast.makeText(this, "Contraseña maestra incorrecta", Toast.LENGTH_LONG).show()
+                    mostrarBannerPersonalizado(
+                        titulo = "Error de acceso",
+                        mensaje = "Contraseña maestra incorrecta",
+                        iconoResId = R.drawable.logo
+                    )
                 }
         }
     }

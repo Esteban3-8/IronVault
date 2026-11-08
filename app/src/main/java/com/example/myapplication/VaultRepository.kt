@@ -1,16 +1,26 @@
 package com.example.myapplication
 
+import android.content.Context
+
 object VaultRepository {
-    // Lista inicial con las credenciales de prueba
-    val credentialList = mutableListOf(
-        Credential("Gmail", "laura.gomez@gmail.com", "P@ssw0rd123!", "Segura"),
-        Credential("Instagram", "lau.gomez", "InstaSecure99!", "Segura"),
-        Credential("Banco Nacional", "lgomez92", "123456", "Débil"),
-        Credential("Netflix", "laura.gomez@gmail.com", "Netlfix2026", "Repetida")
-    )
+    // Lista vacía para que no muestre datos de prueba al arrancar la aplicación
+    val credentialList = mutableListOf<Credential>()
 
     // Función para añadir una nueva credencial y colocarla al principio de la lista
     fun addCredential(credential: Credential) {
         credentialList.add(0, credential)
+    }
+
+    /** Si es invitado, guarda la lista cifrada en el dispositivo. Si no, no hace nada. */
+    fun persistirSiInvitado(context: Context) {
+        if (GuestUtils.esInvitado(context)) {
+            GuestStorage.guardar(context, credentialList)
+        }
+    }
+
+    /** Carga en memoria las credenciales guardadas del invitado. */
+    fun cargarDeInvitado(context: Context) {
+        credentialList.clear()
+        credentialList.addAll(GuestStorage.cargar(context))
     }
 }

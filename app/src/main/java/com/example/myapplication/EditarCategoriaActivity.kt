@@ -1,12 +1,13 @@
 package com.example.myapplication
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
+import android.graphics.Color
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 
 class EditarCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +33,14 @@ class EditarCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             val view = layoutInflater.inflate(R.layout.dialog_icon_category, null)
             sheet.setContentView(view)
             (view.parent as View).setBackgroundColor(Color.TRANSPARENT)
-            view.findViewById<View>(R.id.btnApply).setOnClickListener { sheet.dismiss() }
+            view.findViewById<View>(R.id.btnApply).setOnClickListener {
+                sheet.dismiss()
+                mostrarBannerPersonalizado(
+                    titulo = "Personalización",
+                    mensaje = "Cambios de icono guardados",
+                    iconoResId = R.drawable.logo
+                )
+            }
             sheet.show()
         }
 
@@ -41,9 +49,19 @@ class EditarCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             val view = layoutInflater.inflate(R.layout.dialog_eliminar_categoria, null)
             val dialog = AlertDialog.Builder(this).setView(view).create()
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
             view.findViewById<View>(R.id.btnCancelDelete).setOnClickListener { dialog.dismiss() }
-            // La eliminación real va en la fase de lógica
-            view.findViewById<View>(R.id.btnConfirmDelete).setOnClickListener { dialog.dismiss() }
+
+            view.findViewById<View>(R.id.btnConfirmDelete).setOnClickListener {
+                dialog.dismiss()
+                mostrarBannerPersonalizado(
+                    titulo = "Categoría eliminada",
+                    mensaje = "La categoría ha sido borrada",
+                    iconoResId = R.drawable.logo
+                )
+                finish()
+            }
+
             dialog.show()
 
             dialog.window?.setLayout(

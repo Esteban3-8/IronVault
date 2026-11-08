@@ -6,7 +6,6 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
@@ -63,9 +62,13 @@ class VaultSecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
                 // Usuario ACTIVÓ el switch → mostrar diálogo biométrico
                 mostrarDialogoBiometrico(switchBiometric)
             } else {
-                // Usuario DESACTIVÓ el switch → solo guardar y notificar
+                // Usuario DESACTIVÓ el switch → solo guardar y notificar con banner superior
                 prefs.edit().putBoolean("biometric_enabled", false).apply()
-                Toast.makeText(this, "Autenticación biométrica desactivada", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Biometría desactivada",
+                    mensaje = "Autenticación biométrica desactivada",
+                    iconoResId = R.drawable.logo
+                )
             }
         }
 
@@ -123,7 +126,11 @@ class VaultSecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private fun activarBiometria(mensaje: String) {
         prefs.edit().putBoolean("biometric_enabled", true).apply()
-        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+        mostrarBannerPersonalizado(
+            titulo = "Seguridad actualizada",
+            mensaje = mensaje,
+            iconoResId = R.drawable.logo
+        )
     }
 
     override fun onDestroy() {
@@ -137,7 +144,11 @@ class VaultSecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         dialog.setContentView(view)
 
         view.findViewById<AppCompatButton>(R.id.btnExportConfirm).setOnClickListener {
-            Toast.makeText(this, "Exportando datos... (próximamente)", Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Exportación",
+                mensaje = "Exportando datos... (próximamente)",
+                iconoResId = R.drawable.logo
+            )
             dialog.dismiss()
         }
         view.findViewById<MaterialCardView>(R.id.btnExportCancel).setOnClickListener {
@@ -154,7 +165,13 @@ class VaultSecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         view.findViewById<AppCompatButton>(R.id.btnDeleteConfirm).setOnClickListener {
             getSharedPreferences("security_prefs", MODE_PRIVATE).edit().clear().apply()
             getSharedPreferences("settings_prefs", MODE_PRIVATE).edit().clear().apply()
-            Toast.makeText(this, "Datos eliminados", Toast.LENGTH_SHORT).show()
+
+            mostrarBannerPersonalizado(
+                titulo = "Datos eliminados",
+                mensaje = "Se ha borrado toda la información",
+                iconoResId = R.drawable.logo
+            )
+
             val intent = Intent(this, WelcomeActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)

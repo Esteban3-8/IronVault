@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.net.HttpURLConnection
 import java.net.URL
@@ -157,10 +156,18 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
 
         enviarCorreoHttp(email, nuevoOtp) { enviado ->
             if (enviado) {
-                Toast.makeText(context, "Nuevo código enviado a tu correo", Toast.LENGTH_SHORT).show()
+                requireActivity().mostrarBannerPersonalizado(
+                    titulo = "Código reenviado",
+                    mensaje = "Nuevo código enviado a tu correo",
+                    iconoResId = R.drawable.logo
+                )
                 iniciarCronometro(90000)
             } else {
-                Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show()
+                requireActivity().mostrarBannerPersonalizado(
+                    titulo = "Error de envío",
+                    mensaje = "No se pudo enviar el correo",
+                    iconoResId = R.drawable.logo
+                )
             }
         }
     }
@@ -204,7 +211,11 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
         val otpGuardado = sharedPrefs.getString("temp_otp", "")
 
         if (codigoIngresado == otpGuardado) {
-            Toast.makeText(context, "¡Cuenta verificada exitosamente!", Toast.LENGTH_SHORT).show()
+            requireActivity().mostrarBannerPersonalizado(
+                titulo = "¡Verificación exitosa!",
+                mensaje = "Cuenta verificada con éxito",
+                iconoResId = R.drawable.logo
+            )
 
             parentFragmentManager.setFragmentResult("verifyKey", Bundle().apply {
                 putBoolean("emailVerified", true)
@@ -212,7 +223,11 @@ class VerifyBottomSheet : BottomSheetDialogFragment() {
 
             dismiss()
         } else {
-            Toast.makeText(context, "El código ingresado es incorrecto", Toast.LENGTH_SHORT).show()
+            requireActivity().mostrarBannerPersonalizado(
+                titulo = "Código incorrecto",
+                mensaje = "El código ingresado no es válido",
+                iconoResId = R.drawable.logo
+            )
         }
     }
 

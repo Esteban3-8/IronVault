@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
 import java.security.SecureRandom
@@ -77,7 +76,11 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         btnGenerate?.setOnClickListener {
             val currentLength = if (seekBarLength.progress < 4) 4 else seekBarLength.progress
             tvPassword.text = crearContrasenaAleatoria(currentLength)
-            Toast.makeText(this, "¡Nueva contraseña generada!", Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Generada",
+                mensaje = "¡Nueva contraseña generada!",
+                iconoResId = R.drawable.logo
+            )
         }
 
         // 4. Botón "Copiar al Portapapeles"
@@ -85,7 +88,11 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Contraseña IronVault", tvPassword.text.toString())
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(this, "¡Contraseña copiada!", Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Portapapeles",
+                mensaje = "¡Contraseña copiada con éxito!",
+                iconoResId = R.drawable.logo
+            )
         }
 
         // 5. Botón naranja "Continuar con esta contraseña"
@@ -98,7 +105,11 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
                 setResult(RESULT_OK, resultIntent)
                 finish()
             } else {
-                Toast.makeText(this, "Genera una contraseña primero", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Atención",
+                    mensaje = "Genera una contraseña primero",
+                    iconoResId = R.drawable.logo
+                )
             }
         }
 

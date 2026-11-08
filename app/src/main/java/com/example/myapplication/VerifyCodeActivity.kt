@@ -10,7 +10,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
@@ -45,13 +44,21 @@ class VerifyCodeActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         findViewById<View>(R.id.btnVerifyCode).setOnClickListener {
             val code = digitFields.joinToString("") { it.text.toString() }
             if (code.length == digitFields.size) {
-                Toast.makeText(this, "¡Código verificado con éxito!", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "¡Código verificado!",
+                    mensaje = "Verificación exitosa",
+                    iconoResId = R.drawable.logo
+                )
 
                 val intent = Intent(this, ResetPasswordActivity::class.java)
                 startActivity(intent)
                 finish()
             } else {
-                Toast.makeText(this, "Por favor ingresa todos los dígitos completos", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Código incompleto",
+                    mensaje = "Por favor ingresa todos los dígitos",
+                    iconoResId = R.drawable.logo
+                )
             }
         }
 
@@ -60,7 +67,11 @@ class VerifyCodeActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             val nuevoCodigo = String.format("%06d", Random.nextInt(1000000))
             enviarCorreoVerificacion(userEmail, nuevoCodigo)
 
-            Toast.makeText(this, "Nuevo código reenviado con éxito", Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Código reenviado",
+                mensaje = "Nuevo código enviado con éxito",
+                iconoResId = R.drawable.logo
+            )
             startResendTimer()
         }
 

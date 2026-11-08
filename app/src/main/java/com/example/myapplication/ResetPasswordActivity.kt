@@ -5,7 +5,6 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 
 class ResetPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
@@ -63,23 +62,31 @@ class ResetPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             val confirmPassword = etConfirmPassword?.text.toString().trim()
 
             if (newPassword.length < 6) {
-                etNewPassword?.error = "La contraseña debe tener al menos 6 caracteres"
+                mostrarBannerPersonalizado(
+                    titulo = "Contraseña débil",
+                    mensaje = "Debe tener al menos 6 caracteres",
+                    iconoResId = R.drawable.logo
+                )
                 etNewPassword?.requestFocus()
                 return@setOnClickListener
             }
 
             if (newPassword != confirmPassword) {
-                etConfirmPassword?.error = "Las contraseñas no coinciden"
+                mostrarBannerPersonalizado(
+                    titulo = "Error de validación",
+                    mensaje = "Las contraseñas no coinciden",
+                    iconoResId = R.drawable.logo
+                )
                 etConfirmPassword?.requestFocus()
                 return@setOnClickListener
             }
 
-            // Aquí puedes implementar tu lógica local o el flujo de guardado que necesites
-            Toast.makeText(
-                this,
-                "¡Contraseña actualizada con éxito!",
-                Toast.LENGTH_LONG
-            ).show()
+            // Banner superior de éxito unificado
+            mostrarBannerPersonalizado(
+                titulo = "¡Contraseña actualizada!",
+                mensaje = "Cambios guardados con éxito",
+                iconoResId = R.drawable.logo
+            )
 
             finish()
         }

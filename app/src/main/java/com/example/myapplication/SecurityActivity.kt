@@ -1,19 +1,22 @@
 package com.example.myapplication
 
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 
-// ─────────────────────────────────────────────────────────────────
-//  SecurityActivity
-// ─────────────────────────────────────────────────────────────────
-class SecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class SecurityActivity : BaseActivity() {
 
     private val prefs by lazy {
         getSharedPreferences("security_prefs", MODE_PRIVATE)
@@ -41,13 +44,10 @@ class SecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
     }
 
     private fun configurarBotones() {
-
-        // Botón de retroceso (si existiera en el layout)
-        findViewById<android.widget.ImageView?>(R.id.btnBack)?.setOnClickListener {
+        findViewById<ImageView?>(R.id.btnBack)?.setOnClickListener {
             finish()
         }
 
-        // ── Botón BLOQUEAR BÓVEDA AHORA ──────────────────────────
         findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLockNow).setOnClickListener {
             bloquearBoveda(motivo = "manual")
         }
@@ -68,28 +68,23 @@ class SecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             startActivity(Intent(this, AccessHistoryActivity::class.java))
         }
 
-        // ── BARRA DE NAVEGACIÓN INFERIOR (Menú Píldora) ──────────
-
-        // 1. Ir a Inicio (MainActivity)
+        // ── Barra de navegación inferior ──
         findViewById<LinearLayout>(R.id.btnNavHome).setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
-            finish()
         }
 
-        // 2. Ir al Generador de Contraseñas / Llaves
         findViewById<LinearLayout>(R.id.btnNavKey).setOnClickListener {
             val intent = Intent(this, PasswordGeneratorActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
-            finish()
         }
 
-        // 3. Ir a Ajustes
         findViewById<LinearLayout>(R.id.btnNavSettings).setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
-            finish()
         }
     }
 
@@ -105,27 +100,35 @@ class SecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_auto_lock, null)
         dialog.setContentView(view)
 
-        val opt15s      = view.findViewById<TextView>(R.id.opt15s)
-        val opt30s      = view.findViewById<TextView>(R.id.opt30s)
-        val opt1m       = view.findViewById<TextView>(R.id.opt1m)
-        val opt3m       = view.findViewById<TextView>(R.id.opt3m)
-        val opt5m       = view.findViewById<TextView>(R.id.opt5m)
-        val opt10m      = view.findViewById<TextView>(R.id.opt10m)
+        val opt15s     = view.findViewById<TextView>(R.id.opt15s)
+        val opt30s     = view.findViewById<TextView>(R.id.opt30s)
+        val opt1m      = view.findViewById<TextView>(R.id.opt1m)
+        val opt3m      = view.findViewById<TextView>(R.id.opt3m)
+        val opt5m      = view.findViewById<TextView>(R.id.opt5m)
+        val opt10m     = view.findViewById<TextView>(R.id.opt10m)
+        val optNever   = view.findViewById<TextView>(R.id.optNever)
         val btnCancelar = view.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnCancelSheet)
 
         fun seleccionar(valor: String) {
             prefs.edit().putString("auto_lock", valor).apply()
             findViewById<TextView>(R.id.tvAutoLockValue).text = valor
-            Toast.makeText(this, "Bloqueo automático: $valor", Toast.LENGTH_SHORT).show()
+
+            mostrarBannerPersonalizado(
+                titulo = "¡Cambios Guardados!",
+                mensaje = "Bloqueo automático: $valor",
+                iconoResId = R.drawable.logo
+            )
+
             dialog.dismiss()
         }
 
-        opt15s.setOnClickListener  { seleccionar("15 segundos") }
-        opt30s.setOnClickListener  { seleccionar("30 segundos") }
-        opt1m.setOnClickListener   { seleccionar("1 minuto")    }
-        opt3m.setOnClickListener   { seleccionar("3 minutos")   }
-        opt5m.setOnClickListener   { seleccionar("5 minutos")   }
-        opt10m.setOnClickListener  { seleccionar("10 minutos")  }
+        opt15s.setOnClickListener   { seleccionar("15 segundos") }
+        opt30s.setOnClickListener   { seleccionar("30 segundos") }
+        opt1m.setOnClickListener    { seleccionar("1 minuto")    }
+        opt3m.setOnClickListener    { seleccionar("3 minutos")   }
+        opt5m.setOnClickListener    { seleccionar("5 minutos")   }
+        opt10m.setOnClickListener   { seleccionar("10 minutos")  }
+        optNever.setOnClickListener { seleccionar("Desactivar") }
         btnCancelar.setOnClickListener { dialog.dismiss() }
 
         dialog.show()
@@ -136,15 +139,22 @@ class SecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_attempts, null)
         dialog.setContentView(view)
 
-        val opt3a       = view.findViewById<TextView>(R.id.opt3a)
-        val opt5a       = view.findViewById<TextView>(R.id.opt5a)
-        val opt7a       = view.findViewById<TextView>(R.id.opt7a)
-        val optNever    = view.findViewById<TextView>(R.id.optNever)
+        val opt3a      = view.findViewById<TextView>(R.id.opt3a)
+        val opt5a      = view.findViewById<TextView>(R.id.opt5a)
+        val opt7a      = view.findViewById<TextView>(R.id.opt7a)
+        val optNever   = view.findViewById<TextView>(R.id.optNever)
         val btnCancelar = view.findViewById<com.google.android.material.card.MaterialCardView>(R.id.btnCancelSheet)
 
         fun seleccionar(valor: String) {
             prefs.edit().putString("attempts", valor).apply()
             findViewById<TextView>(R.id.tvAttemptsValue).text = valor
+
+            mostrarBannerPersonalizado(
+                titulo = "¡Cambios Guardados!",
+                mensaje = "Intentos de acceso: $valor",
+                iconoResId = R.drawable.logo
+            )
+
             dialog.dismiss()
         }
 
@@ -155,5 +165,43 @@ class SecurityActivity : BaseActivity() { // 👈 Hereda de BaseActivity
         btnCancelar.setOnClickListener { dialog.dismiss() }
 
         dialog.show()
+    }
+
+    private fun mostrarBannerPersonalizado(titulo: String, mensaje: String, iconoResId: Int) {
+        val rootView = findViewById<View>(R.id.main) ?: window.decorView.rootView
+
+        val snackbar = Snackbar.make(rootView, "", Snackbar.LENGTH_LONG)
+        val customView = LayoutInflater.from(this).inflate(R.layout.layout_custom_banner, null)
+
+        customView.findViewById<TextView>(R.id.bannerTitle).text = titulo
+        customView.findViewById<TextView>(R.id.bannerMessage).text = mensaje
+        customView.findViewById<ImageView>(R.id.bannerIcon).setImageResource(iconoResId)
+
+        // Animación fluida de la línea naranja de izquierda a derecha
+        val orangeLine = customView.findViewById<View>(R.id.bannerLine)
+        orangeLine.post {
+            orangeLine.pivotX = 0f
+            val animator = ValueAnimator.ofFloat(1f, 0f).apply {
+                duration = 2750L
+                addUpdateListener { animation ->
+                    val scale = animation.animatedValue as Float
+                    orangeLine.scaleX = scale
+                }
+            }
+            animator.start()
+        }
+
+        // Corrección de tipo con ViewGroup para evitar errores de compilación
+        val snackbarLayout = snackbar.view as ViewGroup
+        snackbarLayout.setPadding(0, 0, 0, 0)
+        snackbarLayout.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+
+        val params = snackbarLayout.layoutParams as FrameLayout.LayoutParams
+        params.gravity = Gravity.TOP
+        params.topMargin = 120
+        snackbarLayout.layoutParams = params
+
+        snackbarLayout.addView(customView, 0)
+        snackbar.show()
     }
 }

@@ -8,13 +8,18 @@ import android.graphics.Color
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.widget.TextView
 
-class NuevaCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class NuevaCategoriaActivity : BaseActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nueva_categoria)
 
-        findViewById<ImageView>(R.id.btnBack).setOnClickListener { finish() }
+        // Botón para regresar
+        findViewById<ImageView>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
 
+        // Lógica para desplegar/contraer el menú del grupo
         val dropdown = findViewById<LinearLayout>(R.id.groupDropdown)
         val arrow = findViewById<ImageView>(R.id.ivGroupArrow)
 
@@ -26,12 +31,19 @@ class NuevaCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             )
         }
 
+        // Diálogo inferior para seleccionar icono y color de la categoría
         findViewById<View>(R.id.btnIcon).setOnClickListener {
             val dialog = BottomSheetDialog(this)
             val view = layoutInflater.inflate(R.layout.dialog_icon_category, null)
             dialog.setContentView(view)
+
+            // Hacer transparente el fondo nativo del BottomSheet para respetar el diseño curvo
             (view.parent as View).setBackgroundColor(Color.TRANSPARENT)
-            view.findViewById<View>(R.id.btnApply).setOnClickListener { dialog.dismiss() }
+
+            view.findViewById<View>(R.id.btnApply).setOnClickListener {
+                dialog.dismiss()
+            }
+
             val colors = view.findViewById<View>(R.id.containerColors)
             val icons = view.findViewById<View>(R.id.containerIcons)
             val tvColor = view.findViewById<TextView>(R.id.tvTabColor)
@@ -39,23 +51,30 @@ class NuevaCategoriaActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             val lineColor = view.findViewById<View>(R.id.lineColor)
             val lineIcon = view.findViewById<View>(R.id.lineIcon)
 
+            // Función para alternar entre pestañas de Color e Icono
             fun mostrarColor(esColor: Boolean) {
                 colors.visibility = if (esColor) View.VISIBLE else View.GONE
                 icons.visibility = if (esColor) View.GONE else View.VISIBLE
+
                 val on = getColor(R.color.orange_primary)
                 val off = getColor(R.color.text_muted)
                 val lineOff = getColor(R.color.border_color)
+
                 tvColor.setTextColor(if (esColor) on else off)
                 tvIcon.setTextColor(if (esColor) off else on)
                 lineColor.setBackgroundColor(if (esColor) on else lineOff)
                 lineIcon.setBackgroundColor(if (esColor) lineOff else on)
+
                 lineColor.layoutParams.height = if (esColor) 6 else 3
                 lineIcon.layoutParams.height = if (esColor) 3 else 6
-                lineColor.requestLayout(); lineIcon.requestLayout()
+
+                lineColor.requestLayout()
+                lineIcon.requestLayout()
             }
 
             view.findViewById<View>(R.id.tabColor).setOnClickListener { mostrarColor(true) }
             view.findViewById<View>(R.id.tabIcon).setOnClickListener { mostrarColor(false) }
+
             dialog.show()
         }
     }

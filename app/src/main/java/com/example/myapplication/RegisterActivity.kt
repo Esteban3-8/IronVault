@@ -14,7 +14,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import com.google.firebase.auth.ktx.auth
@@ -24,7 +23,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class RegisterActivity : BaseActivity() {
 
     private lateinit var btnBack: ImageView
     private lateinit var etFullName: EditText
@@ -182,14 +181,22 @@ class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             }
 
             btnVerify.isEnabled = false
-            Toast.makeText(this, "Enviando código...", Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Verificación",
+                mensaje = "Enviando código de acceso...",
+                iconoResId = R.drawable.logo
+            )
             enviarYGenerarOtpTemporal(email)
         }
 
         supportFragmentManager.setFragmentResultListener("verifyKey", this) { _, bundle ->
             isEmailVerified = bundle.getBoolean("emailVerified", false)
             if (isEmailVerified) {
-                Toast.makeText(this, "¡Correo verificado con éxito!", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Verificado",
+                    mensaje = "¡Correo verificado con éxito!",
+                    iconoResId = R.drawable.logo
+                )
                 layoutEmailVerified.visibility = View.VISIBLE
                 btnVerify.isEnabled = false
                 btnVerify.text = "Verificado"
@@ -219,7 +226,11 @@ class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             }
 
             if (!isEmailVerified) {
-                Toast.makeText(this, "Debes verificar tu correo antes de continuar", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Atención",
+                    mensaje = "Debes verificar tu correo antes de continuar",
+                    iconoResId = R.drawable.logo
+                )
                 hayError = true
             }
 
@@ -237,7 +248,11 @@ class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             }
 
             if (!cbTerms.isChecked) {
-                Toast.makeText(this, "Debes aceptar los Términos y la Política de Privacidad", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Términos y condiciones",
+                    mensaje = "Debes aceptar los Términos y la Política de Privacidad",
+                    iconoResId = R.drawable.logo
+                )
                 hayError = true
             }
 
@@ -323,7 +338,11 @@ class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
         enviarCorreoHttp(email, otpCode) { enviado ->
             if (enviado) {
-                Toast.makeText(this, "Código enviado a tu correo", Toast.LENGTH_SHORT).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Código enviado",
+                    mensaje = "Revisa tu correo electrónico",
+                    iconoResId = R.drawable.logo
+                )
 
                 val bottomSheet = VerifyBottomSheet().apply {
                     arguments = Bundle().apply {
@@ -333,7 +352,11 @@ class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
                 bottomSheet.show(supportFragmentManager, "VerifyBottomSheet")
                 btnVerify.isEnabled = true
             } else {
-                Toast.makeText(this, "Error al enviar el correo. Revisa la URL o conexión.", Toast.LENGTH_LONG).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Error de envío",
+                    mensaje = "No se pudo enviar el correo. Revisa tu conexión.",
+                    iconoResId = R.drawable.logo
+                )
                 btnVerify.isEnabled = true
             }
         }
@@ -387,11 +410,17 @@ class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
                 db.collection("users").document(userId).set(userData)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "¡Cuenta creada correctamente!", Toast.LENGTH_SHORT).show()
+                        mostrarBannerPersonalizado(
+                            titulo = "¡Bienvenido!",
+                            mensaje = "¡Cuenta creada correctamente!",
+                            iconoResId = R.drawable.logo
+                        )
 
                         // ── GUARDAR SESIÓN PERSISTENTE PARA WELCOMEACTIVITY ──
                         val settingsPrefs = getSharedPreferences("settings_prefs", MODE_PRIVATE)
                         settingsPrefs.edit().putBoolean("is_logged_in", true).apply()
+                        // Ya no es invitado
+                        GuestUtils.marcarInvitado(this, false)
                         // ----------------------------------------------------
 
                         val intent = Intent(this, MasterPasswordActivity::class.java)
@@ -400,19 +429,27 @@ class RegisterActivity : BaseActivity() { // 👈 Hereda de BaseActivity
                         finish()
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error al guardar perfil: ${e.message}", Toast.LENGTH_SHORT).show()
+                        mostrarBannerPersonalizado(
+                            titulo = "Error de perfil",
+                            mensaje = "No se pudo guardar: ${e.message}",
+                            iconoResId = R.drawable.logo
+                        )
                     }
             }
             .addOnFailureListener { e ->
                 val exceptionMessage = e.message ?: ""
 
                 val mensajePersonalizado = if (exceptionMessage.contains("already in use", ignoreCase = true)) {
-                    "Este correo ya está registrado. Por favor, inicia sesión."
+                    "Este correo ya está registrado. Inicia sesión."
                 } else {
                     "Error al crear cuenta: $exceptionMessage"
                 }
 
-                Toast.makeText(this, mensajePersonalizado, Toast.LENGTH_LONG).show()
+                mostrarBannerPersonalizado(
+                    titulo = "Error de registro",
+                    mensaje = mensajePersonalizado,
+                    iconoResId = R.drawable.logo
+                )
             }
     }
 }

@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
@@ -60,7 +59,11 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
         // ── Editar perfil ─────────────────────────────────────────
         findViewById<AppCompatButton>(R.id.btnEditProfile).setOnClickListener {
-            Toast.makeText(this, "Próximamente: editar perfil", Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "En desarrollo",
+                mensaje = "Próximamente: editar perfil",
+                iconoResId = R.drawable.logo
+            )
         }
 
         // ── Seguridad y bóveda ────────────────────────────────────
@@ -156,7 +159,11 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
             prefs.edit().putBoolean("dark_theme", isChecked).apply()
             val mensaje = if (isChecked) "Tema oscuro activado" else "Tema oscuro desactivado"
-            Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Apariencia",
+                mensaje = mensaje,
+                iconoResId = R.drawable.logo
+            )
         }
 
         findViewById<SwitchCompat>(R.id.switchNotifications).setOnCheckedChangeListener { _, isChecked ->
@@ -164,7 +171,11 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
             prefs.edit().putBoolean("notifications", isChecked).apply()
             val mensaje = if (isChecked) "Notificaciones activadas" else "Notificaciones desactivadas"
-            Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Preferencias",
+                mensaje = mensaje,
+                iconoResId = R.drawable.logo
+            )
         }
     }
 
@@ -217,7 +228,11 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             prefs.edit().putString("language", idiomaElegido).apply()
             findViewById<TextView>(R.id.tvLanguageValue).text = idiomaElegido
 
-            Toast.makeText(this, "Idioma: $idiomaElegido", Toast.LENGTH_SHORT).show()
+            mostrarBannerPersonalizado(
+                titulo = "Idioma actualizado",
+                mensaje = "Idioma: $idiomaElegido",
+                iconoResId = R.drawable.logo
+            )
             dialog.dismiss()
         }
 

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#161B22"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="10dp"
+    app:strokeWidth="0dp">
+
+    <!-- clipChildren y clipToPadding aseguran que la línea no sobresalga de las esquinas -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="true"
+        android:clipToPadding="true">
+
+        <!-- Contenido principal (Icono, Textos y Botón Cerrar) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="18dp">
+
+            <!-- Icono dinámico a la izquierda -->
+            <ImageView
+                android:id="@+id/bannerIcon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/logo"
+                android:layout_marginEnd="12dp"
+                android:scaleType="centerCrop" />
+
+            <!-- Textos dinámicos (layout_weight="1" para ocupar el espacio central) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/bannerTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¡Cambios Guardados!"
+                    android:fontFamily="@font/inter_bold"
+                    android:textColor="@color/orange_primary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/bannerMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="La configuración se aplicó con éxito."
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- ❌ Botón de cerrar (X) a la derecha en color naranja -->
+            <ImageView
+                android:id="@+id/btnCloseBanner"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:contentDescription="Cerrar"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="#F97316" />
+        </LinearLayout>
+
+        <!-- Línea naranja inferior abarcando todo el ancho -->
+        <View
+            android:id="@+id/bannerLine"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom|start"
+            android:background="@color/orange_primary" />
+
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>
