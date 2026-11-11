@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_card"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Modo invitado"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tus datos solo están en este dispositivo. Con una cuenta se guardan en la nube."
+        android:textSize="14sp"
+        android:textColor="#A0A0A0"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Botón 1: Crear una cuenta -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnGuestCreate"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="Crear una cuenta"
+        android:textAllCaps="false"
+        android:textColor="#14151A"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:background="@drawable/bg_primary_button"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Botón 2: Ya tengo una cuenta -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnGuestLogin"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="Ya tengo una cuenta"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:background="@drawable/bg_button_outline"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Opción 3: Seguir como invitado (texto limpio tipo enlace) -->
+    <TextView
+        android:id="@+id/tvGuestCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seguir como invitado"
+        android:textSize="14sp"
+        android:textColor="#E8873E"
+        android:gravity="center"
+        android:padding="12dp" />
+
+</LinearLayout>

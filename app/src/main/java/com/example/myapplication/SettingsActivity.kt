@@ -3,6 +3,8 @@ package com.example.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -22,7 +24,7 @@ import com.google.firebase.ktx.Firebase
 //  Pantalla de configuración general: perfil, seguridad,
 //  idioma, tema, notificaciones y cerrar sesión.
 // ─────────────────────────────────────────────────────────────────
-class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class SettingsActivity : BaseActivity() {
 
     // Bandera para evitar que los switches disparen eventos al cargar valores guardados
     private var isInitialized = false
@@ -57,13 +59,16 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
     // ─────────────────────────────────────────────────────────────
     private fun configurarBotones() {
 
+        val esInvitado = GuestUtils.esInvitado(this)
+
         // ── Editar perfil ─────────────────────────────────────────
+        // Cuenta: abre el perfil (ahí se edita el nombre). Invitado: ofrece crear cuenta.
         findViewById<AppCompatButton>(R.id.btnEditProfile).setOnClickListener {
-            mostrarBannerPersonalizado(
-                titulo = "En desarrollo",
-                mensaje = "Próximamente: editar perfil",
-                iconoResId = R.drawable.logo
-            )
+            if (GuestUtils.esInvitado(this)) {
+                GuestUtils.mostrarDialogoCuenta(this)
+            } else {
+                startActivity(Intent(this, ProfileActivity::class.java))
+            }
         }
 
         // ── Seguridad y bóveda ────────────────────────────────────
@@ -81,8 +86,20 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
             mostrarDialogoIdioma()
         }
 
-        // ── Cerrar sesión con diseño oscuro personalizado ─────────
-        findViewById<MaterialCardView>(R.id.btnLogout).setOnClickListener {
+        // ── Cerrar sesión (cuenta) / Crear cuenta (invitado) ─────
+        val btnLogout = findViewById<MaterialCardView>(R.id.btnLogout)
+
+        // Un invitado no tiene sesión que cerrar: el botón le ofrece crear una cuenta
+        if (esInvitado) {
+            encontrarTextView(btnLogout)?.text = "Crear cuenta o iniciar sesión"
+        }
+
+        btnLogout.setOnClickListener {
+            if (GuestUtils.esInvitado(this)) {
+                GuestUtils.mostrarDialogoCuenta(this)
+                return@setOnClickListener
+            }
+
             val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_logout, null)
 
             val dialog = AlertDialog.Builder(this)
@@ -102,10 +119,16 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
                 // 1. Desactivamos la bandera local de sesión
                 prefs.edit().putBoolean("is_logged_in", false).apply()
 
-                // 2. ¡Cerramos sesión oficialmente en Firebase Auth para limpiar el token!
+                // 2. Cerramos sesión oficialmente en Firebase Auth para limpiar el token
                 Firebase.auth.signOut()
 
-                // 3. Redirigimos a WelcomeActivity limpiando todo el historial de pantallas
+                // 3. La siguiente persona no debe ver estas contraseñas
+                VaultRepository.credentialList.clear()
+                getSharedPreferences("IronVaultPermanentCache", MODE_PRIVATE).edit().clear().apply()
+                GuestUtils.marcarInvitado(this, false)
+                SessionManager.limpiarSesion(this)
+
+                // 4. Redirigimos a WelcomeActivity limpiando todo el historial de pantallas
                 val intent = Intent(this, WelcomeActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
@@ -114,6 +137,18 @@ class SettingsActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
             dialog.show()
         }
+    }
+
+    // Busca el primer TextView dentro de una vista (para cambiar el texto del botón)
+    private fun encontrarTextView(view: View): TextView? {
+        if (view is TextView) return view
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                val encontrado = encontrarTextView(view.getChildAt(i))
+                if (encontrado != null) return encontrado
+            }
+        }
+        return null
     }
 
     // ─────────────────────────────────────────────────────────────

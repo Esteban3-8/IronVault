@@ -1,6 +1,15 @@
 package com.example.myapplication
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.ViewGroup
+import android.view.Window
+import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
 import android.util.Base64
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -36,6 +45,40 @@ object GuestUtils {
             .putString(KEY_SALT, Base64.encodeToString(sal, Base64.NO_WRAP))
             .putString(KEY_HASH, hash(clave, sal))
             .putBoolean(KEY_KEY_CREATED, true)
+            .apply()
+    }
+
+    /** Cuadro para el invitado: crear una cuenta o iniciar sesión en una existente. */
+    fun mostrarDialogoCuenta(activity: Activity) {
+        val dialog = Dialog(activity)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_guest_account)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            (activity.resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        dialog.findViewById<AppCompatButton>(R.id.btnGuestCreate).setOnClickListener {
+            dialog.dismiss()
+            activity.startActivity(Intent(activity, RegisterActivity::class.java))
+        }
+        dialog.findViewById<AppCompatButton>(R.id.btnGuestLogin).setOnClickListener {
+            dialog.dismiss()
+            activity.startActivity(Intent(activity, LoginActivity::class.java))
+        }
+        dialog.findViewById<TextView>(R.id.tvGuestCancel).setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    /** Borra la clave maestra local del invitado (al pasar a una cuenta). */
+    fun borrarClave(c: Context) {
+        prefs(c).edit()
+            .remove(KEY_HASH)
+            .remove(KEY_SALT)
+            .putBoolean(KEY_KEY_CREATED, false)
             .apply()
     }
 

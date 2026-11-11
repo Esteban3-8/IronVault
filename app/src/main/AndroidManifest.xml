@@ -81,6 +81,9 @@
         <activity
             android:name=".PasswordGeneratorActivity"
             android:exported="false" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
 
         <!-- Actividad de seguridad -->
         <activity
@@ -120,6 +123,7 @@
             android:name=".EditarCategoriaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

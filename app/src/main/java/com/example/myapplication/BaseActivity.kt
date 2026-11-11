@@ -1,26 +1,23 @@
 package com.example.myapplication
 
 import android.content.Intent
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
 
 open class BaseActivity : AppCompatActivity() {
 
-    override fun onStop() {
-        super.onStop()
-        // Registra el momento en que cualquier pantalla pasa a segundo plano
-        SessionManager.registrarSalida(this)
+    companion object {
+        // Cuántas pantallas de la app están visibles ahora mismo.
+        // Si llega a 0, la app pasó a segundo plano (o se cerró del todo).
+        private var pantallasIniciadas = 0
     }
 
     override fun onStart() {
         super.onStart()
 
-        // LOG DE PRUEBA: quítalo cuando termines de probar
-        Log.d(
-            "GUEST_DEBUG",
-            "pantalla=${this::class.java.simpleName} esInvitado=${GuestUtils.esInvitado(this)} user=${FirebaseAuth.getInstance().currentUser?.email}"
-        )
+        // Si no había ninguna pantalla visible, la app viene de segundo plano.
+        // Si ya había una, solo estamos navegando entre pantallas de la app.
+        val veniaDeSegundoPlano = pantallasIniciadas == 0
+        pantallasIniciadas++
 
         // Invitado: no tiene clave maestra, así que el bloqueo por inactividad no aplica
         if (GuestUtils.esInvitado(this)) {
@@ -28,8 +25,9 @@ open class BaseActivity : AppCompatActivity() {
             return
         }
 
-        // Verifica si el tiempo de inactividad expiró al volver a abrir la app desde cualquier pantalla
-        if (SessionManager.haExpiradoInactividad(this)) {
+        // El bloqueo por inactividad solo se revisa al VOLVER a la app desde segundo plano,
+        // no cada vez que se cambia de pantalla dentro de la app.
+        if (veniaDeSegundoPlano && SessionManager.haExpiradoInactividad(this)) {
             SessionManager.limpiarSesion(this)
 
             // Redirige primero a tu pantalla de carga (SplashActivity)
@@ -39,6 +37,17 @@ open class BaseActivity : AppCompatActivity() {
             }
             startActivity(intent)
             finish()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        pantallasIniciadas--
+        if (pantallasIniciadas <= 0) {
+            pantallasIniciadas = 0
+            // La app salió de verdad a segundo plano: aquí empieza a contar la inactividad
+            SessionManager.registrarSalida(this)
         }
     }
 }

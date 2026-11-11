@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -34,6 +35,32 @@ class SecurityActivity : BaseActivity() {
 
         configurarBotones()
         cargarValoresGuardados()
+
+        // Invitado: no tiene clave maestra, así que se ocultan las opciones que dependen de ella
+        if (GuestUtils.esInvitado(this)) {
+            configurarModoInvitado()
+        }
+    }
+
+    /**
+     * Modo invitado: sin clave maestra no hay nada que bloquear, cambiar ni intentar.
+     * Se ocultan esas opciones y el botón principal invita a crear una cuenta.
+     */
+    private fun configurarModoInvitado() {
+        listOf(
+            R.id.cardChangeKey,
+            R.id.cardAutoLock,
+            R.id.cardAttempts,
+            R.id.cardHistory
+        ).forEach { id ->
+            findViewById<View>(id)?.visibility = View.GONE
+        }
+
+        val btnLock = findViewById<AppCompatButton>(R.id.btnLockNow)
+        btnLock.text = "Crear cuenta para proteger tu bóveda"
+        btnLock.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+        }
     }
 
     private fun bloquearBoveda(motivo: String) {
@@ -48,7 +75,7 @@ class SecurityActivity : BaseActivity() {
             finish()
         }
 
-        findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnLockNow).setOnClickListener {
+        findViewById<AppCompatButton>(R.id.btnLockNow).setOnClickListener {
             bloquearBoveda(motivo = "manual")
         }
 

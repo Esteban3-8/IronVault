@@ -104,6 +104,9 @@ class NuevaCredencialActivity : BaseActivity() {
 
         etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
         btnTogglePassword.setImageResource(R.drawable.ojo)
+        // El campo arranca vacío (se ignora el texto de ejemplo del diseño).
+        // Solo se llena si llega una contraseña desde el generador del menú.
+        etPassword.setText(intent.getStringExtra("EXTRA_GENERATED_PASSWORD") ?: "")
         etPassword.setSelection(etPassword.text.length)
         evaluarSeguridadContrasena(etPassword.text.toString())
 

@@ -1,17 +1,13 @@
 package com.example.myapplication
 
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.Window
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -75,7 +71,7 @@ class MainActivity : BaseActivity() {
         btnSeguras?.setOnClickListener {
             paginaActual = 0
             listaActualMostrada = VaultRepository.credentialList.filter {
-                it.strengthStatus.contains("Segura", ignoreCase = true) || it.strengthStatus.contains("Alta", ignoreCase = true)
+                it.strengthStatus.contains("Segura", true) || it.strengthStatus.contains("Alta", true)
             }
             mostrarCredencialesPaginadas()
         }
@@ -83,7 +79,7 @@ class MainActivity : BaseActivity() {
         btnDebiles?.setOnClickListener {
             paginaActual = 0
             listaActualMostrada = VaultRepository.credentialList.filter {
-                it.strengthStatus.contains("Débil", ignoreCase = true)
+                it.strengthStatus.contains("Débil", true)
             }
             mostrarCredencialesPaginadas()
         }
@@ -91,7 +87,7 @@ class MainActivity : BaseActivity() {
         btnMedias?.setOnClickListener {
             paginaActual = 0
             listaActualMostrada = VaultRepository.credentialList.filter {
-                it.strengthStatus.contains("Media", ignoreCase = true)
+                it.strengthStatus.contains("Media", true)
             }
             mostrarCredencialesPaginadas()
         }
@@ -99,7 +95,7 @@ class MainActivity : BaseActivity() {
         btnRepetidas?.setOnClickListener {
             paginaActual = 0
             listaActualMostrada = VaultRepository.credentialList.filter {
-                it.strengthStatus.contains("Repetida", ignoreCase = true)
+                it.strengthStatus.contains("Repetida", true)
             }
             mostrarCredencialesPaginadas()
         }
@@ -133,13 +129,14 @@ class MainActivity : BaseActivity() {
             startActivity(Intent(this, NuevaCredencialActivity::class.java))
         }
 
-        // Invitado: el círculo abre el cuadro de cuenta. Con cuenta: igual que antes.
+        // Invitado: el círculo abre el cuadro de cuenta unificado.
+        // Con cuenta: abre la pantalla de perfil.
         val cardProfile = findViewById<MaterialCardView>(R.id.cardProfile)
         cardProfile?.setOnClickListener {
             if (GuestUtils.esInvitado(this)) {
-                mostrarDialogoInvitado()
+                GuestUtils.mostrarDialogoCuenta(this)
             } else {
-                startActivity(Intent(this, CredentialDetailActivity::class.java))
+                startActivity(Intent(this, ProfileActivity::class.java))
             }
         }
 
@@ -158,6 +155,9 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        // Actualizar avatar al volver por si el nombre cambió en Firestore
+        configurarAvatarInicial()
 
         // ── Invitado: siempre se carga desde el dispositivo (no hay Firebase) ──
         if (GuestUtils.esInvitado(this)) {
@@ -189,78 +189,6 @@ class MainActivity : BaseActivity() {
         }
 
         cargarListaCredenciales()
-    }
-
-    /** Cuadro del invitado: crear cuenta, iniciar sesión o seguir como invitado. */
-    private fun mostrarDialogoInvitado() {
-        val dp = resources.displayMetrics.density
-        fun px(v: Int) = (v * dp).toInt()
-
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-        val contenedor = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundResource(R.drawable.bg_dialog_card)
-            setPadding(px(24), px(24), px(24), px(20))
-        }
-
-        val titulo = TextView(this).apply {
-            text = "Modo invitado"
-            setTextColor(Color.WHITE)
-            textSize = 18f
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
-        }
-
-        val mensaje = TextView(this).apply {
-            text = "Tus datos solo están en este dispositivo. Con una cuenta se guardan en la nube."
-            setTextColor(Color.parseColor("#8E94A0"))
-            textSize = 14f
-            setPadding(0, px(8), 0, px(8))
-        }
-
-        fun boton(texto: String, fondo: Int, color: Int, accion: () -> Unit): TextView {
-            return TextView(this).apply {
-                text = texto
-                setTextColor(color)
-                textSize = 15f
-                gravity = Gravity.CENTER
-                setBackgroundResource(fondo)
-                setPadding(px(16), px(14), px(16), px(14))
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = px(10) }
-                setOnClickListener {
-                    dialog.dismiss()
-                    accion()
-                }
-            }
-        }
-
-        contenedor.addView(titulo)
-        contenedor.addView(mensaje)
-        contenedor.addView(
-            boton("Crear una cuenta", R.drawable.bg_primary_button, Color.WHITE) {
-                startActivity(Intent(this, RegisterActivity::class.java))
-            }
-        )
-        contenedor.addView(
-            boton("Ya tengo una cuenta", R.drawable.bg_secondary_button, Color.WHITE) {
-                startActivity(Intent(this, LoginActivity::class.java))
-            }
-        )
-        contenedor.addView(
-            boton("Seguir como invitado", R.drawable.bg_secondary_button, Color.parseColor("#8E94A0")) {}
-        )
-
-        dialog.setContentView(contenedor)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.88).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.show()
     }
 
     // El caché guarda 8 campos (categoría y fecha de actualización al final)
@@ -352,10 +280,10 @@ class MainActivity : BaseActivity() {
     }
 
     private fun calcularYMostrarEstadisticas(lista: List<Credential>) {
-        val seguras = lista.count { it.strengthStatus.contains("Segura", ignoreCase = true) || it.strengthStatus.contains("Alta", ignoreCase = true) }
-        val debiles = lista.count { it.strengthStatus.contains("Débil", ignoreCase = true) }
-        val medias = lista.count { it.strengthStatus.contains("Media", ignoreCase = true) }
-        val repetidas = lista.count { it.strengthStatus.contains("Repetida", ignoreCase = true) }
+        val seguras = lista.count { it.strengthStatus.contains("Segura", true) || it.strengthStatus.contains("Alta", true) }
+        val debiles = lista.count { it.strengthStatus.contains("Débil", true) }
+        val medias = lista.count { it.strengthStatus.contains("Media", true) }
+        val repetidas = lista.count { it.strengthStatus.contains("Repetida", true) }
 
         val total = seguras + debiles + medias + repetidas
 
@@ -371,7 +299,7 @@ class MainActivity : BaseActivity() {
             VaultRepository.credentialList
         } else {
             VaultRepository.credentialList.filter {
-                it.serviceName.contains(query, ignoreCase = true) || it.userOrEmail.contains(query, ignoreCase = true)
+                it.serviceName.contains(query, true) || it.userOrEmail.contains(query, true)
             }
         }
         paginaActual = 0
@@ -404,19 +332,19 @@ class MainActivity : BaseActivity() {
                 tvStatus.text = cred.strengthStatus
 
                 when {
-                    cred.strengthStatus.contains("Repetida", ignoreCase = true) -> {
+                    cred.strengthStatus.contains("Repetida", true) -> {
                         tvStatus.setTextColor(Color.parseColor("#9B9B9B"))
                         vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
                     }
-                    cred.strengthStatus.contains("Segura", ignoreCase = true) || cred.strengthStatus.contains("Alta", ignoreCase = true) -> {
+                    cred.strengthStatus.contains("Segura", true) || cred.strengthStatus.contains("Alta", true) -> {
                         tvStatus.setTextColor(Color.parseColor("#71C77D"))
                         vDot?.setCardBackgroundColor(Color.parseColor("#71C77D"))
                     }
-                    cred.strengthStatus.contains("Débil", ignoreCase = true) -> {
+                    cred.strengthStatus.contains("Débil", true) -> {
                         tvStatus.setTextColor(Color.parseColor("#E26B6B"))
                         vDot?.setCardBackgroundColor(Color.parseColor("#E26B6B"))
                     }
-                    cred.strengthStatus.contains("Media", ignoreCase = true) -> {
+                    cred.strengthStatus.contains("Media", true) -> {
                         tvStatus.setTextColor(Color.parseColor("#E5C158"))
                         vDot?.setCardBackgroundColor(Color.parseColor("#E5C158"))
                     }
@@ -426,7 +354,6 @@ class MainActivity : BaseActivity() {
                     }
                 }
 
-                // Se envían los datos reales de la credencial (incluida la categoría) al detalle
                 itemView.setOnClickListener {
                     val intent = Intent(this, CredentialDetailActivity::class.java).apply {
                         putExtra("serviceName", cred.serviceName)
@@ -446,11 +373,9 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        // Actualizar el texto indicador de la página actual
         val totalPaginas = if (listaActualMostrada.isNotEmpty()) (listaActualMostrada.size - 1) / elementosPorPagina + 1 else 1
         tvPaginaInfo?.text = "Pág ${paginaActual + 1}/$totalPaginas"
 
-        // Gestionar opacidad visual de los botones según el límite de páginas
         tvAnterior?.alpha = if (paginaActual > 0) 1.0f else 0.3f
         tvSiguiente?.alpha = if (paginaActual < totalPaginas - 1) 1.0f else 0.3f
     }
@@ -459,17 +384,26 @@ class MainActivity : BaseActivity() {
         val currentUser = Firebase.auth.currentUser
         val tvUserInitial = findViewById<TextView>(R.id.tvUserInitial)
 
-        // Invitado: el círculo muestra una "I" de Invitado
         if (GuestUtils.esInvitado(this)) {
             tvUserInitial?.text = "I"
             return
         }
 
         if (currentUser != null) {
-            val email = currentUser.email ?: ""
-            if (email.isNotEmpty() && tvUserInitial != null) {
-                tvUserInitial.text = email.substring(0, 1).uppercase()
-            }
+            FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(currentUser.uid)
+                .get()
+                .addOnSuccessListener { doc ->
+                    val fullName = doc.getString("fullName") ?: ""
+                    val email = currentUser.email ?: ""
+
+                    // Prioriza el nombre de Firestore para extraer la inicial ("F")
+                    val base = if (fullName.isNotBlank()) fullName else email
+                    if (base.isNotEmpty() && tvUserInitial != null) {
+                        tvUserInitial.text = base.substring(0, 1).uppercase()
+                    }
+                }
         }
     }
 }

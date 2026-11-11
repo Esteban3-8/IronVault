@@ -4,6 +4,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -12,16 +14,27 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
 import java.security.SecureRandom
+import kotlin.math.ln
+import kotlin.math.roundToInt
 
 class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivity
 
     private lateinit var tvPassword: TextView
+    private lateinit var tvStrengthLabel: TextView
+    private lateinit var viewBar1: android.view.View
+    private lateinit var viewBar2: android.view.View
+    private lateinit var viewBar3: android.view.View
     private lateinit var seekBarLength: SeekBar
     private lateinit var tvLengthValue: TextView
     private lateinit var switchUppercase: SwitchCompat
     private lateinit var switchLowercase: SwitchCompat
     private lateinit var switchNumbers: SwitchCompat
     private lateinit var switchSymbols: SwitchCompat
+
+    private val colorDebil = Color.parseColor("#EF4444")
+    private val colorMedia = Color.parseColor("#F59E0B")
+    private val colorAlta = Color.parseColor("#8FC954")
+    private val colorBarraApagada = Color.parseColor("#2C303B")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +48,10 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
 
         // 2. Referencias de los componentes visuales
         tvPassword = findViewById(R.id.tvGeneratedPassword)
+        tvStrengthLabel = findViewById(R.id.tvStrengthLabel)
+        viewBar1 = findViewById(R.id.viewBar1)
+        viewBar2 = findViewById(R.id.viewBar2)
+        viewBar3 = findViewById(R.id.viewBar3)
         seekBarLength = findViewById(R.id.seekBarLength)
         tvLengthValue = findViewById(R.id.tvLengthValue)
 
@@ -58,7 +75,7 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
 
                 // Actualiza la contraseña al vuelo mientras deslizas
                 if (fromUser) {
-                    tvPassword.text = crearContrasenaAleatoria(currentLength)
+                    generarYMostrar(currentLength)
                 }
             }
 
@@ -67,15 +84,23 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+        // Al mover un switch se genera una contraseña nueva con los ajustes actuales
+        val alCambiarSwitch = { _: android.widget.CompoundButton, _: Boolean ->
+            generarYMostrar(longitudActual())
+        }
+        switchUppercase.setOnCheckedChangeListener(alCambiarSwitch)
+        switchLowercase.setOnCheckedChangeListener(alCambiarSwitch)
+        switchNumbers.setOnCheckedChangeListener(alCambiarSwitch)
+        switchSymbols.setOnCheckedChangeListener(alCambiarSwitch)
+
         // Generar contraseña inicial al abrir la pantalla
-        val initialLength = if (seekBarLength.progress < 4) 4 else seekBarLength.progress
+        val initialLength = longitudActual()
         tvLengthValue.text = initialLength.toString()
-        tvPassword.text = crearContrasenaAleatoria(initialLength)
+        generarYMostrar(initialLength)
 
         // 3. Botón "Generar de nuevo"
         btnGenerate?.setOnClickListener {
-            val currentLength = if (seekBarLength.progress < 4) 4 else seekBarLength.progress
-            tvPassword.text = crearContrasenaAleatoria(currentLength)
+            generarYMostrar(longitudActual())
             mostrarBannerPersonalizado(
                 titulo = "Generada",
                 mensaje = "¡Nueva contraseña generada!",
@@ -99,10 +124,18 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         btnContinue?.setOnClickListener {
             val passwordGenerada = tvPassword.text.toString()
             if (passwordGenerada.isNotEmpty()) {
-                val resultIntent = Intent().apply {
-                    putExtra("EXTRA_GENERATED_PASSWORD", passwordGenerada)
+                if (callingActivity != null) {
+                    // Lo abrió "Nueva contraseña": le devolvemos la contraseña
+                    val resultIntent = Intent().apply {
+                        putExtra("EXTRA_GENERATED_PASSWORD", passwordGenerada)
+                    }
+                    setResult(RESULT_OK, resultIntent)
+                } else {
+                    // Lo abrió el menú: abrimos "Nueva contraseña" con la contraseña ya escrita
+                    startActivity(Intent(this, NuevaCredencialActivity::class.java).apply {
+                        putExtra("EXTRA_GENERATED_PASSWORD", passwordGenerada)
+                    })
                 }
-                setResult(RESULT_OK, resultIntent)
                 finish()
             } else {
                 mostrarBannerPersonalizado(
@@ -140,8 +173,11 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         }
     }
 
-    // Función para crear la contraseña combinando la barra y los switches activos
-    private fun crearContrasenaAleatoria(longitud: Int): String {
+    private fun longitudActual(): Int =
+        if (seekBarLength.progress < 4) 4 else seekBarLength.progress
+
+    /** Caracteres disponibles según los switches activos. */
+    private fun obtenerCaracteres(): String {
         val upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         val lowerChars = "abcdefghijklmnopqrstuvwxyz"
         val numberChars = "0123456789"
@@ -157,7 +193,18 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         if (charPool.isEmpty()) {
             charPool = lowerChars
         }
+        return charPool
+    }
 
+    /** Genera una contraseña nueva, la muestra y actualiza la fortaleza. */
+    private fun generarYMostrar(longitud: Int) {
+        val pool = obtenerCaracteres()
+        tvPassword.text = crearContrasenaAleatoria(longitud, pool)
+        actualizarFortaleza(longitud, pool.length)
+    }
+
+    // Función para crear la contraseña con los caracteres disponibles
+    private fun crearContrasenaAleatoria(longitud: Int, charPool: String): String {
         val random = SecureRandom()
         val resultado = StringBuilder(longitud)
 
@@ -167,5 +214,34 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         }
 
         return resultado.toString()
+    }
+
+    /**
+     * Fortaleza real: bits de entropía = longitud * log2(caracteres posibles).
+     * Débil < 45, Media < 75, Alta < 100, Excelente >= 100.
+     */
+    private fun actualizarFortaleza(longitud: Int, tamanoPool: Int) {
+        val bits = (longitud * (ln(tamanoPool.toDouble()) / ln(2.0))).roundToInt()
+
+        val nombre: String
+        val color: Int
+        val barras: Int
+
+        when {
+            bits < 45 -> { nombre = "Débil"; color = colorDebil; barras = 1 }
+            bits < 75 -> { nombre = "Media"; color = colorMedia; barras = 2 }
+            bits < 100 -> { nombre = "Alta"; color = colorAlta; barras = 3 }
+            else -> { nombre = "Excelente"; color = colorAlta; barras = 3 }
+        }
+
+        tvPassword.setTextColor(color)
+        tvStrengthLabel.text = "Fortaleza: $nombre ($bits bits de entropía)"
+        tvStrengthLabel.setTextColor(color)
+
+        val todas = listOf(viewBar1, viewBar2, viewBar3)
+        for ((i, barra) in todas.withIndex()) {
+            val encendida = i < barras
+            barra.backgroundTintList = ColorStateList.valueOf(if (encendida) color else colorBarraApagada)
+        }
     }
 }
