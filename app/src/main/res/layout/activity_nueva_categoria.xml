@@ -52,6 +52,7 @@
             android:focusable="true">
 
             <ImageView
+                android:id="@+id/ivCategoryPreview"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 app:tint="@color/orange_primary"
@@ -106,7 +107,7 @@
             android:minHeight="32dp"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"
-            android:text="Educación"
+            android:hint="Nombre de la categoría"
             android:textColor="@color/text_primary"
             android:textSize="15sp"
             android:textStyle="bold" />

@@ -86,6 +86,7 @@ class CredentialDetailActivity : BaseActivity() {
 
         // Si no llega, se muestra "Sin categoría"
         val category = if (rawCategory.isNotBlank()) rawCategory else "Sin categoría"
+        val appearance = CategoryStore(this).all().find { it.key == rawCategory }
 
         // 3. Botón de retroceso
         btnBack?.setOnClickListener { finish() }
@@ -153,8 +154,11 @@ class CredentialDetailActivity : BaseActivity() {
         etNotes.setText(notes)
 
         // 7. Categoría seleccionada: texto + icono
-        tvCategoryName?.text = category
-        ivCategoryIcon?.setImageResource(iconoParaCategoria(category))
+        tvCategoryName?.text = appearance?.name ?: category
+        ivCategoryIcon?.let { icon ->
+            if (appearance != null) appearance.showIcon(icon)
+            else icon.setImageResource(iconoParaCategoria(category))
+        }
 
         // Fondo y color de texto según la categoría (igual que en el selector de categorías)
         val layoutCategoryBox = findViewById<LinearLayout>(R.id.layoutCategoryBox)

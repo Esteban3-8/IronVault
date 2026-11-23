@@ -62,6 +62,15 @@ class NuevaCredencialActivity : BaseActivity() {
         }
     }
 
+    private val categoryLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val key = result.data?.getStringExtra(CategoryStore.EXTRA_CATEGORY)
+            CategoryStore(this).all().find { it.key == key }?.let(::selectCategory)
+        }
+    }
+
     /** Un archivo de frecuencias por usuario: cada cuenta tiene el suyo y el invitado otro. */
     private fun prefsFrecuencias(): SharedPreferences {
         val uid = Firebase.auth.currentUser?.uid ?: "guest"
@@ -95,6 +104,10 @@ class NuevaCredencialActivity : BaseActivity() {
         tvCategory = findViewById(R.id.tvCategory)
         ivCatIcon = findViewById(R.id.ivCatIcon)
         ivTopCategoryIcon = findViewById(R.id.ivTopCategoryIcon)
+        val restoredCategory = savedInstanceState?.getString(CategoryStore.EXTRA_CATEGORY)
+        if (restoredCategory != null) {
+            CategoryStore(this).all().find { it.key == restoredCategory }?.let(::showCategory)
+        }
         etService = findViewById(R.id.etService)
         etUser = findViewById(R.id.etUser)
         etUrl = findViewById(R.id.etUrl)
@@ -149,7 +162,6 @@ class NuevaCredencialActivity : BaseActivity() {
             val rowFrequentExtra1 = view.findViewById<View>(R.id.rowFrequentExtra1)
             val rowFrequentExtra2 = view.findViewById<View>(R.id.rowFrequentExtra2)
             val rowFrequentExtra3 = view.findViewById<View>(R.id.rowFrequentExtra3)
-            val layoutRowFrequent1 = view.findViewById<View>(R.id.layoutRowFrequent1)
             val layoutRowFrequent2 = view.findViewById<View>(R.id.layoutRowFrequent2)
 
             val tvHeaderFrecuentes = view.findViewById<TextView>(R.id.tvHeaderFrecuentes)
@@ -160,7 +172,7 @@ class NuevaCredencialActivity : BaseActivity() {
 
             btnNewCategory?.setOnClickListener {
                 dialog.dismiss()
-                startActivity(Intent(this, NuevaCategoriaActivity::class.java))
+                categoryLauncher.launch(Intent(this, NuevaCategoriaActivity::class.java))
             }
 
             val etSearchCategory = view.findViewById<EditText>(R.id.etSearch)
@@ -187,61 +199,46 @@ class NuevaCredencialActivity : BaseActivity() {
                 }
             }
 
-            rowOther?.visibility = View.VISIBLE
-            val iconoOtras = obtenerIconoParaCategoria("Otras Claves")
-            configurarOpcionCategoria(dialog, view, R.id.rowOther, "Otras Claves", iconoOtras, esFrecuenteSlot = true)
+            val categories = CategoryStore(this).all()
+            val byKey = categories.associateBy { it.key }
+            val fallback = byKey.getValue(CategoryStore.FALLBACK)
+            bindCategoryOption(dialog, rowOther, fallback, frequent = true)
 
-            val umbralMinimo = 3
-            val topCategoriasFrecuentes = categoryCounts.entries
-                .filter { it.key != "Otras Claves" && it.value >= umbralMinimo }
+            val frequent = categoryCounts.entries
+                .filter { it.key != fallback.key && it.value >= 3 }
                 .sortedByDescending { it.value }
-                .map { it.key }
+                .mapNotNull { byKey[it.key] }
                 .take(3)
+            val slots = listOf(rowFrequentExtra1, rowFrequentExtra2, rowFrequentExtra3)
+            for ((index, slot) in slots.withIndex()) {
+                val category = frequent.getOrNull(index)
+                slot.visibility = if (category == null) View.GONE else View.VISIBLE
+                category?.let { bindCategoryOption(dialog, slot, it, frequent = true) }
+            }
 
-            val slotsExtra = listOf(rowFrequentExtra1, rowFrequentExtra2, rowFrequentExtra3)
-            val idsSlotsExtra = listOf(R.id.rowFrequentExtra1, R.id.rowFrequentExtra2, R.id.rowFrequentExtra3)
-
-            var mostrarFila2 = false
-
-            for (i in slotsExtra.indices) {
-                val slotView = slotsExtra[i]
-                if (slotView != null) {
-                    if (i < topCategoriasFrecuentes.size) {
-                        val catNombre = topCategoriasFrecuentes[i]
-                        slotView.visibility = View.VISIBLE
-                        val iconoCat = obtenerIconoParaCategoria(catNombre)
-                        configurarOpcionCategoria(dialog, view, idsSlotsExtra[i], catNombre, iconoCat, esFrecuenteSlot = true)
-
-                        if (i >= 1) {
-                            mostrarFila2 = true
-                        }
-                    } else {
-                        slotView.visibility = View.GONE
-                    }
+            val containerCategoryList = view.findViewById<ViewGroup>(R.id.containerCategoryList)
+            val groupHeaders = mapOf(
+                CategoryGroup.PERSONAL to tvHeaderPersonales,
+                CategoryGroup.FINANCE to tvHeaderFinanzas,
+                CategoryGroup.WORK to tvHeaderTrabajo
+            )
+            val rows = mutableListOf<Pair<VaultCategory, View>>()
+            for ((group, header) in groupHeaders) {
+                var index = containerCategoryList.indexOfChild(header) + 1
+                for (category in categories.filter { it.group == group }) {
+                    val row = layoutInflater.categoryRow(containerCategoryList, category)
+                    bindCategoryOption(dialog, row, category, frequent = false)
+                    containerCategoryList.addView(row, index++)
+                    rows.add(category to row)
                 }
             }
-
-            layoutRowFrequent2?.visibility = if (mostrarFila2) View.VISIBLE else View.GONE
-
-            // Configurar todas las categorías de las secciones inferiores para que respondan al clic
-            val idsCategoriasCompletas = mapOf(
-                "Redes Sociales" to R.id.rowSocial,
-                "Correos" to R.id.rowMail,
-                "Videojuegos" to R.id.rowGames,
-                "Bancos" to R.id.rowBank,
-                "Compras" to R.id.rowShop,
-                "Educación" to R.id.rowEdu,
-                "Otras Claves" to R.id.rowOtherGroup
-            )
-
-            for ((nombreCat, idLayout) in idsCategoriasCompletas) {
-                val iconoCat = obtenerIconoParaCategoria(nombreCat)
-                configurarOpcionCategoria(dialog, view, idLayout, nombreCat, iconoCat, esFrecuenteSlot = false)
+            var frequentIndex = containerCategoryList.indexOfChild(layoutRowFrequent2) + 1
+            for (category in categories.filter { it.group == CategoryGroup.FREQUENT && it.key != fallback.key }) {
+                val row = layoutInflater.categoryRow(containerCategoryList, category)
+                bindCategoryOption(dialog, row, category, frequent = false)
+                containerCategoryList.addView(row, frequentIndex++)
+                rows.add(category to row)
             }
-
-            val categoriaPersonales = listOf("Redes Sociales", "Correos", "Videojuegos")
-            val categoriaFinanzas = listOf("Bancos", "Compras")
-            val categoriaTrabajo = listOf("Educación", "Otras Claves Grupo")
 
             val tvNoEncontrado = TextView(view.context).apply {
                 text = "No se encontraron categorías"
@@ -252,82 +249,37 @@ class NuevaCredencialActivity : BaseActivity() {
                 visibility = View.GONE
             }
 
-            val containerCategoryList = view.findViewById<ViewGroup>(R.id.containerCategoryList)
-            containerCategoryList?.addView(tvNoEncontrado)
+            containerCategoryList.addView(tvNoEncontrado)
 
-            // Lógica de filtrado inteligente manteniendo tamaño y controlando títulos por sección
-            etSearchCategory?.addTextChangedListener(object : TextWatcher {
+            fun filterCategories(query: String) {
+                val showFallback = fallback.name.contains(query, ignoreCase = true)
+                rowOther.visibility = if (showFallback) View.VISIBLE else View.GONE
+                slots.forEachIndexed { index, slot ->
+                    slot.visibility = if (query.isEmpty() && index < frequent.size) View.VISIBLE else View.GONE
+                }
+                layoutRowFrequent2.visibility = if (query.isEmpty() && frequent.size >= 2) View.VISIBLE else View.GONE
+                val visibleGroups = mutableSetOf<CategoryGroup>()
+                for ((category, row) in rows) {
+                    val visible = category.name.contains(query, ignoreCase = true)
+                    row.visibility = if (visible) View.VISIBLE else View.GONE
+                    if (visible) visibleGroups.add(category.group)
+                }
+                for ((group, header) in groupHeaders) {
+                    header.visibility = if (group in visibleGroups) View.VISIBLE else View.GONE
+                }
+                tvHeaderFrecuentes.visibility = if (showFallback || CategoryGroup.FREQUENT in visibleGroups) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+                tvNoEncontrado.visibility = if (showFallback || visibleGroups.isNotEmpty()) View.GONE else View.VISIBLE
+            }
+            etSearchCategory.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    val query = s.toString().lowercase().trim()
-                    var visiblesCount = 0
-
-                    var hayPersonales = false
-                    var hayFinanzas = false
-                    var hayTrabajo = false
-                    var hayFrecuentes = false
-
-                    val coincideOther = "otras claves".contains(query) || query.isEmpty()
-                    rowOther?.visibility = if (coincideOther) View.VISIBLE else View.GONE
-                    if (coincideOther) {
-                        visiblesCount++
-                        hayFrecuentes = true
-                    }
-
-                    val idsCategorias = mapOf(
-                        "Redes Sociales" to R.id.rowSocial,
-                        "Correos" to R.id.rowMail,
-                        "Videojuegos" to R.id.rowGames,
-                        "Bancos" to R.id.rowBank,
-                        "Compras" to R.id.rowShop,
-                        "Educación" to R.id.rowEdu,
-                        "Otras Claves" to R.id.rowOtherGroup
-                    )
-
-                    for ((nombreCat, idLayout) in idsCategorias) {
-                        val rowView = view.findViewById<View>(idLayout)
-                        if (rowView != null) {
-                            val coincide = nombreCat.lowercase().contains(query) || query.isEmpty()
-                            if (coincide) {
-                                rowView.visibility = View.VISIBLE
-                                visiblesCount++
-
-                                if (categoriaPersonales.contains(nombreCat)) hayPersonales = true
-                                if (categoriaFinanzas.contains(nombreCat)) hayFinanzas = true
-                                if (categoriaTrabajo.contains(nombreCat) || nombreCat == "Otras Claves") hayTrabajo = true
-                            } else {
-                                rowView.visibility = View.GONE
-                            }
-                        }
-                    }
-
-                    if (query.isNotEmpty()) {
-                        rowFrequentExtra1?.visibility = View.GONE
-                        rowFrequentExtra2?.visibility = View.GONE
-                        rowFrequentExtra3?.visibility = View.GONE
-                        layoutRowFrequent2?.visibility = View.GONE
-                    } else {
-                        rowFrequentExtra1?.visibility = if (topCategoriasFrecuentes.size >= 1) View.VISIBLE else View.GONE
-                        rowFrequentExtra2?.visibility = if (topCategoriasFrecuentes.size >= 2) View.VISIBLE else View.GONE
-                        rowFrequentExtra3?.visibility = if (topCategoriasFrecuentes.size >= 3) View.VISIBLE else View.GONE
-                        layoutRowFrequent2?.visibility = if (mostrarFila2) View.VISIBLE else View.GONE
-                        hayFrecuentes = true
-                    }
-
-                    // Control independiente de títulos de sección para evitar títulos flotantes
-                    tvHeaderFrecuentes?.visibility = if (hayFrecuentes) View.VISIBLE else View.GONE
-                    tvHeaderPersonales?.visibility = if (hayPersonales) View.VISIBLE else View.GONE
-                    tvHeaderFinanzas?.visibility = if (hayFinanzas) View.VISIBLE else View.GONE
-                    tvHeaderTrabajo?.visibility = if (hayTrabajo) View.VISIBLE else View.GONE
-
-                    if (visiblesCount == 0) {
-                        tvNoEncontrado.visibility = View.VISIBLE
-                    } else {
-                        tvNoEncontrado.visibility = View.GONE
-                    }
-                }
+                override fun afterTextChanged(s: Editable?) { filterCategories(s.toString().trim()) }
             })
+            filterCategories("")
 
             dialog.show()
         }
@@ -349,7 +301,7 @@ class NuevaCredencialActivity : BaseActivity() {
             }
 
             val usuarioFinal = if (usuario.isEmpty()) "Sin usuario" else usuario
-            val categoriaFinal = selectedCategory ?: "Otras Claves"
+            val categoriaFinal = selectedCategory ?: CategoryStore.FALLBACK
             val fortalezaFinal = tvStrengthHint.text.toString()
             val momentoGuardado = System.currentTimeMillis()
 
@@ -513,49 +465,36 @@ class NuevaCredencialActivity : BaseActivity() {
             }
     }
 
-    private fun configurarOpcionCategoria(dialog: BottomSheetDialog, view: View, idLayout: Int, nombre: String, iconoRes: Int, esFrecuenteSlot: Boolean) {
-        val rowView = view.findViewById<View>(idLayout) ?: return
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(CategoryStore.EXTRA_CATEGORY, selectedCategory)
+    }
 
-        rowView.visibility = View.VISIBLE
-        val tvNombre = encontrarTextView(rowView)
-        tvNombre?.text = nombre
-
-        val ivIcono = encontrarImageView(rowView)
-        ivIcono?.setImageResource(iconoRes)
-
-        val cardView = encontrarMaterialCardView(rowView)
-        cardView?.setCardBackgroundColor(obtenerColorBgParaCategoria(nombre))
-
-        resaltarFila(rowView, nombre == selectedCategory, esFrecuenteSlot)
-
-        rowView.setOnClickListener {
-            selectedCategory = nombre
-            tvCategory.text = nombre
-            tvCategory.setTextColor(colorNormal)
-            tvCategory.setTypeface(null, Typeface.BOLD)
-
-            ivCatIcon.setImageResource(iconoRes)
-            ivTopCategoryIcon.setImageResource(iconoRes)
-
-            categoryCounts[nombre] = (categoryCounts[nombre] ?: 0) + 1
-            categoryLastUsedTime[nombre] = System.currentTimeMillis()
-
-            guardarFrecuenciasEnCache()
-
+    private fun bindCategoryOption(dialog: BottomSheetDialog, row: View, category: VaultCategory, frequent: Boolean) {
+        encontrarTextView(row)?.text = category.name
+        encontrarImageView(row)?.let(category::showIcon)
+        encontrarMaterialCardView(row)?.setCardBackgroundColor(obtenerColorBgParaCategoria(category.key))
+        resaltarFila(row, category.key == selectedCategory, frequent)
+        row.setOnClickListener {
+            selectCategory(category)
             dialog.dismiss()
         }
     }
 
-    private fun obtenerIconoParaCategoria(nombre: String): Int {
-        return when (nombre) {
-            "Redes Sociales" -> R.drawable.ic_cat_social
-            "Correos" -> R.drawable.ic_cat_mail
-            "Videojuegos" -> R.drawable.ic_cat_games
-            "Bancos" -> R.drawable.ic_cat_bank
-            "Compras" -> R.drawable.ic_cat_shop
-            "Educación" -> R.drawable.ic_cat_edu
-            else -> R.drawable.ic_cat_lupa
-        }
+    private fun showCategory(category: VaultCategory) {
+        selectedCategory = category.key
+        tvCategory.text = category.name
+        tvCategory.setTextColor(colorNormal)
+        tvCategory.setTypeface(null, Typeface.BOLD)
+        category.showIcon(ivCatIcon)
+        category.showIcon(ivTopCategoryIcon)
+    }
+
+    private fun selectCategory(category: VaultCategory) {
+        showCategory(category)
+        categoryCounts[category.key] = (categoryCounts[category.key] ?: 0) + 1
+        categoryLastUsedTime[category.key] = System.currentTimeMillis()
+        guardarFrecuenciasEnCache()
     }
 
     private fun obtenerColorBgParaCategoria(nombre: String): Int {

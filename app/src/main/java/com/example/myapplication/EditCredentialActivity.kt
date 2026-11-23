@@ -89,6 +89,7 @@ class EditCredentialActivity : BaseActivity() {
         val rawCategory = intent.getStringExtra("category") ?: ""
         val updatedAt = intent.getLongExtra("updatedAt", 0L)
         val category = if (rawCategory.isNotBlank()) rawCategory else "Sin categoría"
+        val appearance = CategoryStore(this).all().find { it.key == rawCategory }
 
         originalService = title
         originalUser = username
@@ -98,7 +99,7 @@ class EditCredentialActivity : BaseActivity() {
         tvInitial.text = title.firstOrNull()?.uppercase() ?: "?"
         tvTitle.text = title
         findViewById<TextView>(R.id.tvUpdatedAt).text = TimeUtils.tiempoRelativo(updatedAt)
-        tvSubtitleCategory.text = category
+        tvSubtitleCategory.text = appearance?.name ?: category
         etUser.setText(username)
         etPassword.setText(password)
         ultimaPassword = password
@@ -106,8 +107,9 @@ class EditCredentialActivity : BaseActivity() {
         etNotes.setText(notes)
 
         // 4. Categoría: texto, icono y color
-        tvCategoryName.text = category
-        ivCategoryIcon.setImageResource(iconoParaCategoria(category))
+        tvCategoryName.text = appearance?.name ?: category
+        if (appearance != null) appearance.showIcon(ivCategoryIcon)
+        else ivCategoryIcon.setImageResource(iconoParaCategoria(category))
         val fondoCategoria = colorFondoParaCategoria(category)
         val fondoActual = layoutCategoryBox.background?.mutate()
         if (fondoActual is GradientDrawable) {

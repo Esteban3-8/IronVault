@@ -2,24 +2,62 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageView
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.widget.doAfterTextChanged
 
-class AdministrarCategoriasActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class AdministrarCategoriasActivity : BaseActivity() {
+    private lateinit var list: LinearLayout
+    private lateinit var search: EditText
+    private var categories = emptyList<VaultCategory>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_administrar_categorias)
-
-        findViewById<ImageView>(R.id.btnBack).setOnClickListener { finish() }
-
-        findViewById<ImageView>(R.id.btnAdd).setOnClickListener {
-            val intent = Intent(this, NuevaCategoriaActivity::class.java)
-            startActivity(intent)
+        list = findViewById(R.id.manageCategoryList)
+        search = findViewById(R.id.etSearch)
+        search.doAfterTextChanged { renderCategories() }
+        findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
+        findViewById<View>(R.id.btnAdd).setOnClickListener {
+            startActivity(Intent(this, NuevaCategoriaActivity::class.java))
         }
+    }
 
-        findViewById<View>(R.id.rowMail).setOnClickListener {
-            val intent = Intent(this, EditarCategoriaActivity::class.java)
-            startActivity(intent)
+    override fun onResume() {
+        super.onResume()
+        categories = CategoryStore(this).all()
+        renderCategories()
+    }
+
+    private fun renderCategories() {
+        list.removeAllViews()
+        val query = search.text.toString().trim()
+        for (group in CategoryGroup.entries) {
+            val matches = categories.filter { it.group == group && it.name.contains(query, true) }
+            if (matches.isEmpty()) continue
+            list.addView(TextView(this).apply {
+                text = group.label
+                setTextColor(getColor(R.color.cat_section))
+            })
+            for (category in matches) {
+                list.addView(layoutInflater.categoryRow(list, category).apply {
+                    setBackgroundResource(R.drawable.bg_card_row)
+                    setOnClickListener {
+                        startActivity(
+                            Intent(this@AdministrarCategoriasActivity, EditarCategoriaActivity::class.java)
+                                .putExtra(CategoryStore.EXTRA_CATEGORY, category.key)
+                        )
+                    }
+                })
+            }
+        }
+        if (list.childCount == 0) {
+            list.addView(TextView(this).apply {
+                text = "No se encontraron categorías"
+                setTextColor(getColor(R.color.text_muted))
+            })
         }
     }
 }
