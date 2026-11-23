@@ -149,19 +149,34 @@ class RegisterActivity : BaseActivity() {
         etFullName.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) { if (s.toString().isNotEmpty()) tvFullNameError.visibility = View.GONE }
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().isNotEmpty()) tvFullNameError.visibility = View.GONE
+            }
         })
 
         etEmail.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) { if (s.toString().isNotEmpty()) tvEmailError.visibility = View.GONE }
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().isNotEmpty()) {
+                    tvEmailError.visibility = View.GONE
+                }
+                // Si el usuario cambia el correo, se reinicia el estado de verificación
+                if (isEmailVerified) {
+                    isEmailVerified = false
+                    layoutEmailVerified.visibility = View.GONE
+                    btnVerify.isEnabled = true
+                    btnVerify.text = "Verificar"
+                }
+            }
         })
 
         etConfirmPassword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) { if (s.toString().isNotEmpty()) tvConfirmPasswordError.visibility = View.GONE }
+            override fun afterTextChanged(s: Editable?) {
+                if (s.toString().isNotEmpty()) tvConfirmPasswordError.visibility = View.GONE
+            }
         })
 
         btnVerify.setOnClickListener {
@@ -174,6 +189,11 @@ class RegisterActivity : BaseActivity() {
                 tvEmailError.visibility = View.VISIBLE
                 return@setOnClickListener
             }
+
+            if (!validarFormatoCorreo(email)) {
+                return@setOnClickListener
+            }
+
             if (password.length < 6) {
                 tvStrengthHint.text = "La contraseña debe tener al menos 6 caracteres"
                 tvStrengthHint.setTextColor(Color.parseColor("#EF4444"))
@@ -223,6 +243,8 @@ class RegisterActivity : BaseActivity() {
                 tvEmailError.setTextColor(Color.parseColor("#EF4444"))
                 tvEmailError.visibility = View.VISIBLE
                 hayError = true
+            } else if (!validarFormatoCorreo(email)) {
+                hayError = true
             }
 
             if (!isEmailVerified) {
@@ -260,6 +282,35 @@ class RegisterActivity : BaseActivity() {
 
             crearCuentaDefinitivaEnFirebase(nombre, email, password)
         }
+    }
+
+    private fun validarFormatoCorreo(email: String): Boolean {
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tvEmailError.text = "Ingresa un correo electrónico válido"
+            tvEmailError.setTextColor(Color.parseColor("#EF4444"))
+            tvEmailError.visibility = View.VISIBLE
+            return false
+        }
+
+        val dominio = email.substringAfter("@").lowercase()
+        val erroresDominio = mapOf(
+            "gamil.com" to "gmail.com",
+            "gmial.com" to "gmail.com",
+            "gmail.co" to "gmail.com",
+            "hotmal.com" to "hotmail.com",
+            "outlok.com" to "outlook.com"
+        )
+
+        val sugerenciaDominio = erroresDominio[dominio]
+        if (sugerenciaDominio != null) {
+            val sugerencia = "${email.substringBefore("@")}@$sugerenciaDominio"
+            tvEmailError.text = "¿Quisiste decir $sugerencia?"
+            tvEmailError.setTextColor(Color.parseColor("#F59E0B"))
+            tvEmailError.visibility = View.VISIBLE
+            return false
+        }
+
+        return true
     }
 
     private fun mostrarDialogoLegal(titulo: String, contenido: String) {
