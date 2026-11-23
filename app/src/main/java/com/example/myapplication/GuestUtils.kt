@@ -11,8 +11,8 @@ import android.view.Window
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import android.util.Base64
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.Firebase
 import java.security.MessageDigest
 import java.security.SecureRandom
 
