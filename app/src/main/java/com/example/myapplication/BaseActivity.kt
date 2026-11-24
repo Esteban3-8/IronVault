@@ -1,7 +1,12 @@
 package com.example.myapplication
 
 import android.content.Intent
+import android.os.Bundle
+import android.util.TypedValue
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 open class BaseActivity : AppCompatActivity() {
 
@@ -9,6 +14,48 @@ open class BaseActivity : AppCompatActivity() {
         // Cuántas pantallas de la app están visibles ahora mismo.
         // Si llega a 0, la app pasó a segundo plano (o se cerró del todo).
         private var pantallasIniciadas = 0
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun setContentView(layoutResID: Int) {
+        super.setContentView(layoutResID)
+        aplicarInsetsAdaptables()
+    }
+
+    private fun aplicarInsetsAdaptables() {
+        // MainActivity ya ajusta su R.id.scrollContent, así que evitamos sumar doble margen ahí
+        if (this is MainActivity) return
+
+        val contentFrame = findViewById<ViewGroup>(android.R.id.content)
+        val rootView = contentFrame?.getChildAt(0) ?: return
+
+        val extraTop = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            12f,
+            resources.displayMetrics
+        ).toInt()
+
+        val initialTop = rootView.paddingTop
+        val initialBottom = rootView.paddingBottom
+        val initialLeft = rootView.paddingLeft
+        val initialRight = rootView.paddingRight
+
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val bottomInset = maxOf(systemBars.bottom, imeInsets.bottom)
+
+            view.setPadding(
+                initialLeft + systemBars.left,
+                initialTop + systemBars.top + extraTop,
+                initialRight + systemBars.right,
+                initialBottom + bottomInset
+            )
+            insets
+        }
     }
 
     override fun onStart() {
