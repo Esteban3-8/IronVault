@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -163,9 +164,9 @@ class SettingsActivity : BaseActivity() {
             finish()
         }
 
-        // Ir a Seguridad (VaultSecurityActivity)
+        // Ir a Seguridad (SecurityActivity)
         findViewById<LinearLayout>(R.id.btnNavLock).setOnClickListener {
-            val intent = Intent(this, VaultSecurityActivity::class.java)
+            val intent = Intent(this, SecurityActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
             finish()
@@ -183,6 +184,10 @@ class SettingsActivity : BaseActivity() {
         findViewById<LinearLayout>(R.id.btnNavSettings)?.setOnClickListener {
             // Sin acciones
         }
+
+        // Marcar ícono activo: Configuración
+        findViewById<LinearLayout>(R.id.btnNavSettings)?.setBackgroundResource(R.drawable.bg_nav_pill_active)
+        findViewById<ImageView>(R.id.ivNavSettings)?.setColorFilter(getColor(R.color.orange_primary))
     }
 
     // ─────────────────────────────────────────────────────────────

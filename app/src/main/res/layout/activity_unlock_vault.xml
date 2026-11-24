@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:padding="24dp">
 
-        <!-- Flecha Atrás (fija arriba, fuera de la cadena) -->
+        <!-- Flecha Atrás: solo visible cuando NO viene de bloqueo -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -20,15 +20,16 @@
             android:layout_marginTop="12dp"
             android:contentDescription="Volver"
             android:src="@drawable/flecha"
+            android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!--
-            CADENA VERTICAL "packed": desde el escudo hasta el texto inferior,
-            anclada arriba y abajo del padre para centrar todo el bloque.
-        -->
+        <!-- ══════════════════════════════════════════════════════
+             CADENA VERTICAL packed: escudo → título → subtítulo
+             → aviso → etiqueta → campo → botón → pie
+             ══════════════════════════════════════════════════════ -->
 
-        <!-- Icono de Escudo Superior (cabeza de la cadena) -->
+        <!-- Escudo (cabeza de la cadena) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardShield"
             android:layout_width="80dp"
@@ -83,7 +84,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-        <!-- Alerta de Advertencia -->
+        <!-- Alerta de advertencia (siempre visible) -->
         <LinearLayout
             android:id="@+id/layoutWarning"
             android:layout_width="0dp"
@@ -116,7 +117,59 @@
                 android:textSize="11.5sp" />
         </LinearLayout>
 
-        <!-- Etiqueta del campo -->
+        <!-- Panel de bloqueo por intentos: FUERA de la cadena, flota encima -->
+        <!-- Visible solo cuando hay bloqueo activo; gone = no ocupa espacio -->
+        <LinearLayout
+            android:id="@+id/layoutLockout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_warning_border"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="18dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutWarning">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginBottom="8dp"
+                android:src="@android:drawable/ic_lock_lock"
+                app:tint="#FCA5A5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:text="Bóveda bloqueada temporalmente"
+                android:textColor="#FCA5A5"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvCountdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/inter_bold"
+                android:text="00:30"
+                android:textColor="#FFFFFF"
+                android:textSize="34sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Demasiados intentos fallidos"
+                android:textColor="#9A9A9A"
+                android:textSize="11.5sp" />
+        </LinearLayout>
+
+        <!-- Etiqueta del campo (cadena continúa desde layoutWarning) -->
         <TextView
             android:id="@+id/lblPassword"
             android:layout_width="0dp"
@@ -132,7 +185,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutWarning" />
 
-        <!-- Campo de texto: Contraseña maestra -->
+        <!-- Campo contraseña maestra -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMasterPassword"
             android:layout_width="0dp"
@@ -178,7 +231,7 @@
             </RelativeLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Botón Principal Iniciar la Bóveda -->
+        <!-- Botón desbloquear -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnUnlockVault"
             android:layout_width="0dp"
@@ -203,7 +256,7 @@
                 android:textSize="14.5sp" />
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Texto Informativo Inferior (final de la cadena) -->
+        <!-- Pie de página (final de la cadena) -->
         <TextView
             android:id="@+id/tvFooter"
             android:layout_width="wrap_content"

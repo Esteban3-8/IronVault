@@ -113,6 +113,10 @@ class SecurityActivity : BaseActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
+
+        // Marcar ícono activo: Seguridad
+        findViewById<LinearLayout>(R.id.btnNavLock)?.setBackgroundResource(R.drawable.bg_nav_pill_active)
+        findViewById<ImageView>(R.id.ivNavLock)?.setColorFilter(getColor(R.color.orange_primary))
     }
 
     private fun cargarValoresGuardados() {
@@ -120,6 +124,21 @@ class SecurityActivity : BaseActivity() {
         val tvAttempts = findViewById<TextView>(R.id.tvAttemptsValue)
         tvAutoLock.text = prefs.getString("auto_lock", "5 minutos")
         tvAttempts.text = prefs.getString("attempts", "3 Intentos")
+    }
+
+    /** Aplica el estilo de opción seleccionada a [selected] y lo quita del resto. */
+    private fun resaltarOpcion(opciones: List<TextView>, selected: TextView) {
+        opciones.forEach { tv ->
+            if (tv === selected) {
+                tv.setBackgroundResource(R.drawable.bg_option_selected)
+                tv.setTextColor(getColor(R.color.orange_primary))
+                tv.typeface = resources.getFont(R.font.inter_bold)
+            } else {
+                tv.background = null
+                tv.setTextColor(getColor(R.color.text_primary))
+                tv.typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
+            }
+        }
     }
 
     private fun mostrarDialogoAutoLock() {
@@ -136,7 +155,23 @@ class SecurityActivity : BaseActivity() {
         val optNever   = view.findViewById<TextView>(R.id.optNever)
         val btnCancelar = view.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnCancelSheet)
 
+        val opciones = listOf(opt15s, opt30s, opt1m, opt3m, opt5m, opt10m, optNever)
+        val mapaOpciones = mapOf(
+            "15 segundos" to opt15s,
+            "30 segundos" to opt30s,
+            "1 minuto"    to opt1m,
+            "3 minutos"   to opt3m,
+            "5 minutos"   to opt5m,
+            "10 minutos"  to opt10m,
+            "Desactivar"  to optNever
+        )
+
+        // Resaltar la opción actualmente guardada
+        val valorGuardado = prefs.getString("auto_lock", "5 minutos") ?: "5 minutos"
+        mapaOpciones[valorGuardado]?.let { resaltarOpcion(opciones, it) }
+
         fun seleccionar(valor: String) {
+            mapaOpciones[valor]?.let { resaltarOpcion(opciones, it) }
             prefs.edit().putString("auto_lock", valor).apply()
             findViewById<TextView>(R.id.tvAutoLockValue).text = valor
 
@@ -155,7 +190,7 @@ class SecurityActivity : BaseActivity() {
         opt3m.setOnClickListener    { seleccionar("3 minutos")   }
         opt5m.setOnClickListener    { seleccionar("5 minutos")   }
         opt10m.setOnClickListener   { seleccionar("10 minutos")  }
-        optNever.setOnClickListener { seleccionar("Desactivar") }
+        optNever.setOnClickListener { seleccionar("Desactivar")  }
         btnCancelar.setOnClickListener { dialog.dismiss() }
 
         dialog.show()
@@ -172,7 +207,20 @@ class SecurityActivity : BaseActivity() {
         val optNever   = view.findViewById<TextView>(R.id.optNever)
         val btnCancelar = view.findViewById<com.google.android.material.card.MaterialCardView>(R.id.btnCancelSheet)
 
+        val opciones = listOf(opt3a, opt5a, opt7a, optNever)
+        val mapaOpciones = mapOf(
+            "3 Intentos" to opt3a,
+            "5 Intentos" to opt5a,
+            "7 Intentos" to opt7a,
+            "Nunca"       to optNever
+        )
+
+        // Resaltar la opción actualmente guardada
+        val valorGuardado = prefs.getString("attempts", "3 Intentos") ?: "3 Intentos"
+        mapaOpciones[valorGuardado]?.let { resaltarOpcion(opciones, it) }
+
         fun seleccionar(valor: String) {
+            mapaOpciones[valor]?.let { resaltarOpcion(opciones, it) }
             prefs.edit().putString("attempts", valor).apply()
             findViewById<TextView>(R.id.tvAttemptsValue).text = valor
 

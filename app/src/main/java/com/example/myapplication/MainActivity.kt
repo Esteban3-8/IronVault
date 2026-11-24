@@ -6,15 +6,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -41,28 +38,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // Ajuste adaptable para barra de estado / notch / isla dinámica sobre scrollContent
-        val scrollContent = findViewById<View>(R.id.scrollContent)
-        val extraTopPadding = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            16f,
-            resources.displayMetrics
-        ).toInt()
-
-        scrollContent?.let { v ->
-            val initialTop = v.paddingTop
-            ViewCompat.setOnApplyWindowInsetsListener(v) { view, insets ->
-                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                view.setPadding(
-                    view.paddingLeft,
-                    initialTop + systemBars.top + extraTopPadding,
-                    view.paddingRight,
-                    view.paddingBottom
-                )
-                insets
-            }
-        }
 
         configurarAvatarInicial()
 

@@ -18,17 +18,16 @@
         android:layout_marginBottom="16dp"
         android:background="@color/border_option_card" />
 
-    <!-- Opción seleccionada -->
+    <!-- Opción seleccionada dinámicamente -->
     <TextView
         android:id="@+id/opt3a"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="@drawable/bg_option_selected"
-        android:fontFamily="@font/inter_bold"
+        android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:text="3 Intentos"
-        android:textColor="@color/orange_primary"
+        android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
     <TextView

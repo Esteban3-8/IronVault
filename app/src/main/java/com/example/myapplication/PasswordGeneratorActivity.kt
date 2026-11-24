@@ -171,6 +171,10 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
             startActivity(intent)
             finish()
         }
+
+        // Marcar ícono activo: Generador
+        findViewById<LinearLayout>(R.id.btnNavKey)?.setBackgroundResource(R.drawable.bg_nav_pill_active)
+        findViewById<ImageView>(R.id.ivNavKey)?.setColorFilter(getColor(R.color.orange_primary))
     }
 
     private fun longitudActual(): Int =

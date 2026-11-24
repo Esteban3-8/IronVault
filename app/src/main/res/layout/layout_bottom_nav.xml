@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Barra de navegación inferior compartida.
+    Inclúyela en cada pantalla con:
+
+        <include
+            android:id="@+id/bottomNavContainer"
+            layout="@layout/layout_bottom_nav"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    El ícono activo de cada pantalla se gestiona en el Kotlin de cada Activity.
+    Por defecto todos los íconos están inactivos (gris) para que el Kotlin
+    ponga el activo sin conflictos.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomNavContainer"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:layout_marginHorizontal="24dp"
+    android:layout_marginBottom="16dp"
+    android:background="@drawable/bg_bottom_nav"
+    android:elevation="8dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="12dp">
+
+    <!-- Inicio -->
+    <LinearLayout
+        android:id="@+id/btnNavHome"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/ivNavHome"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_home"
+            app:tint="#8C909C" />
+    </LinearLayout>
+
+    <!-- Seguridad -->
+    <LinearLayout
+        android:id="@+id/btnNavLock"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/ivNavLock"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_lock"
+            app:tint="#8C909C" />
+    </LinearLayout>
+
+    <!-- Generador de contraseñas -->
+    <LinearLayout
+        android:id="@+id/btnNavKey"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/ivNavKey"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_key"
+            app:tint="#8C909C" />
+    </LinearLayout>
+
+    <!-- Configuración -->
+    <LinearLayout
+        android:id="@+id/btnNavSettings"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/ivNavSettings"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_settings"
+            app:tint="#8C909C" />
+    </LinearLayout>
+
+</LinearLayout>

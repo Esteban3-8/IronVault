@@ -93,8 +93,11 @@ open class BaseActivity : AppCompatActivity() {
         pantallasIniciadas--
         if (pantallasIniciadas <= 0) {
             pantallasIniciadas = 0
-            // La app salió de verdad a segundo plano: aquí empieza a contar la inactividad
-            SessionManager.registrarSalida(this)
+            // Solo empezar a contar inactividad si el usuario ya entró a la bóveda.
+            // Si está en Login, Registro o Unlock sin haber accedido, no aplica.
+            if (SessionManager.bovedaEstaDesbloqueada(this)) {
+                SessionManager.registrarSalida(this)
+            }
         }
     }
 }
