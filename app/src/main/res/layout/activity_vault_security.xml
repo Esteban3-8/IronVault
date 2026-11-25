@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:fontFamily="@font/inter_bold"
-        android:text="Seguridad y bóveda"
+        android:text="@string/vault_security_title"
         android:textColor="@color/text_primary"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -88,7 +88,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_bold"
-                        android:text="Contraseña principal"
+                        android:text="@string/vault_security_main_password"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp" />
 
@@ -97,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Cambiar la clave principal de acceso"
+                        android:text="@string/vault_security_main_password_sub"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -151,7 +151,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_bold"
-                        android:text="Desbloqueo biométrico"
+                        android:text="@string/vault_security_biometric"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp" />
 
@@ -160,7 +160,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Usar huella digital o reconocimiento"
+                        android:text="@string/vault_security_biometric_sub"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -217,7 +217,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_bold"
-                        android:text="Exportar datos de la bóveda"
+                        android:text="@string/vault_security_export"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp" />
 
@@ -226,7 +226,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Crear copia de seguridad cifrada"
+                        android:text="@string/vault_security_export_sub"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -279,7 +279,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_bold"
-                        android:text="Borrado de datos"
+                        android:text="@string/vault_security_delete"
                         android:textColor="@color/history_red"
                         android:textSize="14sp" />
 
@@ -288,7 +288,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Eliminar registros"
+                        android:text="@string/vault_security_delete_sub"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -307,7 +307,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
-        android:text="IronVault • seguridad cifrada AES-256"
+        android:text="@string/vault_security_footer"
         android:textColor="@color/text_muted"
         android:textSize="11sp"
         app:layout_constraintBottom_toBottomOf="parent"

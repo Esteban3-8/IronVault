@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!--
+        Expone solo la subcarpeta vault_exports dentro del caché privado de la app.
+        El archivo .vault se escribe ahí y se comparte vía FileProvider sin
+        necesitar permisos de almacenamiento externo.
+    -->
+    <cache-path
+        name="vault_exports"
+        path="vault_exports/" />
+</paths>

@@ -8,21 +8,19 @@
     android:background="@color/bg_main"
     tools:context=".SettingsActivity">
 
-    <!-- Título de Configuración -->
     <TextView
         android:id="@+id/tvSettingsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:fontFamily="@font/inter_bold"
-        android:text="Configuración"
+        android:text="@string/settings_title"
         android:textColor="@color/text_primary"
-        android:textSize="20sp"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- ScrollView con el contenido deslizable -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -35,14 +33,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSettingsTitle">
 
-        <!-- LinearLayout interno con 200dp de espacio inferior libre -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="200dp">
 
-            <!-- Avatar -->
+            <!-- ── Perfil ── -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardAvatar"
                 android:layout_width="80dp"
@@ -83,7 +80,6 @@
                 android:textColor="@color/text_muted"
                 android:textSize="12sp" />
 
-            <!-- Editar perfil -->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnEditProfile"
                 android:layout_width="match_parent"
@@ -91,25 +87,25 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/bg_primary_button"
                 android:fontFamily="@font/inter_bold"
-                android:text="Editar perfil"
+                android:text="@string/settings_edit_profile"
                 android:textAllCaps="false"
                 android:textColor="@color/bg_main"
                 android:textSize="14sp"
                 app:backgroundTint="@null" />
 
+            <!-- ══ SECCIÓN: SEGURIDAD ══ -->
             <TextView
-                android:id="@+id/tvConfigLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="28dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Configuración"
+                android:text="Seguridad"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp" />
 
-            <!-- Seguridad y bóveda -->
+            <!-- Contraseña principal -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSecurity"
+                android:id="@+id/cardMainPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -129,7 +125,14 @@
                     <ImageView
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_settings_shield" />
+                        android:layout_marginStart="-1dp"
+                        android:layout_marginTop="-1dp"
+                        android:layout_marginEnd="-1dp"
+                        android:layout_marginBottom="-1dp"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/llave"
+                        app:tint="#E28743" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -142,7 +145,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_bold"
-                            android:text="Seguridad y bóveda"
+                            android:text="@string/vault_security_main_password"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
@@ -151,7 +154,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="sans-serif-medium"
-                            android:text="Bloqueo, accesos y clave maestra"
+                            android:text="@string/vault_security_main_password_sub"
                             android:textColor="@color/text_muted"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -159,7 +162,75 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
+                        android:importantForAccessibility="no"
                         android:src="@drawable/ic_security_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Desbloqueo biométrico -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBiometric"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardBackgroundColor="@color/bg_option_card"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_option_card"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="-5dp"
+                        android:layout_marginTop="-5dp"
+                        android:layout_marginEnd="-5dp"
+                        android:layout_marginBottom="-5dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_vault_fingerprint"
+                        app:tint="#E28743" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_bold"
+                            android:text="@string/vault_security_biometric"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/vault_security_biometric_sub"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchBiometric"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:thumb="@drawable/switch_thumb"
+                        app:thumbTint="@null"
+                        app:track="@drawable/switch_track"
+                        app:trackTint="@null" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -198,7 +269,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_bold"
-                            android:text="Categorías"
+                            android:text="@string/label_categories"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
@@ -207,16 +278,26 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="sans-serif-medium"
-                            android:text="Organiza tus categorías guardadas"
+                            android:text="@string/settings_categories_sub"
                             android:textColor="@color/text_muted"
                             android:textSize="11sp" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Idioma -->
+            <!-- ══ SECCIÓN: GESTIÓN DE DATOS ══ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Gestión de datos"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp" />
+
+            <!-- Exportar bóveda -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardLanguage"
+                android:id="@+id/cardExport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -234,9 +315,14 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_settings_language" />
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="-2dp"
+                        android:layout_marginTop="-2dp"
+                        android:layout_marginEnd="-2dp"
+                        android:layout_marginBottom="-2dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_vault_export" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -249,29 +335,31 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_bold"
-                            android:text="Idioma"
+                            android:text="@string/vault_security_export"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/vault_security_export_sub"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvLanguageValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_chip_orange"
-                        android:fontFamily="@font/inter_bold"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="6dp"
-                        android:text="Español"
-                        android:textColor="@color/orange_primary"
-                        android:textSize="12sp" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_security_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Tema oscuro -->
+            <!-- Importar bóveda -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardTheme"
+                android:id="@+id/cardImport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -289,9 +377,15 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_settings_moon" />
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="-2dp"
+                        android:layout_marginTop="-2dp"
+                        android:layout_marginEnd="-2dp"
+                        android:layout_marginBottom="-2dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_vault_export"
+                        app:tint="@color/orange_primary" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -304,7 +398,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_bold"
-                            android:text="Tema oscuro"
+                            android:text="Importar bóveda"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
@@ -313,33 +407,39 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="sans-serif-medium"
-                            android:text="Activado en todo momento"
+                            android:text="Restaurar desde un archivo .vault"
                             android:textColor="@color/text_muted"
                             android:textSize="11sp" />
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchTheme"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:thumb="@drawable/switch_thumb"
-                        app:thumbTint="@null"
-                        app:track="@drawable/switch_track"
-                        app:trackTint="@null" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_security_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Notificaciones -->
+            <!-- ══ SECCIÓN: ZONA DE PELIGRO ══ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Zona de peligro"
+                android:textColor="#EF4444"
+                android:textSize="12sp" />
+
+            <!-- Eliminar todos los datos -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardNotifications"
+                android:id="@+id/cardDeleteData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 app:cardBackgroundColor="@color/bg_option_card"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/border_option_card"
+                app:strokeColor="#3A1A1A"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -350,9 +450,14 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_settings_bell" />
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="-2dp"
+                        android:layout_marginTop="-2dp"
+                        android:layout_marginEnd="-2dp"
+                        android:layout_marginBottom="-2dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_vault_delete" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -365,8 +470,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_bold"
-                            android:text="Notificaciones"
-                            android:textColor="@color/text_primary"
+                            android:text="@string/vault_security_delete"
+                            android:textColor="@color/history_red"
                             android:textSize="14sp" />
 
                         <TextView
@@ -374,20 +479,16 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="sans-serif-medium"
-                            android:text="Alertas de actividad y accesos"
+                            android:text="@string/vault_security_delete_sub"
                             android:textColor="@color/text_muted"
                             android:textSize="11sp" />
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchNotifications"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:thumb="@drawable/switch_thumb"
-                        app:thumbTint="@null"
-                        app:track="@drawable/switch_track"
-                        app:trackTint="@null" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_security_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -396,7 +497,7 @@
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 app:cardBackgroundColor="@color/bg_option_card"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="0dp"
@@ -408,7 +509,7 @@
                     android:layout_height="match_parent"
                     android:fontFamily="@font/inter_bold"
                     android:gravity="center"
-                    android:text="Cerrar sesión"
+                    android:text="@string/settings_logout"
                     android:textColor="@color/history_red"
                     android:textSize="14sp" />
             </com.google.android.material.card.MaterialCardView>
@@ -420,23 +521,13 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="12dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="IronVault • versión 2.4.1"
-                android:textColor="@color/text_muted"
-                android:textSize="11sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Idioma de la aplicación"
+                android:text="@string/settings_version"
                 android:textColor="@color/text_muted"
                 android:textSize="11sp" />
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Barra de Navegación Inferior -->
     <include
         android:id="@+id/bottomNavContainer"
         layout="@layout/layout_bottom_nav"

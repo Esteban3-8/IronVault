@@ -26,7 +26,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="3 Intentos"
+        android:text="@string/attempts_3"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -37,7 +37,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="5 Intentos"
+        android:text="@string/attempts_5"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -48,7 +48,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="7 Intentos"
+        android:text="@string/attempts_7"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -59,7 +59,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="Nunca"
+        android:text="@string/label_never"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -79,7 +79,7 @@
             android:layout_height="match_parent"
             android:fontFamily="@font/inter_bold"
             android:gravity="center"
-            android:text="Cancelar"
+            android:text="@string/action_cancel"
             android:textColor="@color/text_primary"
             android:textSize="14sp" />
     </com.google.android.material.card.MaterialCardView>

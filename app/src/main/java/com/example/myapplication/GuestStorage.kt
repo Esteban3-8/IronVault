@@ -48,6 +48,7 @@ object GuestStorage {
             for (c in lista) {
                 arreglo.put(
                     JSONObject()
+                        .put("id", c.id)
                         .put("serviceName", c.serviceName)
                         .put("userOrEmail", c.userOrEmail)
                         .put("password", c.password)
@@ -92,14 +93,15 @@ object GuestStorage {
                 val o = arreglo.getJSONObject(i)
                 lista.add(
                     Credential(
-                        serviceName = o.optString("serviceName"),
-                        userOrEmail = o.optString("userOrEmail"),
-                        password = o.optString("password"),
+                        id             = o.optString("id").ifBlank { java.util.UUID.randomUUID().toString() },
+                        serviceName    = o.optString("serviceName"),
+                        userOrEmail    = o.optString("userOrEmail"),
+                        password       = o.optString("password"),
                         strengthStatus = o.optString("strengthStatus", "Segura"),
-                        url = o.optString("url"),
-                        notes = o.optString("notes"),
-                        category = o.optString("category"),
-                        updatedAt = o.optLong("updatedAt", 0L)
+                        url            = o.optString("url"),
+                        notes          = o.optString("notes"),
+                        category       = o.optString("category"),
+                        updatedAt      = o.optLong("updatedAt", 0L)
                     )
                 )
             }

@@ -25,7 +25,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="15 segundos"
+        android:text="@string/lock_15s"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -36,7 +36,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="30 segundos"
+        android:text="@string/lock_30s"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -47,7 +47,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="1 minuto"
+        android:text="@string/lock_1m"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -58,7 +58,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="3 minutos"
+        android:text="@string/lock_3m"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -69,7 +69,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="5 minutos"
+        android:text="@string/lock_5m"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -80,7 +80,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="10 minutos"
+        android:text="@string/lock_10m"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -92,7 +92,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:text="Desactivar"
+        android:text="@string/lock_disable"
         android:textColor="@color/text_primary"
         android:textSize="14sp" />
 
@@ -104,7 +104,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_button_cancel_sheet"
         android:fontFamily="@font/inter_bold"
-        android:text="Cancelar"
+        android:text="@string/action_cancel"
         android:textAllCaps="false"
         android:textColor="@color/text_primary"
         android:textSize="14sp"

@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_bold"
-            android:text="Iron"
+            android:text="@string/splash_iron"
             android:textColor="#FFFFFF"
             android:textSize="34sp" />
 
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_bold"
-            android:text="Vault"
+            android:text="@string/splash_vault"
             android:textColor="#C97D3E"
             android:textSize="34sp" />
     </LinearLayout>
@@ -55,7 +55,7 @@
         android:fontFamily="@font/inter_bold"
         android:gravity="center"
         android:letterSpacing="0.05"
-        android:text="SECURE PASSWORD\nMANAGER"
+        android:text="@string/welcome_subtitle"
         android:textColor="#9CA3AF"
         android:textSize="11sp"
         app:layout_constraintBottom_toTopOf="@id/progressBarLoading"
@@ -83,7 +83,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/inter_bold"
         android:gravity="center"
-        android:text="Desbloqueando tu bóveda..."
+        android:text="@string/splash_unlocking"
         android:textColor="#9CA3AF"
         android:textSize="13sp"
         app:layout_constraintBottom_toTopOf="@id/txtVersion"
@@ -98,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:fontFamily="@font/inter_bold"
-        android:text="IronVault v1.0.0"
+        android:text="@string/splash_version"
         android:textColor="#4B5563"
         android:textSize="11sp"
         app:layout_constraintBottom_toBottomOf="parent"

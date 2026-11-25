@@ -12,7 +12,7 @@
         android:id="@+id/tvSecurityTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Seguridad"
+        android:text="@string/security_title"
         android:textColor="@color/text_primary"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -49,7 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Tu bóveda está protegida"
+        android:text="@string/security_vault_protected"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
-        android:text="Gestiona el bloqueo y el acceso\na tus contraseñas."
+        android:text="@string/security_vault_subtitle"
         android:textColor="@color/text_muted"
         android:textSize="12sp"
         android:fontFamily="sans-serif-medium"
@@ -82,7 +82,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_primary_button"
         android:fontFamily="@font/inter_bold"
-        android:text="Bloquear bóveda ahora"
+        android:text="@string/security_btn_lock_now"
         android:textAllCaps="false"
         android:textColor="@color/bg_main"
         android:textSize="16sp"
@@ -98,7 +98,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Configuración"
+        android:text="@string/label_configuration"
         android:textColor="@color/text_muted"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -148,7 +148,7 @@
                 android:layout_marginStart="14dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/inter_bold"
-                android:text="Cambiar clave maestra"
+                android:text="@string/security_change_key"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp" />
 
@@ -208,7 +208,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_bold"
-                    android:text="Bloqueo automático"
+                    android:text="@string/security_auto_lock"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
@@ -217,7 +217,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Tras el tiempo de inactividad"
+                    android:text="@string/security_auto_lock_sub"
                     android:textColor="@color/text_muted"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -287,7 +287,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_bold"
-                    android:text="Intentos de acceso"
+                    android:text="@string/security_attempts"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
@@ -296,7 +296,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="3 intentos antes de bloquear"
+                    android:text="@string/security_attempts_sub"
                     android:textColor="@color/text_muted"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -366,7 +366,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_bold"
-                    android:text="Historial de accesos"
+                    android:text="@string/security_history"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
@@ -375,7 +375,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Ver actividad reciente"
+                    android:text="@string/security_history_sub"
                     android:textColor="@color/text_muted"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -393,7 +393,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Última vez desbloqueada: hoy, 7:32 p. m."
+        android:text="@string/security_last_unlock"
         android:textColor="@color/text_muted"
         android:textSize="11sp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -191,18 +191,18 @@ class MainActivity : BaseActivity() {
         cargarListaCredenciales()
     }
 
-    // El caché guarda 8 campos (categoría y fecha de actualización al final)
+    // El caché guarda 9 campos (id al inicio + los 8 campos originales)
     private fun guardarCredencialesEnCache(lista: List<Credential>) {
         val prefs = getSharedPreferences("IronVaultPermanentCache", MODE_PRIVATE)
         val editor = prefs.edit()
         val dataString = lista.joinToString("|||") {
-            "${it.serviceName}###${it.userOrEmail}###${it.password}###${it.strengthStatus}###${it.url}###${it.notes}###${it.category}###${it.updatedAt}"
+            "${it.id}###${it.serviceName}###${it.userOrEmail}###${it.password}###${it.strengthStatus}###${it.url}###${it.notes}###${it.category}###${it.updatedAt}"
         }
         editor.putString("all_credentials_key", dataString)
         editor.apply()
     }
 
-    // Lee la categoría si existe (el caché viejo de 6 campos sigue funcionando)
+    // Retrocompatible: si el caché tiene 8 campos (sin id) genera uno nuevo automáticamente
     private fun cargarCredencialesDeCache(): List<Credential> {
         val prefs = getSharedPreferences("IronVaultPermanentCache", MODE_PRIVATE)
         val dataString = prefs.getString("all_credentials_key", "") ?: ""
@@ -212,13 +212,36 @@ class MainActivity : BaseActivity() {
             for (item in items) {
                 val partes = item.split("###")
                 if (partes.size >= 6) {
-                    lista.add(
-                        Credential(
-                            partes[0], partes[1], partes[2], partes[3], partes[4], partes[5],
-                            partes.getOrElse(6) { "" },
-                            partes.getOrElse(7) { "0" }.toLongOrNull() ?: 0L
+                    if (partes.size >= 9) {
+                        // Formato nuevo: id en partes[0]
+                        lista.add(
+                            Credential(
+                                id             = partes[0],
+                                serviceName    = partes[1],
+                                userOrEmail    = partes[2],
+                                password       = partes[3],
+                                strengthStatus = partes[4],
+                                url            = partes[5],
+                                notes          = partes[6],
+                                category       = partes[7],
+                                updatedAt      = partes[8].toLongOrNull() ?: 0L
+                            )
                         )
-                    )
+                    } else {
+                        // Formato viejo (8 campos sin id): generar UUID nuevo
+                        lista.add(
+                            Credential(
+                                serviceName    = partes[0],
+                                userOrEmail    = partes[1],
+                                password       = partes[2],
+                                strengthStatus = partes[3],
+                                url            = partes[4],
+                                notes          = partes[5],
+                                category       = partes.getOrElse(6) { "" },
+                                updatedAt      = partes.getOrElse(7) { "0" }.toLongOrNull() ?: 0L
+                            )
+                        )
+                    }
                 }
             }
         }

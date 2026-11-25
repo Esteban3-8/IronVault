@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,18 +15,31 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.auth
+import com.google.firebase.Firebase
 
 // ─────────────────────────────────────────────────────────────────
 //  PrincipalPasswordActivity
+//
 //  Permite cambiar la contraseña principal de la bóveda.
-//  Similar a ChangeMasterKeyActivity pero con una barra de fortaleza
-//  diferente: un solo View que crece/decrece con layout_weight.
+//
+//  Flujo:
+//  1. El usuario escribe su contraseña actual.
+//  2. Se reautentica contra Firebase Auth (misma contraseña que usa
+//     para iniciar sesión en la app).
+//  3. Si es correcta, se llama a updatePassword() con la nueva.
+//  4. Firebase actualiza la contraseña en su base de datos.
+//
+//  "¿Olvidaste tu contraseña?" redirige al mismo flujo de recuperación
+//  que existe en la pantalla de inicio de sesión (ForgotPasswordActivity).
+//
+//  NOTA SOBRE EXPORTACIÓN:
+//  La contraseña que protege un archivo .vault es INDEPENDIENTE de la
+//  contraseña principal. El usuario la elige en el momento de exportar.
+//  Cambiar la contraseña principal aquí NO invalida los respaldos anteriores.
 // ─────────────────────────────────────────────────────────────────
-class PrincipalPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivity
-
-    private val prefs by lazy {
-        getSharedPreferences("security_prefs", MODE_PRIVATE)
-    }
+class PrincipalPasswordActivity : BaseActivity() {
 
     private var isCurrentVisible = false
     private var isNewVisible     = false
@@ -36,7 +50,6 @@ class PrincipalPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         enableEdgeToEdge()
         setContentView(R.layout.activity_principal_password)
 
-        // paddingStart/End="24dp" en el XML
         val dp24 = (24 * resources.displayMetrics.density).toInt()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -50,73 +63,101 @@ class PrincipalPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivit
     }
 
     private fun configurarBotones() {
-
-        // ── Atrás ─────────────────────────────────────────────────
         findViewById<ImageView>(R.id.btnBack).setOnClickListener { finish() }
 
-        // ── Cambiar contraseña principal ──────────────────────────
+        // ── Olvidé contraseña → mismo flujo del login ─────────────
+        findViewById<TextView>(R.id.tvForgotPassword).setOnClickListener {
+            startActivity(Intent(this, ForgotPasswordActivity::class.java))
+        }
+
         val etCurrent = findViewById<EditText>(R.id.etCurrentPassword)
         val etNew     = findViewById<EditText>(R.id.etNewPassword)
         val etConfirm = findViewById<EditText>(R.id.etConfirmPassword)
+        val btnChange = findViewById<AppCompatButton>(R.id.btnChangePrincipal)
 
-        findViewById<AppCompatButton>(R.id.btnChangePrincipal).setOnClickListener {
+        btnChange.setOnClickListener {
             val current = etCurrent.text.toString().trim()
             val nueva   = etNew.text.toString().trim()
             val confirm = etConfirm.text.toString().trim()
 
+            // ── Validaciones locales ──────────────────────────────
             if (current.isEmpty() || nueva.isEmpty() || confirm.isEmpty()) {
-                mostrarBannerPersonalizado(
-                    titulo = "Campos vacíos",
-                    mensaje = "Por favor completa todos los campos",
-                    iconoResId = R.drawable.logo
-                )
+                mostrarBannerPersonalizado("Campos vacíos", "Por favor completa todos los campos", R.drawable.logo)
                 return@setOnClickListener
             }
-
-            val claveGuardada = prefs.getString("master_key", "") ?: ""
-            if (claveGuardada.isNotEmpty() && current != claveGuardada) {
-                mostrarBannerPersonalizado(
-                    titulo = "Contraseña incorrecta",
-                    mensaje = "La contraseña actual no es válida",
-                    iconoResId = R.drawable.logo
-                )
-                return@setOnClickListener
-            }
-
             if (nueva != confirm) {
-                mostrarBannerPersonalizado(
-                    titulo = "Error de coincidencia",
-                    mensaje = "Las contraseñas nuevas no coinciden",
-                    iconoResId = R.drawable.logo
-                )
+                mostrarBannerPersonalizado("Error de coincidencia", "Las contraseñas nuevas no coinciden", R.drawable.logo)
+                return@setOnClickListener
+            }
+            if (evaluarFortaleza(nueva) < 2) {
+                mostrarBannerPersonalizado("Contraseña débil", "Usa al menos 8 caracteres con letras y números", R.drawable.logo)
+                return@setOnClickListener
+            }
+            if (nueva == current) {
+                mostrarBannerPersonalizado("Sin cambios", "La nueva contraseña debe ser diferente a la actual", R.drawable.logo)
                 return@setOnClickListener
             }
 
-            if (nueva.length < 8) {
-                mostrarBannerPersonalizado(
-                    titulo = "Contraseña débil",
-                    mensaje = "La clave debe tener al menos 8 caracteres",
-                    iconoResId = R.drawable.logo
-                )
+            val user = Firebase.auth.currentUser
+            if (user == null || user.email == null) {
+                mostrarBannerPersonalizado("Error de sesión", "No se pudo verificar tu identidad. Inicia sesión nuevamente.", R.drawable.logo)
                 return@setOnClickListener
             }
 
-            prefs.edit().putString("master_key", nueva).apply()
+            // Deshabilitar botón mientras opera Firebase
+            btnChange.isEnabled = false
+            btnChange.text = "Verificando..."
 
-            mostrarBannerPersonalizado(
-                titulo = "¡Actualizado!",
-                mensaje = "Contraseña principal actualizada con éxito",
-                iconoResId = R.drawable.logo
-            )
+            // ── Paso 1: reautenticar con la contraseña actual ─────
+            val credential = EmailAuthProvider.getCredential(user.email!!, current)
 
-            finish()
+            user.reauthenticate(credential)
+                .addOnSuccessListener {
+                    // ── Paso 2: actualizar contraseña en Firebase Auth ──
+                    user.updatePassword(nueva)
+                        .addOnSuccessListener {
+                            btnChange.isEnabled = true
+                            btnChange.text = "Cambiar contraseña principal"
+
+                            mostrarBannerPersonalizado(
+                                titulo = "¡Contraseña actualizada!",
+                                mensaje = "Tu contraseña principal fue cambiada con éxito.",
+                                iconoResId = R.drawable.logo
+                            )
+
+                            // Limpiar campos
+                            etCurrent.text.clear()
+                            etNew.text.clear()
+                            etConfirm.text.clear()
+
+                            finish()
+                        }
+                        .addOnFailureListener { e ->
+                            btnChange.isEnabled = true
+                            btnChange.text = "Cambiar contraseña principal"
+                            mostrarBannerPersonalizado(
+                                titulo = "Error al actualizar",
+                                mensaje = "No se pudo cambiar la contraseña. Intenta de nuevo.",
+                                iconoResId = R.drawable.logo
+                            )
+                        }
+                }
+                .addOnFailureListener {
+                    btnChange.isEnabled = true
+                    btnChange.text = "Cambiar contraseña principal"
+                    mostrarBannerPersonalizado(
+                        titulo = "Contraseña incorrecta",
+                        mensaje = "La contraseña actual no es válida.",
+                        iconoResId = R.drawable.logo
+                    )
+                }
         }
     }
 
     private fun configurarOjos() {
-        val etCurrent  = findViewById<EditText>(R.id.etCurrentPassword)
-        val etNew      = findViewById<EditText>(R.id.etNewPassword)
-        val etConfirm  = findViewById<EditText>(R.id.etConfirmPassword)
+        val etCurrent = findViewById<EditText>(R.id.etCurrentPassword)
+        val etNew     = findViewById<EditText>(R.id.etNewPassword)
+        val etConfirm = findViewById<EditText>(R.id.etConfirmPassword)
 
         findViewById<ImageView>(R.id.ivToggleCurrent).setOnClickListener {
             isCurrentVisible = !isCurrentVisible
@@ -141,66 +182,41 @@ class PrincipalPasswordActivity : BaseActivity() { // 👈 Hereda de BaseActivit
     }
 
     private fun configurarBarraFortaleza() {
-        val etNew        = findViewById<EditText>(R.id.etNewPassword)
-        val barraFill    = findViewById<View>(R.id.viewStrengthFill)
-        val tvLabel      = findViewById<TextView>(R.id.tvStrengthLabel)
+        val etNew     = findViewById<EditText>(R.id.etNewPassword)
+        val barraFill = findViewById<View>(R.id.viewStrengthFill)
+        val tvLabel   = findViewById<TextView>(R.id.tvStrengthLabel)
 
         etNew.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
             override fun afterTextChanged(s: Editable?) {
-                val nivel = evaluarFortaleza(s.toString())
-                actualizarBarra(barraFill, tvLabel, nivel)
+                actualizarBarra(barraFill, tvLabel, evaluarFortaleza(s.toString()))
             }
         })
-
-        actualizarBarra(barraFill, tvLabel, evaluarFortaleza(etNew.text.toString()))
+        actualizarBarra(barraFill, tvLabel, 0)
     }
 
     private fun actualizarBarra(barra: View, label: TextView, nivel: Int) {
         val params = barra.layoutParams as android.widget.LinearLayout.LayoutParams
-
         when (nivel) {
-            0 -> {
-                params.weight = 0f
-                barra.setBackgroundColor(ContextCompat.getColor(this, R.color.border_option_card))
-                label.text = ""
-                label.setTextColor(ContextCompat.getColor(this, R.color.text_muted))
-            }
-            1 -> {
-                params.weight = 3f   // 30% → débil
-                barra.setBackgroundColor(ContextCompat.getColor(this, R.color.history_red))
-                label.text = "Fortaleza Baja"
-                label.setTextColor(ContextCompat.getColor(this, R.color.history_red))
-            }
-            2 -> {
-                params.weight = 6f   // 60% → media
-                barra.setBackgroundColor(0xFFFFC107.toInt())
-                label.text = "Fortaleza Media"
-                label.setTextColor(0xFFFFC107.toInt())
-            }
-            3 -> {
-                params.weight = 10f  // 100% → fuerte
-                barra.setBackgroundColor(ContextCompat.getColor(this, R.color.green_accent))
-                label.text = "Fortaleza Alta"
-                label.setTextColor(ContextCompat.getColor(this, R.color.green_accent))
-            }
+            0 -> { params.weight = 0f;  label.text = "" }
+            1 -> { params.weight = 3f;  label.text = "Fortaleza Baja";  label.setTextColor(ContextCompat.getColor(this, R.color.history_red));      barra.setBackgroundColor(ContextCompat.getColor(this, R.color.history_red)) }
+            2 -> { params.weight = 6f;  label.text = "Fortaleza Media"; label.setTextColor(0xFFFFC107.toInt());                                      barra.setBackgroundColor(0xFFFFC107.toInt()) }
+            3 -> { params.weight = 10f; label.text = "Fortaleza Alta";  label.setTextColor(ContextCompat.getColor(this, R.color.green_accent));      barra.setBackgroundColor(ContextCompat.getColor(this, R.color.green_accent)) }
         }
-
         barra.layoutParams = params
         barra.requestLayout()
     }
 
     private fun evaluarFortaleza(password: String): Int {
         if (password.isEmpty()) return 0
-        val tieneLetras   = Regex("[a-zA-Z]").containsMatchIn(password)
-        val tieneNumeros  = Regex("[0-9]").containsMatchIn(password)
-        val tieneSimbolos = Regex("[^a-zA-Z0-9]").containsMatchIn(password)
+        val letras   = Regex("[a-zA-Z]").containsMatchIn(password)
+        val numeros  = Regex("[0-9]").containsMatchIn(password)
+        val simbolos = Regex("[^a-zA-Z0-9]").containsMatchIn(password)
         return when {
-            password.length >= 8 && tieneLetras && tieneNumeros && tieneSimbolos -> 3
-            password.length >= 6 && (tieneLetras || tieneNumeros)                -> 2
-            else                                                                 -> 1
+            password.length >= 8 && letras && numeros && simbolos -> 3
+            password.length >= 6 && (letras || numeros)           -> 2
+            else                                                  -> 1
         }
     }
 }

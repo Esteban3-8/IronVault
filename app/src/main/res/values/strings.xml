@@ -1,3 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">IronVault</string>
+
+    <!-- Comunes -->
+    <string name="action_save">Guardar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_continue">Continuar</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_send">Enviar</string>
+    <string name="action_select">Seleccionar</string>
+    <string name="label_configuration">Configuración</string>
+    <string name="label_security">Seguridad</string>
+    <string name="label_category">Categoría</string>
+    <string name="label_categories">Categorías</string>
+    <string name="label_language">Idioma</string>
+    <string name="label_password">Contraseña</string>
+    <string name="label_email">Correo electrónico</string>
+    <string name="label_name">Nombre</string>
+    <string name="label_url">URL del servicio</string>
+    <string name="label_notes">Notas adicionales</string>
+    <string name="label_username">Usuario o correo</string>
+    <string name="label_today">Hoy</string>
+    <string name="label_yesterday">Ayer</string>
+    <string name="label_success">Éxito</string>
+    <string name="label_failed">Fallido</string>
+    <string name="label_never">Nunca</string>
+    <string name="label_total">Total</string>
+    <string name="label_secure">Seguras</string>
+    <string name="label_weak">Débiles</string>
+    <string name="label_medium">Medias</string>
+    <string name="label_repeated">Repetidas</string>
+    <string name="label_strong">Fortaleza Alta</string>
+    <string name="label_master_password">Contraseña maestra</string>
+
+    <!-- Welcome -->
+    <string name="welcome_subtitle">SECURE PASSWORD\nMANAGER</string>
+    <string name="welcome_tagline">Tus contraseñas, organizadas y\nprotegidas en un solo lugar.</string>
+    <string name="welcome_badge">Cifrado de extremo a extremo</string>
+    <string name="welcome_btn_register">Crear una cuenta</string>
+    <string name="welcome_btn_login">Iniciar Sesión</string>
+    <string name="welcome_guest_mode">Continuar como invitado</string>
+    <string name="welcome_guest_note">Los datos se guardan solo en este dispositivo</string>
+    <string name="welcome_about">Acerca de</string>
+    <string name="welcome_terms">Al continuar aceptas nuestros términos\ny política de privacidad.</string>
+    <string name="welcome_help">¿Necesitas ayuda? v1.0.0</string>
+
+    <!-- Splash -->
+    <string name="splash_iron">Iron</string>
+    <string name="splash_vault">Vault</string>
+    <string name="splash_unlocking">Desbloqueando tu bóveda…</string>
+    <string name="splash_version">IronVault v1.0.0</string>
+
+    <!-- Login -->
+    <string name="login_title">Iniciar sesión</string>
+    <string name="login_subtitle">Ingresa tu correo y tu contraseña.</string>
+    <string name="login_hint_email">Correo electrónico</string>
+    <string name="login_hint_password">Contraseña de la cuenta</string>
+    <string name="login_remember">Recordarme</string>
+    <string name="login_forgot">¿Olvidaste tu contraseña?</string>
+    <string name="login_btn">Continuar</string>
+    <string name="login_no_account">¿No tienes cuenta? </string>
+    <string name="login_register">Regístrate</string>
+
+    <!-- Register -->
+    <string name="register_title">Crea tu cuenta</string>
+    <string name="register_subtitle">Solo toma un minuto.</string>
+    <string name="register_terms_prefix">Acepto los </string>
+    <string name="register_terms">Términos</string>
+    <string name="register_terms_and"> y la </string>
+    <string name="register_privacy">Política de Privacidad</string>
+    <string name="register_btn">Crear cuenta</string>
+    <string name="register_password_medium">Media - Añade un símbolo</string>
+
+    <!-- Forgot password -->
+    <string name="forgot_title">Recuperar contraseña</string>
+    <string name="forgot_subtitle">Usaremos esto para identificar tu cuenta y enviarte el código de verificación.</string>
+    <string name="forgot_btn">Continuar</string>
+    <string name="forgot_remember">¿Recordaste tu contraseña? </string>
+    <string name="forgot_login">Inicia sesión</string>
+
+    <!-- Verify code -->
+    <string name="verify_title">Confirmar código</string>
+    <string name="verify_subtitle">Código enviado a tu correo</string>
+    <string name="verify_resend_prefix">¿No recibiste el código? Reenviar</string>
+    <string name="verify_resend">Reenviar en 0:28</string>
+    <string name="verify_btn">Verificar código</string>
+
+    <!-- Reset password -->
+    <string name="reset_title">Restablecer contraseña</string>
+    <string name="reset_subtitle">Ingresa y confirma tu nueva clave de acceso para asegurar tu cuenta.</string>
+    <string name="reset_new_password">Nueva contraseña</string>
+    <string name="reset_btn">Guardar contraseña</string>
+
+    <!-- Unlock vault -->
+    <string name="unlock_title">Ingresa tu contraseña maestra</string>
+    <string name="unlock_subtitle_default">Ya iniciaste sesión. Ahora ingresa la llave que protege tu bóveda.</string>
+    <string name="unlock_warning">Si la olvidas, NO se podrá recuperar bajo ningún motivo.</string>
+    <string name="unlock_label_password">Contraseña maestra</string>
+    <string name="unlock_btn">Iniciar la bóveda</string>
+    <string name="unlock_footer">Si la olvidas, no podremos recuperarla.</string>
+    <string name="unlock_lockout_title">Bóveda bloqueada temporalmente</string>
+    <string name="unlock_lockout_subtitle">Demasiados intentos fallidos</string>
+
+    <!-- Master password -->
+    <string name="master_title">Crea tu contraseña maestra</string>
+    <string name="master_subtitle">Ya iniciaste sesión. Ahora crea la llave que protegerá tu bóveda.</string>
+    <string name="master_warning">Si la olvidas, NO se podrá recuperar bajo ningún motivo.</string>
+    <string name="master_min_chars">Mínimo 6 caracteres</string>
+    <string name="master_btn">Crear bóveda</string>
+    <string name="master_footer">Si la olvidas, no podremos recuperarla.</string>
+
+    <!-- Change master key -->
+    <string name="change_key_title">Cambiar clave maestra</string>
+    <string name="change_key_subtitle">Por seguridad, primero confirma\ntu clave actual.</string>
+    <string name="change_key_warning">Si la olvidas, NO se podrá recuperar bajo ningún motivo.</string>
+    <string name="change_key_btn">Guardar nueva clave</string>
+    <string name="change_key_note">Todas tus contraseñas guardadas se volverán a cifrar\ncon la nueva clave.</string>
+    <string name="change_key_hint_current">Contraseña actual</string>
+    <string name="change_key_hint_new">Nueva clave maestra</string>
+    <string name="change_key_hint_confirm">Confirmación nueva clave maestra</string>
+
+    <!-- Main / Home -->
+    <string name="main_iron">Iron</string>
+    <string name="main_vault">Vault</string>
+    <string name="main_vault_title">Tu bóveda</string>
+    <string name="main_search_hint">Buscar contraseña</string>
+    <string name="main_general_state">ESTADO GENERAL</string>
+    <string name="main_your_passwords">Tus contraseñas</string>
+    <string name="main_prev">◀ Ant</string>
+    <string name="main_next">Sig ▶</string>
+
+    <!-- Security -->
+    <string name="security_title">Seguridad</string>
+    <string name="security_vault_protected">Tu bóveda está protegida</string>
+    <string name="security_vault_subtitle">Gestiona el bloqueo y el acceso\na tus contraseñas.</string>
+    <string name="security_btn_lock_now">Bloquear bóveda ahora</string>
+    <string name="security_change_key">Cambiar clave maestra</string>
+    <string name="security_auto_lock">Bloqueo automático</string>
+    <string name="security_auto_lock_sub">Tras el tiempo de inactividad</string>
+    <string name="security_attempts">Intentos de acceso</string>
+    <string name="security_attempts_sub">3 intentos antes de bloquear</string>
+    <string name="security_history">Historial de accesos</string>
+    <string name="security_history_sub">Ver actividad reciente</string>
+    <string name="security_last_unlock">Última vez desbloqueada: hoy, 7:32 p. m.</string>
+    <string name="security_default_auto_lock">5 minutos</string>
+    <string name="security_default_attempts">3 Intentos</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_edit_profile">Editar perfil</string>
+    <string name="settings_security_title">Seguridad y bóveda</string>
+    <string name="settings_security_sub">Bloqueo, accesos y clave maestra</string>
+    <string name="settings_categories_sub">Organiza tus categorías guardadas</string>
+    <string name="settings_language_default">Español</string>
+    <string name="settings_logout">Cerrar sesión</string>
+    <string name="settings_version">IronVault • versión 2.4.1</string>
+
+    <!-- Password generator -->
+    <string name="generator_title">Generador de contraseñas</string>
+    <string name="generator_copy">📋  Copiar al Portapapeles</string>
+    <string name="generator_length">Longitud</string>
+    <string name="generator_uppercase">Mayúsculas (A-Z)</string>
+    <string name="generator_lowercase">Minúsculas (a-z)</string>
+    <string name="generator_numbers">Números (0-9)</string>
+    <string name="generator_symbols">Símbolos (!_$%&amp;)</string>
+    <string name="generator_regenerate">Generar de nuevo</string>
+    <string name="generator_accept">Continuar con esta contraseña</string>
+    <string name="generator_strength_hint">Fortaleza: Excelente (128 bits de entropía)</string>
+
+    <!-- Nueva credencial -->
+    <string name="new_cred_title">Nueva contraseña</string>
+    <string name="new_cred_subtitle">Guarda un nuevo acceso en tu bóveda</string>
+    <string name="new_cred_hint_service">Servicio o plataforma</string>
+    <string name="new_cred_hint_user">Usuario o correo</string>
+    <string name="new_cred_hint_password">Contraseña</string>
+    <string name="new_cred_min_chars">Mínimo 6 caracteres</string>
+    <string name="new_cred_hint_url">URL del servicio (opcional)</string>
+    <string name="new_cred_hint_category">Categoría</string>
+    <string name="new_cred_select_category">Seleccionar categoría</string>
+    <string name="new_cred_hint_notes">Notas adicionales (opcional)</string>
+    <string name="new_cred_btn">Guardar credencial</string>
+    <string name="new_cred_encrypted_note">Tu contraseña se guarda cifrada en la bóveda.</string>
+
+    <!-- Credential detail -->
+    <string name="cred_label_user">Usuario o correo</string>
+    <string name="cred_label_password">Contraseña</string>
+    <string name="cred_label_strength">Fortaleza alta</string>
+    <string name="cred_label_url">URL del servicio</string>
+    <string name="cred_label_notes">Notas adicionales</string>
+    <string name="cred_btn_edit">Editar</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Mi perfil</string>
+    <string name="profile_no_name">Sin nombre</string>
+    <string name="profile_edit_name">Editar nombre</string>
+    <string name="profile_security_score">Puntaje de seguridad</string>
+    <string name="profile_no_passwords">Sin contraseñas aún</string>
+    <string name="profile_security_warnings">Avisos de seguridad</string>
+    <string name="profile_passwords_by_category">Contraseñas por categoría</string>
+    <string name="profile_account">Tu cuenta</string>
+    <string name="profile_account_type">Tipo de cuenta</string>
+    <string name="profile_email_verified">Correo verificado</string>
+    <string name="profile_last_login">Último inicio de sesión</string>
+    <string name="profile_member_since">Miembro desde</string>
+    <string name="profile_change_password">Cambiar contraseña</string>
+
+    <!-- Access history -->
+    <string name="history_title">Historial de accesos</string>
+    <string name="history_subtitle">Registro de intentos de desbloqueo\nde tu bóveda en este equipo.</string>
+    <string name="history_unlock_success">Desbloqueo exitoso</string>
+    <string name="history_wrong_password">Contraseña incorrecta</string>
+    <string name="history_clear">Borrar historial</string>
+
+    <!-- Vault security -->
+    <string name="vault_security_title">Seguridad y bóveda</string>
+    <string name="vault_security_main_password">Contraseña principal</string>
+    <string name="vault_security_main_password_sub">Cambiar la clave principal de acceso</string>
+    <string name="vault_security_biometric">Desbloqueo biométrico</string>
+    <string name="vault_security_biometric_sub">Usar huella digital o reconocimiento</string>
+    <string name="vault_security_export">Exportar datos de la bóveda</string>
+    <string name="vault_security_export_sub">Crear copia de seguridad cifrada</string>
+    <string name="vault_security_delete">Borrado de datos</string>
+    <string name="vault_security_delete_sub">Eliminar registros</string>
+    <string name="vault_security_footer">IronVault • seguridad cifrada AES-256</string>
+
+    <!-- Business rules -->
+    <string name="business_title">Reglas de Negocio</string>
+    <string name="business_rule_title">Regla de Negocio Principal</string>
+    <string name="business_rule_body">Toda transacción y registro sensible en IronVault debe estar cifrado localmente mediante una llave maestra única, impidiendo accesos no autorizados.</string>
+    <string name="business_features_title">Funcionalidades de la App</string>
+    <string name="business_feature_1">Gestión segura de credenciales y notas.</string>
+    <string name="business_feature_2">Autenticación biométrica integrada.</string>
+    <string name="business_feature_3">Bloqueo automático por inactividad.</string>
+    <string name="business_feature_4">Exportación de datos de bóveda cifrada.</string>
+    <string name="business_policy_title">Políticas de Seguridad</string>
+    <string name="business_policy_body">Bloqueo temporal de la cuenta tras superar el límite de intentos fallidos de acceso.</string>
+    <string name="business_footer">IronVault • Módulo de Reglas y Lógica de Negocio</string>
+
+    <!-- Guest mode -->
+    <string name="guest_title">Modo invitado</string>
+    <string name="guest_warning">Tus contraseñas se guardarán solo en este dispositivo. Si lo pierdes o desinstalas la app, se perderán.</string>
+    <string name="guest_btn_continue">Entiendo, continuar sin cuenta</string>
+    <string name="guest_btn_create">Mejor crear una cuenta</string>
+
+    <!-- Categories -->
+    <string name="category_new_title">Nueva Categoría</string>
+    <string name="category_edit_title">Editar Categoría</string>
+    <string name="category_label_name">Nombre de la categoría</string>
+    <string name="category_label_group">Grupo / Clasificación</string>
+    <string name="category_group_work">Trabajo y Educación</string>
+    <string name="category_group_personal">cuentas personales</string>
+    <string name="category_group_finance">finanzas y servicios</string>
+    <string name="category_group_frequent">frecuentes</string>
+    <string name="category_btn_save">Guardar Categoría</string>
+    <string name="manage_categories_title">Categorías</string>
+    <string name="manage_categories_search_hint">Buscar categoría…</string>
+
+    <!-- Dialog - auto lock -->
+    <string name="lock_15s">15 segundos</string>
+    <string name="lock_30s">30 segundos</string>
+    <string name="lock_1m">1 minuto</string>
+    <string name="lock_3m">3 minutos</string>
+    <string name="lock_5m">5 minutos</string>
+    <string name="lock_10m">10 minutos</string>
+    <string name="lock_disable">Desactivar</string>
+
+    <!-- Dialog - attempts -->
+    <string name="attempts_3">3 Intentos</string>
+    <string name="attempts_5">5 Intentos</string>
+    <string name="attempts_7">7 Intentos</string>
+
+    <!-- Dialog - category selector -->
+    <string name="dialog_category_title">Categoría</string>
+    <string name="dialog_category_frequent">FRECUENTES</string>
+    <string name="dialog_category_personal">CUENTAS PERSONALES</string>
+    <string name="dialog_category_finance">FINANZAS Y SERVICIOS</string>
+    <string name="dialog_category_work">TRABAJO Y EDUCACIÓN</string>
+    <string name="dialog_category_other">Otras Claves</string>
+    <string name="dialog_category_new">Nueva categoría</string>
+
+    <!-- Dialog - language -->
+    <string name="lang_spanish">Español</string>
+    <string name="lang_english">English</string>
+    <string name="lang_portuguese">Português</string>
+    <string name="lang_french">Français</string>
+    <string name="lang_german">Deutsch</string>
+    <string name="lang_italian">Italiano</string>
+    <string name="dialog_language_title">Idioma</string>
+    <string name="dialog_language_btn">Seleccionar</string>
+    <string name="settings_guest_btn">Crear cuenta o iniciar sesión</string>
+    <string name="settings_guest_name">Modo invitado</string>
+    <string name="settings_guest_email">Sin cuenta — tus datos son solo locales</string>
+
+    <!-- Dialog - logout -->
+    <string name="logout_title">Cerrar sesión</string>
+    <string name="logout_message">¿Estás seguro de que quieres cerrar sesión?</string>
+    <string name="logout_btn">Cerrar sesión</string>
+
+    <!-- Dialog - confirm delete -->
+    <string name="confirm_delete_title">Eliminar credencial</string>
+    <string name="confirm_delete_message">¿Seguro que quieres eliminar esta credencial? Esta acción no se puede deshacer.</string>
+
+    <!-- Dialog - biometric -->
+    <string name="biometric_title">Autenticación biométrica</string>
+    <string name="biometric_countdown">Este diálogo se cerrará en 5 segundos</string>
+    <string name="biometric_use_password">Usar contraseña maestra</string>
+
+    <!-- Dialog - edit name -->
+    <string name="edit_name_title">Editar nombre</string>
+    <string name="edit_name_hint">Tu nombre completo</string>
+
+    <!-- Dialog - eliminar categoría -->
+    <string name="delete_category_title">Eliminar categoría</string>
+    <string name="delete_category_message">¿Seguro que deseas eliminar esta categoría? Las transacciones existentes mantendrán el nombre de la categoría.</string>
+
+    <!-- Dialog - export -->
+    <string name="export_title">¿Descargar tus datos?</string>
+    <string name="export_message">Se creará un archivo .json cifrado\nque contiene todas tus credenciales.</string>
+    <string name="export_warning">Guarda este archivo en una ubicación segura.\nNo compartas tu clave maestra.</string>
+    <string name="export_btn">Exportar</string>
+
+    <!-- Dialog - delete data -->
+    <string name="delete_data_title">Borrado de datos</string>
+    <string name="delete_data_message">¿Deseas proceder con la\neliminación de registros?</string>
+    <string name="delete_data_warning">Esta acción borrará permanentemente\nla información seleccionada.</string>
+
+    <!-- Dialog - guest account -->
+    <string name="guest_account_title">Modo invitado</string>
+    <string name="guest_account_message">Tus datos solo están en este dispositivo. Con una cuenta se guardan en la nube.</string>
+    <string name="guest_account_create">Crear una cuenta</string>
+    <string name="guest_account_login">Ya tengo una cuenta</string>
+    <string name="guest_account_continue">Seguir como invitado</string>
+
+    <!-- Dialog - verify -->
+    <string name="dialog_verify_title">Verifica tu correo</string>
+    <string name="dialog_verify_subtitle">Código enviado a us***@gmail.com</string>
+    <string name="dialog_verify_resend_prefix">¿No recibiste el código? </string>
+    <string name="dialog_verify_resend_timer">Reenviar en 0:28</string>
+
+    <!-- Banner -->
+    <string name="banner_saved_title">¡Cambios Guardados!</string>
+    <string name="banner_saved_message">La configuración se aplicó con éxito.</string>
+
+    <!-- Principal password -->
+    <string name="principal_title">Contraseña principal</string>
+    <string name="principal_subtitle">Por seguridad, confirma tu identidad para cambiar tu contraseña maestra actual.</string>
+    <string name="principal_hint_current">Contraseña actual</string>
+    <string name="principal_hint_new">Nueva contraseña</string>
+    <string name="principal_hint_confirm">Confirmar nueva contraseña</string>
+    <string name="principal_btn">Cambiar contraseña principal</string>
+    <string name="principal_footer">IronVault • seguridad cifrada AES-256</string>
 </resources>

@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Iron"
+                    android:text="@string/main_iron"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp" />
 
@@ -54,7 +54,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Vault"
+                    android:text="@string/main_vault"
                     android:textColor="#E8873E"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -89,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Tu bóveda"
+                android:text="@string/main_vault_title"
                 android:textColor="#FFFFFF"
                 android:textSize="22sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -128,7 +128,7 @@
                         android:layout_marginStart="12dp"
                         android:background="@null"
                         android:fontFamily="sans-serif"
-                        android:hint="Buscar contraseña"
+                        android:hint="@string/main_search_hint"
                         android:textColor="#FFFFFF"
                         android:textColorHint="#6B7280"
                         android:textSize="14sp" />
@@ -174,7 +174,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="ESTADO GENERAL"
+                                android:text="@string/main_general_state"
                                 android:textColor="#8E94A0"
                                 android:textSize="10sp"
                                 android:fontFamily="sans-serif-medium"
@@ -234,7 +234,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Seguras"
+                                android:text="@string/label_secure"
                                 android:textColor="#8E94A0"
                                 android:textSize="10sp" />
                         </LinearLayout>
@@ -261,7 +261,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Débiles"
+                                android:text="@string/label_weak"
                                 android:textColor="#8E94A0"
                                 android:textSize="10sp" />
                         </LinearLayout>
@@ -288,7 +288,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Medias"
+                                android:text="@string/label_medium"
                                 android:textColor="#8E94A0"
                                 android:textSize="10sp" />
                         </LinearLayout>
@@ -315,7 +315,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Repetidas"
+                                android:text="@string/label_repeated"
                                 android:textColor="#8E94A0"
                                 android:textSize="10sp" />
                         </LinearLayout>
@@ -332,7 +332,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Tus contraseñas"
+                android:text="@string/main_your_passwords"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -352,7 +352,7 @@
                     android:id="@+id/tvAnterior"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="◀ Ant"
+                    android:text="@string/main_prev"
                     android:textColor="#E8873E"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium"
@@ -373,7 +373,7 @@
                     android:id="@+id/tvSiguiente"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sig ▶"
+                    android:text="@string/main_next"
                     android:textColor="#E8873E"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium"
