@@ -84,30 +84,34 @@ object VaultBiometrics {
             else spec.setUserAuthenticationValidityDurationSeconds(-1)
             val generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
             generator.init(spec.build())
-            val deviceKey = generator.generateKey()
+            generator.generateKey()
+            val deviceKey = store().getKey(alias(user), null) as SecretKey
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-            cipher.init(Cipher.ENCRYPT_MODE, deviceKey); cipher.updateAAD(binding.toByteArray())
+            cipher.init(Cipher.ENCRYPT_MODE, deviceKey)
             prompt(activity, cipher, { authorized ->
                 try {
+                    android.util.Log.d("VaultBiometrics", "prompt ok — unlocked=${VaultService.unlocked} sameUser=${VaultService.uid == user} sameEpoch=${VaultService.epoch() == epoch}")
                     check(VaultService.unlocked && VaultService.uid == user && VaultService.epoch() == epoch)
                     val encrypted = authorized.doFinal(candidate)
+                    android.util.Log.d("VaultBiometrics", "doFinal ok, encrypted=${encrypted.size} bytes")
                     val nonce = authorized.iv
-                    val verifier = Cipher.getInstance("AES/GCM/NoPadding")
-                    verifier.init(Cipher.DECRYPT_MODE, deviceKey, GCMParameterSpec(128, nonce))
-                    verifier.updateAAD(binding.toByteArray())
-                    prompt(activity, verifier, { verified ->
-                        try {
-                            val recovered = verified.doFinal(encrypted)
-                            try { check(MessageDigest.isEqual(candidate, recovered)) } finally { recovered.fill(0) }
-                            check(VaultService.unlocked && VaultService.uid == user && VaultService.epoch() == epoch)
-                            check(prefs(activity).edit().putString(user, JSONObject().put("binding", binding)
-                                .put("nonce", nonce.b64()).put("ciphertext", encrypted.b64()).toString()).commit())
-                            candidate.fill(0); done()
-                        } catch (_: Exception) { fail("No se pudo verificar la configuración biométrica") }
-                    }, ::fail)
-                } catch (_: Exception) { fail("La configuración biométrica no se completó") }
+                    check(prefs(activity).edit().putString(user, JSONObject()
+                        .put("binding", binding)
+                        .put("nonce", nonce.b64())
+                        .put("ciphertext", encrypted.b64())
+                        .toString()).commit())
+                    android.util.Log.d("VaultBiometrics", "prefs saved ok")
+                    candidate.fill(0)
+                    done()
+                } catch (ex: Exception) { 
+                    android.util.Log.e("VaultBiometrics", "enroll failed: ${ex.javaClass.name}: ${ex.message}", ex)
+                    fail("La configuración biométrica no se completó. Inténtalo de nuevo.") 
+                }
             }, ::fail)
-        } catch (_: Exception) { fail("Configura biometría fuerte en los ajustes del dispositivo y vuelve a intentar") }
+        } catch (ex: Exception) { 
+            android.util.Log.e("VaultBiometrics", "enroll outer failed: ${ex.javaClass.name}: ${ex.message}", ex)
+            fail("Configura biometría fuerte en los ajustes del dispositivo y vuelve a intentar") 
+        }
     }
     internal fun unlock(activity: FragmentActivity, e: VaultEnvelope, done: (ByteArray) -> Unit, error: (String) -> Unit) {
         val user = VaultService.uid
@@ -119,7 +123,6 @@ object VaultBiometrics {
             val key = store().getKey(alias(user), null) as SecretKey
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(128, record.getString("nonce").unb64()))
-            cipher.updateAAD(binding.toByteArray())
             prompt(activity, cipher, { authorized ->
                 val dek = authorized.doFinal(record.getString("ciphertext").unb64())
                 try { done(dek) } finally { dek.fill(0) }

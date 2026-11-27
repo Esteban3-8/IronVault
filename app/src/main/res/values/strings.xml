@@ -217,8 +217,8 @@
 
     <!-- Vault security -->
     <string name="vault_security_title">Seguridad y bóveda</string>
-    <string name="vault_security_main_password">Contraseña principal</string>
-    <string name="vault_security_main_password_sub">Cambiar la clave principal de acceso</string>
+    <string name="vault_security_main_password">Contraseña de cuenta</string>
+    <string name="vault_security_main_password_sub">Cambiar la contraseña de inicio de sesión</string>
     <string name="vault_security_biometric">Desbloqueo biométrico</string>
     <string name="vault_security_biometric_sub">Usar huella digital o reconocimiento</string>
     <string name="vault_security_export">Exportar datos de la bóveda</string>
@@ -344,6 +344,15 @@
     <!-- Banner -->
     <string name="banner_saved_title">¡Cambios Guardados!</string>
     <string name="banner_saved_message">La configuración se aplicó con éxito.</string>
+
+    <!-- Change account password -->
+    <string name="change_account_password_title">Contraseña de cuenta</string>
+    <string name="change_account_password_subtitle">Cambia la contraseña con la que inicias sesión en IronVault.</string>
+    <string name="change_account_password_hint_current">Contraseña actual</string>
+    <string name="change_account_password_hint_new">Nueva contraseña</string>
+    <string name="change_account_password_hint_confirm">Confirmar nueva contraseña</string>
+    <string name="change_account_password_btn">Cambiar contraseña</string>
+    <string name="change_account_password_forgot">¿No recuerdas tu contraseña? Recupérala por correo</string>
 
     <!-- Principal password -->
     <string name="principal_title">Contraseña principal</string>

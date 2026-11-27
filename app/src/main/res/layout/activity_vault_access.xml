@@ -8,7 +8,7 @@
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="IronVault"
             android:textSize="24sp" android:fontFamily="@font/inter_bold" android:textColor="#E8873E" />
         <TextView android:id="@+id/accessTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="28dp" android:text="Desbloquear bóveda" android:textSize="25sp" android:textColor="@color/text_primary" android:gravity="center" />
+            android:layout_marginTop="28dp" android:text="Desbloquear bóveda" android:textSize="25sp" android:fontFamily="@font/inter_bold" android:textColor="@color/text_primary" android:gravity="center" />
         <TextView android:id="@+id/accessMessage" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:text="Bóveda bloqueada. Verifica tu identidad para acceder de forma segura a tus contraseñas."
             android:fontFamily="sans-serif-medium" android:textSize="13sp" android:textColor="#9A9A9A" android:accessibilityLiveRegion="polite" />
@@ -18,22 +18,22 @@
         <androidx.appcompat.widget.AppCompatButton android:id="@+id/accessBiometric" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
             android:visibility="gone" android:text="Desbloquear con biometría" android:layout_marginTop="16dp" android:background="@drawable/bg_secondary_button" android:backgroundTint="@null" android:textColor="#FFFFFF" android:textAllCaps="false" android:fontFamily="sans-serif-medium" />
         <TextView android:id="@+id/accessPasswordLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Usar contraseña maestra"
-            android:layout_marginTop="20dp" android:fontFamily="sans-serif-medium" android:textSize="13sp" android:textColor="#9A9A9A" android:labelFor="@id/accessPassword" />
+            android:layout_marginTop="20dp" android:fontFamily="sans-serif-medium" android:textSize="13sp" android:textColor="#9A9A9A" android:labelFor="@id/accessPassword" android:visibility="gone" />
         <EditText android:id="@+id/accessPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:paddingHorizontal="18dp" android:paddingVertical="16dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="13.5sp" android:minHeight="56dp" android:hint="Contraseña maestra" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" />
+            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" android:visibility="gone" />
         <EditText android:id="@+id/accessNewPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:paddingHorizontal="18dp" android:paddingVertical="16dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="13.5sp" android:minHeight="56dp" android:hint="Nueva contraseña maestra (mínimo 8 caracteres)" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" />
+            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" android:visibility="gone" />
         <EditText android:id="@+id/accessConfirm" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:paddingHorizontal="18dp" android:paddingVertical="16dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="13.5sp" android:minHeight="56dp" android:hint="Repite la nueva contraseña maestra" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" />
+            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" android:visibility="gone" />
         <EditText android:id="@+id/accessAccountPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:paddingHorizontal="18dp" android:paddingVertical="16dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="13.5sp" android:minHeight="56dp" android:hint="Repite tu contraseña de inicio de sesión" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" />
+            android:textColor="#FFFFFF" android:textColorHint="#7A7A7A" android:visibility="gone" />
         <androidx.appcompat.widget.AppCompatCheckBox android:id="@+id/accessAcknowledgement" android:button="@drawable/custom_checkbox" app:buttonTint="@null" android:buttonTint="@null" android:drawablePadding="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="Entiendo que mi contraseña maestra no es recuperable. Los administradores y soporte no pueden recuperarla ni restablecerla. Si pierdo mis accesos válidos, puedo perder mis datos permanentemente."
-            android:fontFamily="sans-serif-medium" android:textSize="13sp" android:textColor="#9A9A9A" android:minHeight="48dp" />
+            android:fontFamily="sans-serif-medium" android:textSize="13sp" android:textColor="#9A9A9A" android:minHeight="48dp" android:visibility="gone" />
         <TextView android:id="@+id/accessLockout" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="12dp" android:textColor="#C97D3E" android:textSize="13sp"
             android:fontFamily="sans-serif-medium" android:gravity="center" android:visibility="gone" />

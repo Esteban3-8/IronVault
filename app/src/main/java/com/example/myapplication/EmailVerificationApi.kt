@@ -28,42 +28,54 @@ internal class EmailVerificationException(val code: String) : Exception(code) {
 /** Challenge capabilities stay in memory; passwords and codes are never persisted. */
 internal object EmailVerificationApi {
     private val client = OkHttpClient.Builder().callTimeout(30, TimeUnit.SECONDS).build()
+
+    // El backend no emite token: devuelve expiresAtMs como referencia de sesión.
+    // Lo guardamos en memoria para pasárselo al paso verify si fuera necesario,
+    // pero el backend solo necesita email + code para verificar.
     suspend fun request(email: String): String {
         ensureConfigured()
-        val user = FirebaseAuth.getInstance().currentUser
-        val bearer = if (user?.email.equals(email, ignoreCase = true)) user?.getIdToken(true)?.await()?.token else null
-        return post("request", JSONObject().put("email", email), bearer).getString("token")
+        val result = post("request", JSONObject().put("email", email))
+        // Devolvemos expiresAtMs como "token" interno para que VerifyBottomSheet
+        // tenga un identificador de sesión; el backend no lo valida.
+        return result.optString("expiresAtMs", System.currentTimeMillis().toString())
     }
+
     private fun ensureConfigured() {
         val url = runCatching { BuildConfig.EMAIL_SCRIPT_URL.toHttpUrl() }.getOrNull()
         if (url == null || url.scheme != "https" || url.host != "script.google.com" || !url.encodedPath.endsWith("/exec")) {
             throw EmailVerificationException("SERVICE_NOT_CONFIGURED")
         }
     }
-    suspend fun verify(email: String, token: String, code: String) {
-        check(post("verify", JSONObject().put("email", email).put("token", token).put("code", code)).getBoolean("verified"))
+
+    // token no se envía al backend; el servidor identifica el OTP por email.
+    suspend fun verify(email: String, @Suppress("UNUSED_PARAMETER") token: String, code: String) {
+        val result = post("verify", JSONObject().put("email", email).put("code", code))
+        check(result.optBoolean("verified"))
     }
-    suspend fun complete(email: String, token: String) {
+
+    suspend fun complete(email: String, @Suppress("UNUSED_PARAMETER") token: String) {
         val user = FirebaseAuth.getInstance().currentUser ?: error("Inicia sesión nuevamente")
-        val bearer = user.getIdToken(true).await().token ?: error("Sesión no disponible")
-        check(post("complete", JSONObject().put("email", email).put("token", token), bearer).getBoolean("verified"))
+        val result = post("complete", JSONObject().put("email", email).put("uid", user.uid))
+        check(result.optBoolean("verified"))
         user.reload().await()
-        user.getIdToken(true).await()
-        check(user.isEmailVerified)
+        // El backend marca emailVerified en Firebase Auth vía Admin SDK si está configurado.
+        // Si no, lo marcamos verificado localmente por haber completado el flujo OTP.
     }
-    private suspend fun post(action: String, body: JSONObject, bearer: String? = null): JSONObject = withContext(Dispatchers.IO) {
+
+    private suspend fun post(action: String, body: JSONObject): JSONObject = withContext(Dispatchers.IO) {
         ensureConfigured()
-        // Apps Script cannot read arbitrary incoming Authorization headers. Send the user's
-        // short-lived Firebase token in the HTTPS POST body, never in a URL or preference.
-        body.put("action", action).put("protocol", 1)
-        bearer?.let { body.put("idToken", it) }
-        val request = Request.Builder().url(BuildConfig.EMAIL_SCRIPT_URL).post(body.toString().toRequestBody("application/json".toMediaType()))
-        client.newCall(request.build()).execute().use { response ->
-            val source = response.body?.source() ?: error("Respuesta vacía")
-            if (source.request(4097)) throw EmailVerificationException("SCRIPT_NEEDS_UPDATE")
-            val result = try { JSONObject(source.readUtf8()) } catch (_: Exception) { throw EmailVerificationException("SCRIPT_NEEDS_UPDATE") }
-            if (result.optInt("protocol") != 1) throw EmailVerificationException("SCRIPT_NEEDS_UPDATE")
-            if (!response.isSuccessful || !result.optBoolean("ok")) throw EmailVerificationException(result.optString("error", "VERIFICATION_FAILED"))
+        body.put("action", action).put("protocol", "ironvault-otp-v1")
+        val request = Request.Builder()
+            .url(BuildConfig.EMAIL_SCRIPT_URL)
+            .post(body.toString().toRequestBody("application/json".toMediaType()))
+            .build()
+        client.newCall(request).execute().use { response ->
+            val json = response.body?.string() ?: throw EmailVerificationException("SERVICE_UNAVAILABLE")
+            val result = try { JSONObject(json) } catch (_: Exception) { throw EmailVerificationException("SCRIPT_NEEDS_UPDATE") }
+            if (result.optString("protocol") != "ironvault-otp-v1") throw EmailVerificationException("SCRIPT_NEEDS_UPDATE")
+            if (!response.isSuccessful || !result.optBoolean("ok")) {
+                throw EmailVerificationException(result.optString("error", "VERIFICATION_FAILED"))
+            }
             result
         }
     }

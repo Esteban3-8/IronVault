@@ -81,10 +81,10 @@ class SettingsActivity : BaseActivity() {
             else startActivity(Intent(this, ProfileActivity::class.java))
         }
 
-        // ── Contraseña principal ──────────────────────────────────
+        // ── Contraseña de cuenta ──────────────────────────────────
         if (!esInvitado) {
             findViewById<MaterialCardView>(R.id.cardMainPassword).setOnClickListener {
-                startActivity(Intent(this, ChangeMasterKeyActivity::class.java))
+                startActivity(Intent(this, ChangeAccountPasswordActivity::class.java))
             }
         }
 
@@ -215,21 +215,61 @@ class SettingsActivity : BaseActivity() {
 
     private fun mostrarDialogoBiometrico(sw: SwitchCompat) {
         sw.isChecked = false
-        val input = EditText(this).apply { inputType = 129; isSaveEnabled = false }
-        AlertDialog.Builder(this).setTitle("Activar biometría")
-            .setMessage("Confirma la contraseña maestra. El sistema pedirá autenticación y una comprobación final.")
-            .setView(input).setNegativeButton("Cancelar", null).setPositiveButton("Continuar") { _, _ ->
-                val chars = input.text.toString().toCharArray(); input.text.clear()
-                vaultJob {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirm_master_key, null)
+        val input = dialogView.findViewById<android.widget.EditText>(R.id.etMasterKeyInput)
+        val toggleBtn = dialogView.findViewById<android.widget.ImageView>(R.id.ivToggleMasterKey)
+        val errorText = dialogView.findViewById<android.widget.TextView>(R.id.tvMasterKeyError)
+        val btnConfirm = dialogView.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnConfirmMasterKey)
+        val btnCancel = dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.btnCancelMasterKey)
+
+        dialogView.findViewById<android.widget.TextView>(R.id.tvConfirmSubtitle)?.text =
+            "Confirma tu contraseña maestra para activar el desbloqueo biométrico."
+
+        var passwordVisible = false
+        toggleBtn.setOnClickListener {
+            passwordVisible = !passwordVisible
+            input.inputType = if (passwordVisible)
+                android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            else
+                android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            input.setSelection(input.text.length)
+            toggleBtn.setImageResource(if (passwordVisible) R.drawable.ojo else R.drawable.ojo_cerrado)
+        }
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(dialogView).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        btnCancel.setOnClickListener { dialog.dismiss() }
+
+        btnConfirm.setOnClickListener {
+            val chars = input.text.toString().toCharArray()
+            input.text.clear()
+            errorText.visibility = android.view.View.GONE
+            btnConfirm.isEnabled = false
+            vaultJob {
+                try {
+                    val key = VaultService.verify(chars)
                     try {
-                        val key = VaultService.verify(chars)
-                        try { VaultBiometrics.enroll(this@SettingsActivity, key,
-                            { sw.isChecked = true; mostrarBannerPersonalizado("Biometría activada", "Configuración verificada", R.drawable.logo) },
-                            { sw.isChecked = false; mostrarBannerPersonalizado("Biometría", it, R.drawable.logo) }) }
-                        finally { key.fill(0) }
-                    } finally { chars.fill('\u0000') }
-                }
-            }.show()
+                        VaultBiometrics.enroll(this@SettingsActivity, key,
+                            {
+                                sw.isChecked = true
+                                mostrarBannerPersonalizado("Biometría activada", "Configuración verificada", R.drawable.logo)
+                            },
+                            { msg ->
+                                sw.isChecked = false
+                                mostrarBannerPersonalizado("Biometría", msg, R.drawable.logo)
+                            })
+                        dialog.dismiss()
+                    } finally { key.fill(0) }
+                } catch (e: Exception) {
+                    if (e is kotlinx.coroutines.CancellationException) throw e
+                    errorText.visibility = android.view.View.VISIBLE
+                    btnConfirm.isEnabled = true
+                } finally { chars.fill('\u0000') }
+            }
+        }
+        dialog.setOnDismissListener { input.text.clear() }
+        dialog.show()
     }
 
     private fun activarBiometria(msg: String) {

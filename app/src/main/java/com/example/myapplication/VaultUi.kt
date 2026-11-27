@@ -16,24 +16,46 @@ internal fun FragmentActivity.vaultJob(work: suspend () -> Unit) = lifecycleScop
 }
 
 internal fun FragmentActivity.confirmMaster(action: String, done: () -> Unit) {
-    val input = EditText(this).apply {
-        hint = "Contraseña maestra actual"
-        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        isSaveEnabled = false
+    val dialogView = layoutInflater.inflate(R.layout.dialog_confirm_master_key, null)
+    val input = dialogView.findViewById<EditText>(R.id.etMasterKeyInput)
+    val toggleBtn = dialogView.findViewById<android.widget.ImageView>(R.id.ivToggleMasterKey)
+    val errorText = dialogView.findViewById<android.widget.TextView>(R.id.tvMasterKeyError)
+    val btnConfirm = dialogView.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btnConfirmMasterKey)
+    val btnCancel = dialogView.findViewById<com.google.android.material.card.MaterialCardView>(R.id.btnCancelMasterKey)
+
+    var passwordVisible = false
+    toggleBtn.setOnClickListener {
+        passwordVisible = !passwordVisible
+        input.inputType = if (passwordVisible)
+            android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        else
+            android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        input.setSelection(input.text.length)
+        toggleBtn.setImageResource(if (passwordVisible) R.drawable.ojo else R.drawable.ojo_cerrado)
     }
-    val dialog = AlertDialog.Builder(this).setTitle("Confirmar contraseña maestra")
-        .setMessage("Esta contraseña protege tu bóveda. No es la contraseña de tu cuenta.")
-        .setView(input).setNegativeButton("Cancelar", null).setPositiveButton("Confirmar", null).create()
-    dialog.setOnShowListener { dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-        val chars = input.text.toString().toCharArray(); input.text.clear()
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+
+    val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+        .setView(dialogView).create()
+    dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+    btnCancel.setOnClickListener { dialog.dismiss() }
+
+    btnConfirm.setOnClickListener {
+        val chars = input.text.toString().toCharArray()
+        input.text.clear()
+        errorText.visibility = android.view.View.GONE
+        btnConfirm.isEnabled = false
         vaultJob {
             try {
                 VaultService.authorize(chars, action)
                 dialog.dismiss(); done()
-            } finally { chars.fill('\u0000'); dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true }
+            } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                errorText.visibility = android.view.View.VISIBLE
+                btnConfirm.isEnabled = true
+            } finally { chars.fill('\u0000') }
         }
-    } }
+    }
     dialog.setOnDismissListener { input.text.clear() }
     dialog.show()
 }
