@@ -381,9 +381,11 @@ class NuevaCredencialActivity : BaseActivity() {
     }
 
     private fun bindCategoryOption(dialog: BottomSheetDialog, row: View, category: VaultCategory, frequent: Boolean) {
-        encontrarTextView(row)?.text = category.name
-        encontrarImageView(row)?.let(category::showIcon)
-        encontrarMaterialCardView(row)?.setCardBackgroundColor(obtenerColorBgParaCategoria(category.key))
+        if (row.findViewById<View>(R.id.categoryRowIcon) == null) {
+            encontrarTextView(row)?.text = category.name
+            encontrarImageView(row)?.let(category::showIcon)
+            encontrarMaterialCardView(row)?.setCardBackgroundColor(obtenerColorBgParaCategoria(category.key))
+        }
         resaltarFila(row, category.key == selectedCategory, frequent)
         row.setOnClickListener {
             selectCategory(category)

@@ -1,17 +1,42 @@
 package com.example.myapplication
 
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
 import android.widget.ScrollView
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.math.roundToInt
 
 class ResponsiveLayoutTest {
+    @Test fun categoryRowsReflectEditedColors() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.runOnMainSync {
+            val context = ContextThemeWrapper(instrumentation.targetContext, R.style.Theme_MyApplication)
+            val inflater = LayoutInflater.from(context)
+            val parent = LinearLayout(context)
+            val original = VaultCategory("sample", "Ejemplo", CategoryGroup.PERSONAL, "ic_pick_lock")
+            val light = context.getColor(R.color.pick_mint)
+            val dark = context.getColor(R.color.pick_navy)
+            val created = original.copy(color = light)
+            val edited = created.copy(color = dark, icon = "ic_pick_home")
+
+            for (category in listOf(created, edited)) {
+                val row = inflater.categoryRow(parent, category)
+                val icon = row.findViewById<ImageView>(R.id.categoryRowIcon)
+                assertEquals(category.color, (icon.parent as View).backgroundTintList?.defaultColor)
+                assertTrue(icon.drawable != null && icon.colorFilter != null)
+            }
+        }
+    }
+
     @Test fun actionsRemainReachableInCompactWindows() {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         instrumentation.runOnMainSync {
@@ -23,6 +48,13 @@ class ResponsiveLayoutTest {
                 fun layout(resource: Int): View {
                     val root = LayoutInflater.from(context).inflate(resource, null)
                     root.findViewById<View>(R.id.groupDropdown)?.visibility = View.VISIBLE
+                    root.findViewById<LinearLayout>(R.id.groupOptions)?.let { options ->
+                        for (group in CategoryGroup.entries) {
+                            val row = LayoutInflater.from(context).inflate(R.layout.item_category_group, options, false)
+                            (row as android.widget.TextView).text = group.label
+                            options.addView(row)
+                        }
+                    }
                     root.measure(MeasureSpec.makeMeasureSpec((width * density).roundToInt(), MeasureSpec.EXACTLY),
                         MeasureSpec.makeMeasureSpec((height * density).roundToInt(), MeasureSpec.EXACTLY))
                     root.layout(0, 0, root.measuredWidth, root.measuredHeight)
@@ -48,6 +80,13 @@ class ResponsiveLayoutTest {
                     val card = root.findViewById<View>(R.id.cardGroup)
                     val scroll = card.parent.parent as ScrollView
                     assertTrue(scroll.height > 0 && scroll.bottom <= save.top && save.bottom <= root.height)
+                    val options = root.findViewById<LinearLayout>(R.id.groupOptions)
+                    val last = options.getChildAt(options.childCount - 1)
+                    val bounds = Rect(0, 0, last.width, last.height)
+                    scroll.offsetDescendantRectToMyCoords(last, bounds)
+                    scroll.scrollTo(0, bounds.bottom)
+                    assertTrue(bounds.bottom <= scroll.scrollY + scroll.height)
+                    if (height == 1024) assertEquals(0, scroll.scrollY)
                 }
                 val verify = layout(R.layout.activity_verify_code)
                 val last = verify.findViewById<View>(R.id.etDigit6)

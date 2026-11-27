@@ -161,14 +161,15 @@
 
     <!-- Password generator -->
     <string name="generator_title">Generador de contraseñas</string>
-    <string name="generator_copy">📋  Copiar al Portapapeles</string>
+    <string name="generator_copy">Copiar</string>
     <string name="generator_length">Longitud</string>
+    <string name="generator_keep_one">Mantén activo al menos un tipo de carácter</string>
     <string name="generator_uppercase">Mayúsculas (A-Z)</string>
     <string name="generator_lowercase">Minúsculas (a-z)</string>
     <string name="generator_numbers">Números (0-9)</string>
     <string name="generator_symbols">Símbolos (!_$%&amp;)</string>
-    <string name="generator_regenerate">Generar de nuevo</string>
-    <string name="generator_accept">Continuar con esta contraseña</string>
+    <string name="generator_regenerate">Regenerar</string>
+    <string name="generator_accept">Usar esta contraseña</string>
     <string name="generator_strength_hint">Fortaleza: Excelente (128 bits de entropía)</string>
 
     <!-- Nueva credencial -->
