@@ -8,6 +8,26 @@ service cloud.firestore {
         && request.resource.data.verified == false;
       allow update: if owner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fullName']);
       allow delete: if false;
+      match /accessEvents/{eventId} {
+        allow get: if owner(uid);
+        allow list: if owner(uid) && request.query.limit != null && request.query.limit <= 30;
+        allow create: if owner(uid)
+          && request.resource.data.keys().hasAll(['version','deviceId','deviceName','androidVersion','authTime','recordedAt'])
+          && request.resource.data.keys().hasOnly(['version','deviceId','deviceName','androidVersion','authTime','recordedAt'])
+          && request.resource.data.version == 1
+          && request.resource.data.deviceId is string
+          && request.resource.data.deviceId.matches('[a-f0-9]{64}')
+          && request.resource.data.deviceName is string
+          && request.resource.data.deviceName.size() > 0 && request.resource.data.deviceName.size() <= 80
+          && request.resource.data.androidVersion is string
+          && request.resource.data.androidVersion.size() > 0 && request.resource.data.androidVersion.size() <= 32
+          && request.resource.data.authTime is int && request.resource.data.authTime > 0
+          && request.resource.data.authTime == request.auth.token.auth_time
+          && eventId == request.resource.data.deviceId + '_' + string(request.auth.token.auth_time)
+          && request.resource.data.recordedAt == request.time;
+        // Preserve history: a recovered account cannot rewrite or erase previous access events.
+        allow update, delete: if false;
+      }
       match /vault/{id} {
         allow read: if owner(uid) && id == 'active';
         // ALL writes require the independently signed server protocol, including first creation.
