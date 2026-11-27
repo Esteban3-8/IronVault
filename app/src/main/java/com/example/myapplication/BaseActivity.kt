@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.ViewGroup
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,6 +18,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     override fun setContentView(layoutResID: Int) {
+        if (NavTab.entries.any { it.screen == javaClass }) enableEdgeToEdge()
         super.setContentView(layoutResID)
         fun preventSavedSecrets(view: android.view.View) {
             if (view is android.widget.TextView) view.isSaveEnabled = false
@@ -27,9 +29,6 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     private fun aplicarInsetsAdaptables() {
-        // MainActivity ya ajusta su R.id.scrollContent, así que evitamos sumar doble margen ahí
-        if (this is MainActivity) return
-
         val contentFrame = findViewById<ViewGroup>(android.R.id.content)
         val rootView = contentFrame?.getChildAt(0) ?: return
 
@@ -57,6 +56,11 @@ open class BaseActivity : AppCompatActivity() {
             )
             insets
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        animateTabContent(intent)
     }
 
     override fun onStart() {

@@ -12,12 +12,9 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.EmailAuthProvider
@@ -44,14 +41,7 @@ class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!ensureVaultAccess()) return
-        enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, sys.top, 0, 0)
-            insets
-        }
 
         configurarBotones()
         cargarEstadoBiometrico()
@@ -275,22 +265,7 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun configurarNavegacionInferior() {
-        val nav = listOf<Pair<Int, Class<*>>>(
-            R.id.btnNavHome to MainActivity::class.java,
-            R.id.btnNavLock to SecurityActivity::class.java,
-            R.id.btnNavKey  to PasswordGeneratorActivity::class.java
-        )
-        nav.forEach { (id, cls) ->
-            findViewById<LinearLayout>(id).setOnClickListener {
-                startActivity(Intent(this, cls).apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                })
-                finish()
-            }
-        }
-        findViewById<LinearLayout>(R.id.btnNavSettings)?.setOnClickListener { }
-        findViewById<LinearLayout>(R.id.btnNavSettings)?.setBackgroundResource(R.drawable.bg_nav_pill_active)
-        findViewById<ImageView>(R.id.ivNavSettings)?.setColorFilter(getColor(R.color.orange_primary))
+        bindBottomNavigation(NavTab.SETTINGS)
     }
 
     private fun cargarDatosPerfil() {

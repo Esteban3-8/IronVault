@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 
@@ -37,14 +38,13 @@ abstract class CategoryFormActivity(private val layout: Int) : BaseActivity() {
         val groupLabel = findViewById<TextView>(R.id.tvGroup)
         val preview = findViewById<ImageView>(R.id.ivCategoryPreview)
         nameInput.setText(category.name)
-        groupLabel.text = category.group.label
-        category.showIcon(preview)
+        category.showPreview(preview)
 
         findViewById<View>(R.id.btnBack).setOnClickListener { finish() }
         findViewById<View>(R.id.btnIcon).setOnClickListener {
             showCategoryIconPicker(category) {
                 category = it
-                category.showIcon(preview)
+                category.showPreview(preview)
             }
         }
 
@@ -58,19 +58,32 @@ abstract class CategoryFormActivity(private val layout: Int) : BaseActivity() {
         findViewById<View>(R.id.groupHeader).setOnClickListener {
             showGroups(dropdown.visibility != View.VISIBLE)
         }
-        val groupOptions = mapOf(
-            R.id.optPersonales to CategoryGroup.PERSONAL,
-            R.id.optFinanzas to CategoryGroup.FINANCE,
-            R.id.optTrabajo to CategoryGroup.WORK,
-            R.id.optFrecuentes to CategoryGroup.FREQUENT
-        )
-        for ((id, group) in groupOptions) {
-            findViewById<View>(id).setOnClickListener {
+        val options = findViewById<LinearLayout>(R.id.groupOptions)
+        val groupRows = CategoryGroup.entries.associateWith { group ->
+            (layoutInflater.inflate(R.layout.item_category_group, options, false) as TextView).apply {
+                text = group.label
+                options.addView(this)
+            }
+        }
+
+        fun renderGroup() {
+            groupLabel.text = category.group.label
+            groupLabel.setTextColor(getColor(R.color.orange_primary))
+            for ((group, row) in groupRows) {
+                row.isSelected = group == category.group
+                row.setBackgroundResource(if (row.isSelected) R.drawable.bg_option_selected else 0)
+                row.setTextColor(getColor(if (row.isSelected) R.color.orange_primary else R.color.text_primary))
+            }
+        }
+
+        for ((group, row) in groupRows) {
+            row.setOnClickListener {
                 category = category.copy(group = group)
-                groupLabel.text = group.label
+                renderGroup()
                 showGroups(false)
             }
         }
+        renderGroup()
 
         findViewById<View>(R.id.btnSave).setOnClickListener {
             val name = nameInput.text.toString().trim()

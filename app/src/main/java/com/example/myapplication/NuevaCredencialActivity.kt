@@ -218,11 +218,22 @@ class NuevaCredencialActivity : BaseActivity() {
             }
 
             val containerCategoryList = view.findViewById<ViewGroup>(R.id.containerCategoryList)
-            val groupHeaders = mapOf(
+            val groupHeaders = mutableMapOf(
                 CategoryGroup.PERSONAL to tvHeaderPersonales,
                 CategoryGroup.FINANCE to tvHeaderFinanzas,
                 CategoryGroup.WORK to tvHeaderTrabajo
             )
+            for (group in CategoryGroup.entries) {
+                if (group == CategoryGroup.FREQUENT || group in groupHeaders) continue
+                val header = TextView(view.context).apply {
+                    text = group.label
+                    setTextColor(tvHeaderTrabajo.currentTextColor)
+                    typeface = tvHeaderTrabajo.typeface
+                    setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, tvHeaderTrabajo.textSize)
+                }
+                containerCategoryList.addView(header, tvHeaderTrabajo.layoutParams)
+                groupHeaders[group] = header
+            }
             val rows = mutableListOf<Pair<VaultCategory, View>>()
             for ((group, header) in groupHeaders) {
                 var index = containerCategoryList.indexOfChild(header) + 1

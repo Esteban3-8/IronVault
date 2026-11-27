@@ -12,8 +12,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 
@@ -27,12 +25,6 @@ class SecurityActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_security)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         configurarBotones()
         cargarValoresGuardados()
@@ -99,27 +91,7 @@ class SecurityActivity : BaseActivity() {
         }
 
         // ── Barra de navegación inferior ──
-        findViewById<LinearLayout>(R.id.btnNavHome).setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-        }
-
-        findViewById<LinearLayout>(R.id.btnNavKey).setOnClickListener {
-            val intent = Intent(this, PasswordGeneratorActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-        }
-
-        findViewById<LinearLayout>(R.id.btnNavSettings).setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-        }
-
-        // Marcar ícono activo: Seguridad
-        findViewById<LinearLayout>(R.id.btnNavLock)?.setBackgroundResource(R.drawable.bg_nav_pill_active)
-        findViewById<ImageView>(R.id.ivNavLock)?.setColorFilter(getColor(R.color.orange_primary))
+        bindBottomNavigation(NavTab.SECURITY)
     }
 
     private fun cargarValoresGuardados() {

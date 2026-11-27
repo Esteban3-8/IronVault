@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
+import androidx.core.graphics.ColorUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 internal fun AppCompatActivity.showCategoryIconPicker(
@@ -22,21 +23,37 @@ internal fun AppCompatActivity.showCategoryIconPicker(
 
     var selection = category
     val preview = view.findViewById<ImageView>(R.id.ivPreview)
-    selection.showIcon(preview)
     val iconGrid = view.findViewById<ViewGroup>(R.id.gridIcons)
+    val colorGrid = view.findViewById<ViewGroup>(R.id.gridColors)
+
+    fun renderSelection() {
+        selection.showPreview(preview)
+        for (option in iconGrid.children) {
+            option.isSelected = option.tag == selection.icon
+        }
+        for (option in colorGrid.children) {
+            val color = option.backgroundTintList?.defaultColor ?: continue
+            option.isSelected = color == selection.color
+            option.foreground = if (option.isSelected) {
+                getDrawable(R.drawable.ic_check)?.mutate()?.apply {
+                    setTint(if (ColorUtils.calculateLuminance(color) > 0.179) Color.BLACK else Color.WHITE)
+                }
+            } else null
+        }
+    }
     for (option in iconGrid.children) {
         option.setOnClickListener {
             selection = selection.copy(icon = option.tag as String)
-            selection.showIcon(preview)
+            renderSelection()
         }
     }
-    val colorGrid = view.findViewById<ViewGroup>(R.id.gridColors)
     for (option in colorGrid.children) {
         option.setOnClickListener {
             selection = selection.copy(color = option.backgroundTintList?.defaultColor)
-            selection.showIcon(preview)
+            renderSelection()
         }
     }
+    renderSelection()
     view.findViewById<View>(R.id.btnApply).setOnClickListener {
         onApply(selection)
         dialog.dismiss()

@@ -1,7 +1,11 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.view.View
 import android.widget.ImageView
+import androidx.core.graphics.ColorUtils
 import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONObject
 
@@ -20,11 +24,26 @@ internal data class VaultCategory(
     }
 }
 
+internal fun VaultCategory.showPreview(view: ImageView) {
+    showIcon(view)
+    val container = view.parent as View
+    container.backgroundTintList = color?.let { ColorStateList.valueOf(it) }
+    color?.let { background ->
+        val darkContrast = ColorUtils.calculateContrast(Color.BLACK, background)
+        val lightContrast = ColorUtils.calculateContrast(Color.WHITE, background)
+        view.setColorFilter(if (darkContrast >= lightContrast) Color.BLACK else Color.WHITE)
+    }
+}
+
 internal enum class CategoryGroup(val label: String) {
     PERSONAL("Cuentas personales"),
     FINANCE("Finanzas y servicios"),
     WORK("Trabajo y educación"),
-    FREQUENT("Frecuentes")
+    FREQUENT("Frecuentes"),
+    ENTERTAINMENT("Entretenimiento"),
+    HEALTH("Salud y bienestar"),
+    TRAVEL("Viajes"),
+    HOME("Hogar")
 }
 
 internal class CategoryStore(context: Context) {

@@ -149,33 +149,7 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
 
         // ── BARRA DE NAVEGACIÓN INFERIOR (Menú Píldora) ──────────
 
-        // 1. Ir a Inicio (MainActivity)
-        findViewById<LinearLayout>(R.id.btnNavHome)?.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
-            finish()
-        }
-
-        // 2. Ir a Seguridad (SecurityActivity)
-        findViewById<LinearLayout>(R.id.btnNavLock)?.setOnClickListener {
-            val intent = Intent(this, SecurityActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-
-        // 3. Botón Llave (Ya estás aquí)
-
-        // 4. Ir a Ajustes (SettingsActivity)
-        findViewById<LinearLayout>(R.id.btnNavSettings)?.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-
-        // Marcar ícono activo: Generador
-        findViewById<LinearLayout>(R.id.btnNavKey)?.setBackgroundResource(R.drawable.bg_nav_pill_active)
-        findViewById<ImageView>(R.id.ivNavKey)?.setColorFilter(getColor(R.color.orange_primary))
+        bindBottomNavigation(NavTab.GENERATOR)
     }
 
     private fun longitudActual(): Int =

@@ -84,8 +84,13 @@
     </LinearLayout>
 
     <!-- Colores -->
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/containerColors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -132,8 +137,23 @@
             <View style="@style/ColorDot" android:backgroundTint="@color/pick_rose" />
             <View style="@style/ColorDot" android:backgroundTint="@color/pick_slate" />
             <View style="@style/ColorDot" android:backgroundTint="@color/pick_dark" />
+
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_peach" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_butter" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_mint" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_ice" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_lavender" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_blush" />
+
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_burgundy" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_cocoa" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_forest" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_petrol" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_navy" />
+            <View style="@style/ColorDot" android:backgroundTint="@color/pick_plum" />
         </GridLayout>
     </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
         <LinearLayout
         android:id="@+id/containerIcons"

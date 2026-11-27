@@ -141,17 +141,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        findViewById<LinearLayout>(R.id.btnNavLock)?.setOnClickListener {
-            startActivity(Intent(this, SecurityActivity::class.java))
-        }
-
-        findViewById<LinearLayout>(R.id.btnNavKey)?.setOnClickListener {
-            startActivity(Intent(this, PasswordGeneratorActivity::class.java))
-        }
-
-        findViewById<LinearLayout>(R.id.btnNavSettings)?.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
+        bindBottomNavigation(NavTab.HOME)
     }
 
     override fun onResume() {
