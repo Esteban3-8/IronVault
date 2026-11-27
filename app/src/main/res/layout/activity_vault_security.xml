@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:fillViewport="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_main"
@@ -12,306 +13,316 @@
     android:paddingBottom="20dp"
     tools:context=".VaultSecurityActivity">
 
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:contentDescription="Volver"
-        android:src="@drawable/flecha"
-        app:layout_constraintBottom_toBottomOf="@id/tvVaultTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tvVaultTitle" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:contentDescription="Volver"
+            android:src="@drawable/flecha"
+            app:layout_constraintBottom_toBottomOf="@id/tvVaultTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvVaultTitle" />
 
-    <TextView
-        android:id="@+id/tvVaultTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:fontFamily="@font/inter_bold"
-        android:text="@string/vault_security_title"
-        android:textColor="@color/text_primary"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvVaultTitle">
-
-        <!-- Regla: tamaño - margen inicio - margen fin = 26dp efectivos en todos los íconos -->
-
-        <!-- Contraseña maestra -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardMainPassword"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvVaultTitle"
+            android:layout_width="0dp"
+            android:gravity="center"
+            android:layout_marginEnd="48dp"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/bg_option_card"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/border_option_card"
-            app:strokeWidth="1dp">
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/inter_bold"
+            android:text="@string/vault_security_title"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnBack"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
+        <LinearLayout
+            android:id="@+id/vaultOptions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvVaultTitle">
+
+            <!-- Regla: tamaño - margen inicio - margen fin = 26dp efectivos en todos los íconos -->
+
+            <!-- Contraseña maestra -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardMainPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:id="@+id/ivVaultKey"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginStart="-1dp"
-                    android:layout_marginTop="-1dp"
-                    android:layout_marginEnd="-1dp"
-                    android:layout_marginBottom="-1dp"
-                    android:importantForAccessibility="no"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/llave"
-                    app:tint="#E28743" />
+                app:cardBackgroundColor="@color/bg_option_card"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_option_card"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter_bold"
-                        android:text="@string/vault_security_main_password"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                    <ImageView
+                        android:id="@+id/ivVaultKey"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="-1dp"
+                        android:layout_marginTop="-1dp"
+                        android:layout_marginEnd="-1dp"
+                        android:layout_marginBottom="-1dp"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/llave"
+                        app:tint="#E28743" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/vault_security_main_password_sub"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp" />
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_bold"
+                            android:text="@string/vault_security_main_password"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/vault_security_main_password_sub"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_security_chevron" />
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_security_chevron" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Desbloqueo biométrico -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardBiometric"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:cardBackgroundColor="@color/bg_option_card"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/border_option_card"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
+            <!-- Desbloqueo biométrico -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBiometric"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="-5dp"
-                    android:layout_marginTop="-5dp"
-                    android:layout_marginEnd="-5dp"
-                    android:layout_marginBottom="-5dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_vault_fingerprint"
-                    app:tint="#E28743" />
+                android:layout_marginTop="10dp"
+                app:cardBackgroundColor="@color/bg_option_card"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_option_card"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                    <TextView
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="-5dp"
+                        android:layout_marginTop="-5dp"
+                        android:layout_marginEnd="-5dp"
+                        android:layout_marginBottom="-5dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_vault_fingerprint"
+                        app:tint="#E28743" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_bold"
+                            android:text="@string/vault_security_biometric"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/vault_security_biometric_sub"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchBiometric"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter_bold"
-                        android:text="@string/vault_security_biometric"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/vault_security_biometric_sub"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp" />
+                        android:checked="true"
+                        android:thumb="@drawable/switch_thumb"
+                        app:thumbTint="@null"
+                        app:track="@drawable/switch_track"
+                        app:trackTint="@null" />
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switchBiometric"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:thumb="@drawable/switch_thumb"
-                    app:thumbTint="@null"
-                    app:track="@drawable/switch_track"
-                    app:trackTint="@null" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Exportar datos -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardExport"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:cardBackgroundColor="@color/bg_option_card"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/border_option_card"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
+            <!-- Exportar datos -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardExport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="-2dp"
-                    android:layout_marginTop="-2dp"
-                    android:layout_marginEnd="-2dp"
-                    android:layout_marginBottom="-2dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_vault_export" />
+                android:layout_marginTop="10dp"
+                app:cardBackgroundColor="@color/bg_option_card"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_option_card"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter_bold"
-                        android:text="@string/vault_security_export"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="-2dp"
+                        android:layout_marginTop="-2dp"
+                        android:layout_marginEnd="-2dp"
+                        android:layout_marginBottom="-2dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_vault_export" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/vault_security_export_sub"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp" />
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_bold"
+                            android:text="@string/vault_security_export"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/vault_security_export_sub"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_security_chevron" />
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_security_chevron" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Borrado de datos -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardDeleteData"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:cardBackgroundColor="@color/bg_option_card"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/border_option_card"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
+            <!-- Borrado de datos -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDeleteData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="-2dp"
-                    android:layout_marginTop="-2dp"
-                    android:layout_marginEnd="-2dp"
-                    android:layout_marginBottom="-2dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_vault_delete" />
+                android:layout_marginTop="10dp"
+                app:cardBackgroundColor="@color/bg_option_card"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_option_card"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter_bold"
-                        android:text="@string/vault_security_delete"
-                        android:textColor="@color/history_red"
-                        android:textSize="14sp" />
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="-2dp"
+                        android:layout_marginTop="-2dp"
+                        android:layout_marginEnd="-2dp"
+                        android:layout_marginBottom="-2dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_vault_delete" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/vault_security_delete_sub"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11sp" />
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter_bold"
+                            android:text="@string/vault_security_delete"
+                            android:textColor="@color/history_red"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/vault_security_delete_sub"
+                            android:textColor="@color/text_muted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_security_chevron" />
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_security_chevron" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvVaultFooter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:text="@string/vault_security_footer"
-        android:textColor="@color/text_muted"
-        android:textSize="11sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tvVaultFooter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/vault_security_footer"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/vaultOptions"
+            app:layout_constraintVertical_bias="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

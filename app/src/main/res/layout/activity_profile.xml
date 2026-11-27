@@ -21,8 +21,9 @@
 
             <ImageView
                 android:id="@+id/btnBack"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
                 android:layout_gravity="start|center_vertical"
                 android:contentDescription="Volver"
                 android:src="@drawable/flecha" />

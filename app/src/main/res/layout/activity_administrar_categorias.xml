@@ -15,12 +15,12 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center_vertical|start"
             android:layout_marginStart="12dp"
             android:contentDescription="Volver"
-            android:padding="8dp"
+            android:padding="12dp"
             android:src="@drawable/ic_arrow_back" />
 
         <TextView
