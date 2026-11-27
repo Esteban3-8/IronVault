@@ -11,7 +11,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="8dp">
 
         <ImageView
             android:id="@+id/btnBack"
@@ -30,17 +30,19 @@
             android:fontFamily="@font/inter_bold"
             android:text="Categorías"
             android:textColor="@color/text_primary"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/btnAdd"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center_vertical|end"
             android:layout_marginEnd="12dp"
             android:contentDescription="Nueva categoría"
-            android:padding="9dp"
-            android:src="@drawable/ic_header_add" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:src="@drawable/ic_header_add"
+            app:tint="@color/orange_primary" />
     </FrameLayout>
 
     <!-- Buscador -->
@@ -48,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_input"
         android:gravity="center_vertical"
@@ -64,17 +66,20 @@
 
         <EditText
             android:id="@+id/etSearch"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:layout_marginStart="12dp"
             android:autofillHints="none"
             android:background="@null"
             android:fontFamily="sans-serif"
             android:hint="Buscar categoría..."
             android:inputType="text"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_muted"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <!-- Lista -->

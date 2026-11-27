@@ -1,23 +1,26 @@
 package com.example.myapplication
 
 import android.content.ClipData
+import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.os.PersistableBundle
+import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SwitchCompat
+import java.math.BigInteger
 import java.security.SecureRandom
 import kotlin.math.ln
 import kotlin.math.roundToInt
 
-class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivity
+class PasswordGeneratorActivity : BaseActivity() {
 
     private lateinit var tvPassword: TextView
     private lateinit var tvStrengthLabel: TextView
@@ -35,17 +38,13 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
     private val colorMedia = Color.parseColor("#F59E0B")
     private val colorAlta = Color.parseColor("#8FC954")
     private val colorBarraApagada = Color.parseColor("#2C303B")
+    private val random = SecureRandom()
+    private var restaurandoAjustes = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_password_generator)
-
-        // 1. Botón para regresar con la flecha (si aplica)
-        val btnBack = findViewById<ImageView>(R.id.btnBack)
-        btnBack?.setOnClickListener {
-            finish()
-        }
 
         // 2. Referencias de los componentes visuales
         tvPassword = findViewById(R.id.tvGeneratedPassword)
@@ -68,14 +67,13 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         // Control del SeekBar (Longitud) en tiempo real
         seekBarLength.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                // Mínimo 4 caracteres para evitar errores
-                val currentLength = if (progress < 4) 4 else progress
+                val currentLength = progress + MIN_LENGTH
 
                 // Actualiza el número de la derecha inmediatamente
                 tvLengthValue.text = currentLength.toString()
 
                 // Actualiza la contraseña al vuelo mientras deslizas
-                if (fromUser) {
+                if (fromUser && !restaurandoAjustes) {
                     generarYMostrar(currentLength)
                 }
             }
@@ -86,8 +84,15 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         })
 
         // Al mover un switch se genera una contraseña nueva con los ajustes actuales
-        val alCambiarSwitch = { _: android.widget.CompoundButton, _: Boolean ->
-            generarYMostrar(longitudActual())
+        val alCambiarSwitch = { button: android.widget.CompoundButton, checked: Boolean ->
+            if (!restaurandoAjustes) {
+                if (!checked && obtenerGrupos().isEmpty()) {
+                    button.isChecked = true
+                    Toast.makeText(this, R.string.generator_keep_one, Toast.LENGTH_SHORT).show()
+                } else {
+                    generarYMostrar(longitudActual())
+                }
+            }
         }
         switchUppercase.setOnCheckedChangeListener(alCambiarSwitch)
         switchLowercase.setOnCheckedChangeListener(alCambiarSwitch)
@@ -112,7 +117,11 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
         // 4. Botón "Copiar al Portapapeles"
         btnCopy?.setOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Contraseña IronVault", tvPassword.text.toString())
+            val clip = ClipData.newPlainText("Contraseña IronVault", tvPassword.text.toString()).apply {
+                description.extras = PersistableBundle().apply {
+                    putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+            }
             clipboard.setPrimaryClip(clip)
             mostrarBannerPersonalizado(
                 titulo = "Portapapeles",
@@ -149,59 +158,62 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
 
         // ── BARRA DE NAVEGACIÓN INFERIOR (Menú Píldora) ──────────
 
-        bindBottomNavigation(NavTab.GENERATOR)
-    }
-
-    private fun longitudActual(): Int =
-        if (seekBarLength.progress < 4) 4 else seekBarLength.progress
-
-    /** Caracteres disponibles según los switches activos. */
-    private fun obtenerCaracteres(): String {
-        val upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        val lowerChars = "abcdefghijklmnopqrstuvwxyz"
-        val numberChars = "0123456789"
-        val symbolChars = "!@#$%^&*()_+-=[]{}|;:,.<>?"
-
-        var charPool = ""
-        if (switchUppercase.isChecked) charPool += upperChars
-        if (switchLowercase.isChecked) charPool += lowerChars
-        if (switchNumbers.isChecked) charPool += numberChars
-        if (switchSymbols.isChecked) charPool += symbolChars
-
-        // Si el usuario desactiva todos los switches, usar minúsculas por defecto
-        if (charPool.isEmpty()) {
-            charPool = lowerChars
+        if (callingActivity != null) {
+            findViewById<View>(R.id.bottomNavContainer).visibility = View.GONE
+        } else {
+            bindBottomNavigation(NavTab.GENERATOR)
         }
-        return charPool
     }
 
-    /** Genera una contraseña nueva, la muestra y actualiza la fortaleza. */
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        restaurandoAjustes = true
+        super.onRestoreInstanceState(savedInstanceState)
+        if (::seekBarLength.isInitialized) {
+            if (obtenerGrupos().isEmpty()) switchLowercase.isChecked = true
+            tvLengthValue.text = longitudActual().toString()
+            generarYMostrar(longitudActual())
+        }
+        restaurandoAjustes = false
+    }
+
+    private fun longitudActual(): Int = seekBarLength.progress + MIN_LENGTH
+
+    private fun obtenerGrupos(): List<String> = buildList {
+        if (switchUppercase.isChecked) add("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        if (switchLowercase.isChecked) add("abcdefghijklmnopqrstuvwxyz")
+        if (switchNumbers.isChecked) add("0123456789")
+        if (switchSymbols.isChecked) add("!@#$%^&*()_+-=[]{}|;:,.<>?")
+    }
+
     private fun generarYMostrar(longitud: Int) {
-        val pool = obtenerCaracteres()
-        tvPassword.text = crearContrasenaAleatoria(longitud, pool)
-        actualizarFortaleza(longitud, pool.length)
+        val grupos = obtenerGrupos()
+        val pool = grupos.joinToString("")
+        var password: String
+        // Rechazar las muestras incompletas conserva la misma probabilidad para cada contraseña válida.
+        do {
+            password = buildString(longitud) {
+                repeat(longitud) { append(pool[random.nextInt(pool.length)]) }
+            }
+        } while (grupos.any { grupo -> password.none { it in grupo } })
+        tvPassword.text = password
+        actualizarFortaleza(bitsDeEntropia(longitud, grupos))
     }
 
-    // Función para crear la contraseña con los caracteres disponibles
-    private fun crearContrasenaAleatoria(longitud: Int, charPool: String): String {
-        val random = SecureRandom()
-        val resultado = StringBuilder(longitud)
-
-        for (i in 0 until longitud) {
-            val indice = random.nextInt(charPool.length)
-            resultado.append(charPool[indice])
+    private fun bitsDeEntropia(longitud: Int, grupos: List<String>): Int {
+        // Inclusión-exclusión sobre los conjuntos de caracteres omitidos.
+        var cantidad = BigInteger.ZERO
+        for (omitidos in 0 until (1 shl grupos.size)) {
+            val disponibles = grupos.indices.sumOf { index ->
+                if (omitidos and (1 shl index) == 0) grupos[index].length else 0
+            }
+            val combinaciones = BigInteger.valueOf(disponibles.toLong()).pow(longitud)
+            cantidad = if (Integer.bitCount(omitidos) % 2 == 0) cantidad + combinaciones
+            else cantidad - combinaciones
         }
-
-        return resultado.toString()
+        return (ln(cantidad.toDouble()) / ln(2.0)).roundToInt()
     }
 
-    /**
-     * Fortaleza real: bits de entropía = longitud * log2(caracteres posibles).
-     * Débil < 45, Media < 75, Alta < 100, Excelente >= 100.
-     */
-    private fun actualizarFortaleza(longitud: Int, tamanoPool: Int) {
-        val bits = (longitud * (ln(tamanoPool.toDouble()) / ln(2.0))).roundToInt()
-
+    private fun actualizarFortaleza(bits: Int) {
         val nombre: String
         val color: Int
         val barras: Int
@@ -213,7 +225,6 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
             else -> { nombre = "Excelente"; color = colorAlta; barras = 3 }
         }
 
-        tvPassword.setTextColor(color)
         tvStrengthLabel.text = "Fortaleza: $nombre ($bits bits de entropía)"
         tvStrengthLabel.setTextColor(color)
 
@@ -222,5 +233,9 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
             val encendida = i < barras
             barra.backgroundTintList = ColorStateList.valueOf(if (encendida) color else colorBarraApagada)
         }
+    }
+
+    private companion object {
+        const val MIN_LENGTH = 4
     }
 }

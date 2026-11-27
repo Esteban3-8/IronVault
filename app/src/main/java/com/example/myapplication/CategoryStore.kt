@@ -26,13 +26,20 @@ internal data class VaultCategory(
 
 internal fun VaultCategory.showPreview(view: ImageView) {
     showIcon(view)
-    val container = view.parent as View
-    container.backgroundTintList = color?.let { ColorStateList.valueOf(it) }
-    color?.let { background ->
-        val darkContrast = ColorUtils.calculateContrast(Color.BLACK, background)
-        val lightContrast = ColorUtils.calculateContrast(Color.WHITE, background)
-        view.setColorFilter(if (darkContrast >= lightContrast) Color.BLACK else Color.WHITE)
+    val defaultColor = when (icon) {
+        "ic_cat_mail" -> R.color.pick_blue
+        "ic_cat_games" -> R.color.pick_violet
+        "ic_cat_bank", "ic_cat_lupa" -> R.color.pick_emerald
+        "ic_cat_shop" -> R.color.pick_amber
+        "ic_cat_edu" -> R.color.pick_pink
+        else -> R.color.orange_primary
     }
+    val background = ColorUtils.setAlphaComponent(color ?: view.context.getColor(defaultColor), 255)
+    val container = view.parent as View
+    container.backgroundTintList = ColorStateList.valueOf(background)
+    val darkContrast = ColorUtils.calculateContrast(Color.BLACK, background)
+    val lightContrast = ColorUtils.calculateContrast(Color.WHITE, background)
+    view.setColorFilter(if (darkContrast >= lightContrast) Color.BLACK else Color.WHITE)
 }
 
 internal enum class CategoryGroup(val label: String) {

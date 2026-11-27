@@ -28,6 +28,7 @@ class AdministrarCategoriasActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!::list.isInitialized || !ensureVaultAccess()) return
         categories = CategoryStore(this).all()
         renderCategories()
     }
@@ -38,13 +39,13 @@ class AdministrarCategoriasActivity : BaseActivity() {
         for (group in CategoryGroup.entries) {
             val matches = categories.filter { it.group == group && it.name.contains(query, true) }
             if (matches.isEmpty()) continue
-            list.addView(TextView(this).apply {
+            list.addView((layoutInflater.inflate(R.layout.item_manage_category_header, list, false) as TextView).apply {
                 text = group.label
-                setTextColor(getColor(R.color.cat_section))
             })
             for (category in matches) {
                 list.addView(layoutInflater.categoryRow(list, category).apply {
                     setBackgroundResource(R.drawable.bg_card_row)
+                    findViewById<View>(R.id.categoryRowChevron).visibility = View.VISIBLE
                     setOnClickListener {
                         startActivity(
                             Intent(this@AdministrarCategoriasActivity, EditarCategoriaActivity::class.java)
@@ -56,8 +57,9 @@ class AdministrarCategoriasActivity : BaseActivity() {
         }
         if (list.childCount == 0) {
             list.addView(TextView(this).apply {
-                text = "No se encontraron categorías"
-                setTextColor(getColor(R.color.text_muted))
+                text = if (query.isEmpty()) "Todavía no hay categorías" else "No se encontraron categorías"
+                gravity = android.view.Gravity.CENTER
+                setTextColor(getColor(R.color.text_soft))
             })
         }
     }
