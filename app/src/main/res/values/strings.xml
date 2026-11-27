@@ -51,7 +51,7 @@
     <!-- Splash -->
     <string name="splash_iron">Iron</string>
     <string name="splash_vault">Vault</string>
-    <string name="splash_unlocking">Desbloqueando tu bóveda…</string>
+    <string name="splash_unlocking">Iniciando IronVault…</string>
     <string name="splash_version">IronVault v1.0.0</string>
 
     <!-- Login -->

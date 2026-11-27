@@ -75,7 +75,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtSubtitleManager" />
 
-    <!-- Mensaje "Desbloqueando tu bóveda..." -->
+    <!-- Mensaje de inicio; la bóveda permanece bloqueada. -->
     <TextView
         android:id="@+id/txtLoadingMsg"
         android:layout_width="wrap_content"
