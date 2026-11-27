@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -19,9 +18,12 @@ import androidx.appcompat.widget.AppCompatButton
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.Firebase
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
+
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CancellationException
+import com.google.firebase.auth.EmailAuthProvider
 
 class RegisterActivity : BaseActivity() {
 
@@ -52,9 +54,12 @@ class RegisterActivity : BaseActivity() {
     private var isPasswordVisible = true
     private var isConfirmPasswordVisible = true
     private var isEmailVerified = false
+    private var verifiedToken: String? = null
+    private var creating = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_register)
 
         btnBack = findViewById(R.id.btnBack)
@@ -67,6 +72,7 @@ class RegisterActivity : BaseActivity() {
         cbTerms = findViewById(R.id.cbTerms)
         btnVerify = findViewById(R.id.btnVerify)
         btnCreateAccount = findViewById(R.id.btnCreateAccount)
+        btnCreateAccount.isEnabled = false
         layoutEmailVerified = findViewById(R.id.layoutEmailVerified)
 
         tvFullNameError = findViewById(R.id.tvFullNameError)
@@ -164,6 +170,8 @@ class RegisterActivity : BaseActivity() {
                 // Si el usuario cambia el correo, se reinicia el estado de verificación
                 if (isEmailVerified) {
                     isEmailVerified = false
+                    verifiedToken = null
+                    btnCreateAccount.isEnabled = false
                     layoutEmailVerified.visibility = View.GONE
                     btnVerify.isEnabled = true
                     btnVerify.text = "Verificar"
@@ -181,7 +189,7 @@ class RegisterActivity : BaseActivity() {
 
         btnVerify.setOnClickListener {
             val email = etEmail.text.toString().trim()
-            val password = etPassword.text.toString().trim()
+            val password = etPassword.text.toString()
 
             if (email.isEmpty()) {
                 tvEmailError.text = "Ingresa un correo electrónico"
@@ -200,6 +208,10 @@ class RegisterActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
+            if (etFullName.text.toString().isBlank() || password != etConfirmPassword.text.toString() || !cbTerms.isChecked) {
+                mostrarBannerPersonalizado("Completa tus datos", "Ingresa tu nombre, confirma la contraseña y acepta los términos antes de verificar.", R.drawable.logo)
+                return@setOnClickListener
+            }
             btnVerify.isEnabled = false
             mostrarBannerPersonalizado(
                 titulo = "Verificación",
@@ -209,25 +221,11 @@ class RegisterActivity : BaseActivity() {
             enviarYGenerarOtpTemporal(email)
         }
 
-        supportFragmentManager.setFragmentResultListener("verifyKey", this) { _, bundle ->
-            isEmailVerified = bundle.getBoolean("emailVerified", false)
-            if (isEmailVerified) {
-                mostrarBannerPersonalizado(
-                    titulo = "Verificado",
-                    mensaje = "¡Correo verificado con éxito!",
-                    iconoResId = R.drawable.logo
-                )
-                layoutEmailVerified.visibility = View.VISIBLE
-                btnVerify.isEnabled = false
-                btnVerify.text = "Verificado"
-            }
-        }
-
         btnCreateAccount.setOnClickListener {
             val nombre = etFullName.text.toString().trim()
             val email = etEmail.text.toString().trim()
-            val password = etPassword.text.toString().trim()
-            val confirmPass = etConfirmPassword.text.toString().trim()
+            val password = etPassword.text.toString()
+            val confirmPass = etConfirmPassword.text.toString()
 
             var hayError = false
 
@@ -244,15 +242,6 @@ class RegisterActivity : BaseActivity() {
                 tvEmailError.visibility = View.VISIBLE
                 hayError = true
             } else if (!validarFormatoCorreo(email)) {
-                hayError = true
-            }
-
-            if (!isEmailVerified) {
-                mostrarBannerPersonalizado(
-                    titulo = "Atención",
-                    mensaje = "Debes verificar tu correo antes de continuar",
-                    iconoResId = R.drawable.logo
-                )
                 hayError = true
             }
 
@@ -278,7 +267,11 @@ class RegisterActivity : BaseActivity() {
                 hayError = true
             }
 
-            if (hayError) return@setOnClickListener
+            if (!isEmailVerified || verifiedToken == null) {
+                mostrarBannerPersonalizado("Verifica tu correo", "Introduce el código recibido antes de crear tu cuenta.", R.drawable.logo)
+                hayError = true
+            }
+            if (hayError || creating) return@setOnClickListener
 
             crearCuentaDefinitivaEnFirebase(nombre, email, password)
         }
@@ -378,129 +371,82 @@ class RegisterActivity : BaseActivity() {
         }
     }
 
+    internal fun emailVerified(email: String, token: String) {
+        if (!etEmail.text.toString().trim().equals(email, ignoreCase = true)) return
+        verifiedToken = token
+        isEmailVerified = true
+        layoutEmailVerified.visibility = View.VISIBLE
+        btnVerify.text = "Verificado"
+        btnVerify.isEnabled = false
+        btnCreateAccount.isEnabled = true
+        mostrarBannerPersonalizado("Verificado", "Correo verificado. Ya puedes crear tu cuenta.", R.drawable.logo)
+    }
+
     private fun enviarYGenerarOtpTemporal(email: String) {
-        val otpCode = (100000..999999).random().toString()
-
-        val sharedPrefs = getSharedPreferences("IronVaultPrefs", Context.MODE_PRIVATE)
-        sharedPrefs.edit()
-            .putString("temp_otp", otpCode)
-            .putString("user_email", email)
-            .apply()
-
-        enviarCorreoHttp(email, otpCode) { enviado ->
-            if (enviado) {
-                mostrarBannerPersonalizado(
-                    titulo = "Código enviado",
-                    mensaje = "Revisa tu correo electrónico",
-                    iconoResId = R.drawable.logo
-                )
-
-                val bottomSheet = VerifyBottomSheet().apply {
-                    arguments = Bundle().apply {
-                        putString("arg_email", email)
-                    }
+        lifecycleScope.launch {
+            try {
+                val token = EmailVerificationApi.request(email)
+                if (etEmail.text.toString().trim() != email) return@launch
+                VerifyBottomSheet().apply {
+                    arguments = Bundle().apply { putString("arg_email", email) }
+                    challengeToken = token
+                }.show(supportFragmentManager, "VerifyBottomSheet")
+            } catch (e: CancellationException) { throw e }
+            catch (e: EmailVerificationException) {
+                val title = if (e.code == "EMAIL_ALREADY_REGISTERED") "Correo ya registrado"
+                    else if (e.code == "SERVICE_NOT_CONFIGURED") "Servicio no configurado" else "No se envió el código"
+                if (e.code == "EMAIL_ALREADY_REGISTERED") {
+                    tvEmailError.text = e.userMessage
+                    tvEmailError.setTextColor(Color.parseColor("#EF4444"))
+                    tvEmailError.visibility = View.VISIBLE
                 }
-                bottomSheet.show(supportFragmentManager, "VerifyBottomSheet")
-                btnVerify.isEnabled = true
-            } else {
-                mostrarBannerPersonalizado(
-                    titulo = "Error de envío",
-                    mensaje = "No se pudo enviar el correo. Revisa tu conexión.",
-                    iconoResId = R.drawable.logo
-                )
-                btnVerify.isEnabled = true
+                mostrarBannerPersonalizado(title, e.userMessage, R.drawable.logo)
             }
+            catch (_: Exception) {
+                mostrarBannerPersonalizado("No se pudo conectar", "No se pudo contactar con el servicio de verificación. Comprueba tu conexión e inténtalo nuevamente.", R.drawable.logo)
+            } finally { btnVerify.isEnabled = !isEmailVerified }
         }
     }
 
-    private fun enviarCorreoHttp(email: String, code: String, onResult: (Boolean) -> Unit) {
-        Thread {
-            try {
-                val baseUrl = "https://script.google.com/macros/s/AKfycbyBVOes8JC04vuOc0FXUHmPQ_d9Po5TKSX9XNwISKlfj6LYJI8iw-I0SBXrxtPU-dzi/exec"
-                val token = "ironvault_secreto_2026"
-                val urlStr = baseUrl + "?email=" + URLEncoder.encode(email, "UTF-8") +
-                        "&code=" + URLEncoder.encode(code, "UTF-8") +
-                        "&token=" + URLEncoder.encode(token, "UTF-8")
-
-                val conn = URL(urlStr).openConnection() as HttpURLConnection
-                conn.requestMethod = "GET"
-                conn.instanceFollowRedirects = true
-                conn.connectTimeout = 20000
-                conn.readTimeout = 20000
-
-                val responseCode = conn.responseCode
-                conn.disconnect()
-
-                val exito = responseCode == HttpURLConnection.HTTP_OK
-
-                runOnUiThread {
-                    onResult(exito)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                runOnUiThread {
-                    onResult(false)
-                }
-            }
-        }.start()
-    }
-
     private fun crearCuentaDefinitivaEnFirebase(fullName: String, email: String, pass: String) {
-        val auth = Firebase.auth
-        val db = Firebase.firestore
-
-        auth.createUserWithEmailAndPassword(email, pass)
-            .addOnSuccessListener { result ->
-                val userId = result.user?.uid ?: return@addOnSuccessListener
-                val userData = hashMapOf(
-                    "email" to email,
-                    "fullName" to fullName,
-                    "completedRegistration" to true,
-                    "verified" to true
-                )
-
-                db.collection("users").document(userId).set(userData)
-                    .addOnSuccessListener {
-                        mostrarBannerPersonalizado(
-                            titulo = "¡Bienvenido!",
-                            mensaje = "¡Cuenta creada correctamente!",
-                            iconoResId = R.drawable.logo
-                        )
-
-                        // ── GUARDAR SESIÓN PERSISTENTE PARA WELCOMEACTIVITY ──
-                        val settingsPrefs = getSharedPreferences("settings_prefs", MODE_PRIVATE)
-                        settingsPrefs.edit().putBoolean("is_logged_in", true).apply()
-                        // Ya no es invitado
-                        GuestUtils.marcarInvitado(this, false)
-                        // ----------------------------------------------------
-
-                        val intent = Intent(this, MasterPasswordActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                    }
-                    .addOnFailureListener { e ->
-                        mostrarBannerPersonalizado(
-                            titulo = "Error de perfil",
-                            mensaje = "No se pudo guardar: ${e.message}",
-                            iconoResId = R.drawable.logo
-                        )
-                    }
+        val token = verifiedToken ?: return
+        if (creating) return
+        creating = true
+        val controls = listOf(etFullName, etEmail, etPassword, etConfirmPassword, cbTerms, btnCreateAccount, btnVerify)
+        controls.forEach { it.isEnabled = false }
+        lifecycleScope.launch {
+            try {
+                val auth = Firebase.auth
+                val existing = auth.currentUser
+                val user = if (existing != null && existing.email.equals(email, ignoreCase = true)) {
+                    // Retry interrupted registration without creating a duplicate account.
+                    existing.reauthenticate(EmailAuthProvider.getCredential(email, pass)).await()
+                    existing
+                } else auth.createUserWithEmailAndPassword(email, pass).await().user ?: error("Registro incompleto")
+                EmailVerificationApi.complete(email, token)
+                val profile = Firebase.firestore.collection("users").document(user.uid)
+                val old = profile.get(com.google.firebase.firestore.Source.SERVER).await()
+                if (!old.exists()) profile.set(mapOf("email" to email, "fullName" to fullName,
+                    "completedRegistration" to true, "verified" to false)).await()
+                // Firebase Auth emailVerified is authoritative, not the editable profile flag.
+                verifiedToken = null
+                etPassword.text.clear(); etConfirmPassword.text.clear()
+                GuestUtils.marcarInvitado(this@RegisterActivity, false)
+                startActivity(Intent(this@RegisterActivity, MasterPasswordActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                finish()
+            } catch (e: CancellationException) { throw e }
+            catch (_: Exception) {
+                verifiedToken = null; isEmailVerified = false
+                layoutEmailVerified.visibility = View.GONE
+                btnVerify.text = "Verificar"
+                mostrarBannerPersonalizado("Registro pendiente", "No se pudo completar. Comprueba la conexión y verifica el correo nuevamente. Si la cuenta ya existía, inicia sesión.", R.drawable.logo)
+            } finally {
+                creating = false
+                controls.forEach { it.isEnabled = true }
+                btnCreateAccount.isEnabled = isEmailVerified
+                btnVerify.isEnabled = !isEmailVerified
             }
-            .addOnFailureListener { e ->
-                val exceptionMessage = e.message ?: ""
-
-                val mensajePersonalizado = if (exceptionMessage.contains("already in use", ignoreCase = true)) {
-                    "Este correo ya está registrado. Inicia sesión."
-                } else {
-                    "Error al crear cuenta: $exceptionMessage"
-                }
-
-                mostrarBannerPersonalizado(
-                    titulo = "Error de registro",
-                    mensaje = mensajePersonalizado,
-                    iconoResId = R.drawable.logo
-                )
-            }
+        }
     }
 }

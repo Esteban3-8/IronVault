@@ -50,6 +50,7 @@ class EditCredentialActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_edit_credential)
 
         // 1. Referencias
@@ -83,7 +84,7 @@ class EditCredentialActivity : BaseActivity() {
         // 2. Datos que llegan desde el detalle
         val title = intent.getStringExtra("serviceName") ?: ""
         val username = intent.getStringExtra("userOrEmail") ?: ""
-        val password = intent.getStringExtra("password") ?: ""
+        val password = VaultRepository.credentialList.firstOrNull { it.id == intent.getStringExtra("credential_id") }?.password ?: ""
         val url = intent.getStringExtra("url") ?: ""
         val notes = intent.getStringExtra("notes") ?: ""
         val rawCategory = intent.getStringExtra("category") ?: ""
@@ -166,105 +167,17 @@ class EditCredentialActivity : BaseActivity() {
     }
 
     private fun guardarCambios(category: String) {
-        val nuevoUsuario = etUser.text.toString().trim().ifEmpty { "Sin usuario" }
-        val nuevaPass = etPassword.text.toString().trim()
-        val nuevaUrl = etUrl.text.toString().trim()
-        val nuevasNotas = etNotes.text.toString().trim()
-        val ahora = System.currentTimeMillis()
-
-        if (nuevaPass.isEmpty()) {
-            mostrarBannerPersonalizado(
-                titulo = "Campo requerido",
-                mensaje = "La contraseña no puede estar vacía",
-                iconoResId = R.drawable.logo
-            )
-            return
-        }
-
-        // Actualizar la copia local que usa la lista
-        val indice = VaultRepository.credentialList.indexOfFirst {
-            it.serviceName == originalService &&
-                    it.userOrEmail == originalUser &&
-                    it.password == originalPassword
-        }
-        if (indice >= 0) {
-            val anterior = VaultRepository.credentialList[indice]
-            VaultRepository.credentialList[indice] = anterior.copy(
-                userOrEmail = nuevoUsuario,
-                password = nuevaPass,
-                strengthStatus = estadoParaGuardar,
-                url = nuevaUrl,
-                notes = nuevasNotas,
-                updatedAt = ahora
-            )
-        }
-
-        val cambios = hashMapOf<String, Any>(
-            "userOrEmail" to nuevoUsuario,
-            "password" to nuevaPass,
-            "strengthStatus" to estadoParaGuardar,
-            "url" to nuevaUrl,
-            "notes" to nuevasNotas,
-            "updatedAt" to ahora
-        )
-
-        val userId = Firebase.auth.currentUser?.uid
-        if (userId == null) {
-            // Invitado: se guarda cifrado en el dispositivo
-            VaultRepository.persistirSiInvitado(this)
-            mostrarBannerPersonalizado(
-                titulo = "Cambios guardados",
-                mensaje = "Actualizada localmente",
-                iconoResId = R.drawable.logo
-            )
-            volverALista()
-            return
-        }
-
-        // Buscar el documento original en Firebase y actualizarlo
-        FirebaseFirestore.getInstance()
-            .collection("users")
-            .document(userId)
-            .collection("credentials")
-            .whereEqualTo("serviceName", originalService)
-            .whereEqualTo("userOrEmail", originalUser)
-            .whereEqualTo("password", originalPassword)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { resultado ->
-                val documento = resultado.documents.firstOrNull()
-                if (documento == null) {
-                    mostrarBannerPersonalizado(
-                        titulo = "No se encontró",
-                        mensaje = "No se encontró la credencial en la nube",
-                        iconoResId = R.drawable.logo
-                    )
-                    return@addOnSuccessListener
-                }
-                documento.reference.update(cambios)
-                    .addOnSuccessListener {
-                        mostrarBannerPersonalizado(
-                            titulo = "¡Cambios guardados!",
-                            mensaje = "Credencial actualizada con éxito",
-                            iconoResId = R.drawable.logo
-                        )
-                        volverALista()
-                    }
-                    .addOnFailureListener {
-                        mostrarBannerPersonalizado(
-                            titulo = "Error de sincronización",
-                            mensaje = "No se pudieron guardar los cambios",
-                            iconoResId = R.drawable.logo
-                        )
-                    }
-            }
-            .addOnFailureListener {
-                mostrarBannerPersonalizado(
-                    titulo = "Error de sincronización",
-                    mensaje = "No se pudo conectar con la nube",
-                    iconoResId = R.drawable.logo
-                )
-            }
+        val previous = VaultRepository.credentialList.firstOrNull {
+            it.serviceName == originalService && it.userOrEmail == originalUser && it.password == originalPassword
+        } ?: return
+        val updated = previous.copy(userOrEmail = etUser.text.toString(), password = etPassword.text.toString(),
+            url = etUrl.text.toString(), notes = etNotes.text.toString(), category = category,
+            strengthStatus = estadoParaGuardar, updatedAt = System.currentTimeMillis())
+        if (updated.password.isEmpty()) return
+        if (GuestUtils.esInvitado(this)) {
+            VaultRepository.credentialList[VaultRepository.credentialList.indexOf(previous)] = updated
+            VaultRepository.persistirSiInvitado(this); volverALista()
+        } else vaultJob { VaultService.save(updated); volverALista() }
     }
 
     // Vuelve a la lista (cierra también el detalle, que tendría datos viejos)

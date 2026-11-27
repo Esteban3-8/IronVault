@@ -18,6 +18,7 @@ class AccessHistoryActivity : BaseActivity() { // 👈 Hereda de BaseActivity pa
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         enableEdgeToEdge()
         setContentView(R.layout.activity_access_history)
 

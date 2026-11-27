@@ -25,6 +25,7 @@ class SecurityActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_security)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -64,6 +65,8 @@ class SecurityActivity : BaseActivity() {
     }
 
     private fun bloquearBoveda(motivo: String) {
+        VaultService.lock(false)
+        SessionManager.limpiarSesion(this)
         val intent = Intent(this, UnlockVaultActivity::class.java)
         intent.putExtra("lock_reason", motivo)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -84,11 +87,11 @@ class SecurityActivity : BaseActivity() {
         }
 
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardAutoLock).setOnClickListener {
-            mostrarDialogoAutoLock()
+            confirmMaster("security-settings") { VaultService.consume("security-settings"); mostrarDialogoAutoLock() }
         }
 
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardAttempts).setOnClickListener {
-            mostrarDialogoIntentos()
+            confirmMaster("security-settings") { VaultService.consume("security-settings"); mostrarDialogoIntentos() }
         }
 
         findViewById<com.google.android.material.card.MaterialCardView>(R.id.cardHistory).setOnClickListener {
@@ -132,7 +135,7 @@ class SecurityActivity : BaseActivity() {
             if (tv === selected) {
                 tv.setBackgroundResource(R.drawable.bg_option_selected)
                 tv.setTextColor(getColor(R.color.orange_primary))
-                tv.typeface = resources.getFont(R.font.inter_bold)
+                tv.typeface = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.inter_bold)
             } else {
                 tv.background = null
                 tv.setTextColor(getColor(R.color.text_primary))

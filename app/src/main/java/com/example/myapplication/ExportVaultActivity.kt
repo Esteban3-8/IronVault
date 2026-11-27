@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,6 +43,7 @@ class ExportVaultActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         // Bloquear capturas de pantalla
         window.setFlags(
             android.view.WindowManager.LayoutParams.FLAG_SECURE,
@@ -121,8 +122,8 @@ class ExportVaultActivity : BaseActivity() {
                 mostrarBannerPersonalizado("Campo requerido", "Ingresa la contraseña del respaldo.", R.drawable.logo)
                 return@setOnClickListener
             }
-            if (evaluarFortaleza(password) < 2) {
-                mostrarBannerPersonalizado("Contraseña débil", "Usa al menos 8 caracteres con letras y números.", R.drawable.logo)
+            if (password.length !in 15..4096) {
+                mostrarBannerPersonalizado("Contraseña débil", "Usa una frase de al menos 15 caracteres.", R.drawable.logo)
                 return@setOnClickListener
             }
             if (password != confirm) {
@@ -130,6 +131,12 @@ class ExportVaultActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
+            if (!GuestUtils.esInvitado(this)) {
+                try { VaultService.consume("export") } catch (_: Exception) {
+                    confirmMaster("export") { btnExport.performClick() }; return@setOnClickListener
+                }
+            }
+            val epoch = VaultService.epoch()
             val credenciales = VaultRepository.credentialList.toList()
 
             // Deshabilitar UI durante el proceso
@@ -138,11 +145,13 @@ class ExportVaultActivity : BaseActivity() {
             progress.visibility = View.VISIBLE
 
             // Cifrado en IO thread (PBKDF2 es intensivo)
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 try {
+                    if (!GuestUtils.esInvitado(this@ExportVaultActivity)) VaultService.checkBackupPassword(password)
                     val bytes    = VaultBackupService.exportToBytes(credenciales, password)
                     val fileName = VaultBackupService.generateFileName()
 
+                    if (!GuestUtils.esInvitado(this@ExportVaultActivity)) check(VaultService.unlocked && VaultService.epoch() == epoch)
                     // Escribir en caché privada (no requiere permisos de almacenamiento)
                     val cacheDir = File(cacheDir, "vault_exports").also { it.mkdirs() }
                     val file     = File(cacheDir, fileName)
@@ -164,6 +173,7 @@ class ExportVaultActivity : BaseActivity() {
                         etPassword.text.clear()
                         etConfirm.text.clear()
 
+                        if (!GuestUtils.esInvitado(this@ExportVaultActivity)) check(VaultService.unlocked && VaultService.epoch() == epoch)
                         // Compartir con el sistema operativo
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
                             type = "application/octet-stream"

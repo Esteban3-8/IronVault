@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatButton
 class GuestModeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_guest_mode)
 
         findViewById<ImageView>(R.id.btnBack).setOnClickListener { finish() }

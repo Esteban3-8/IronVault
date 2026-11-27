@@ -43,6 +43,7 @@ class CredentialDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_credential_detail)
 
         // 1. Referencias de las vistas
@@ -70,7 +71,7 @@ class CredentialDetailActivity : BaseActivity() {
         // 2. Recibir los datos reales
         val title = intent.getStringExtra("serviceName") ?: ""
         val username = intent.getStringExtra("userOrEmail") ?: ""
-        val password = intent.getStringExtra("password") ?: ""
+        val password = VaultRepository.credentialList.firstOrNull { it.id == intent.getStringExtra("credential_id") }?.password ?: ""
         val url = intent.getStringExtra("url") ?: ""
         val notes = intent.getStringExtra("notes") ?: ""
         val initialStatus = intent.getStringExtra("strengthStatus") ?: "Segura"
@@ -82,7 +83,6 @@ class CredentialDetailActivity : BaseActivity() {
             ?: intent.getStringExtra("categoryName")
             ?: ""
 
-        android.util.Log.d("CAT_DEBUG", "Detalle recibe category = '$rawCategory'")
 
         // Si no llega, se muestra "Sin categoría"
         val category = if (rawCategory.isNotBlank()) rawCategory else "Sin categoría"
@@ -97,7 +97,7 @@ class CredentialDetailActivity : BaseActivity() {
             val editIntent = Intent(this, EditCredentialActivity::class.java).apply {
                 putExtra("serviceName", title)
                 putExtra("userOrEmail", username)
-                putExtra("password", etPassword.text.toString())
+                putExtra("credential_id", intent.getStringExtra("credential_id"))
                 putExtra("url", url)
                 putExtra("notes", notes)
                 putExtra("category", category)
@@ -275,62 +275,12 @@ class CredentialDetailActivity : BaseActivity() {
      * Se identifica por servicio + usuario + contraseña originales.
      */
     private fun eliminarCredencial(servicio: String, usuario: String, contrasena: String) {
-        val userId = Firebase.auth.currentUser?.uid
-
-        // Sin sesión (invitado): solo se elimina de la lista local y se guarda en el dispositivo
-        if (userId == null) {
-            quitarDeListaLocal(servicio, usuario, contrasena)
-            mostrarBannerPersonalizado(
-                titulo = "Credencial eliminada",
-                mensaje = "Eliminada localmente",
-                iconoResId = R.drawable.logo
-            )
-            volverALista()
-            return
-        }
-
-        FirebaseFirestore.getInstance()
-            .collection("users")
-            .document(userId)
-            .collection("credentials")
-            .whereEqualTo("serviceName", servicio)
-            .whereEqualTo("userOrEmail", usuario)
-            .whereEqualTo("password", contrasena)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { resultado ->
-                val documento = resultado.documents.firstOrNull()
-                if (documento == null) {
-                    // No estaba en la nube: se limpia solo la copia local
-                    quitarDeListaLocal(servicio, usuario, contrasena)
-                    volverALista()
-                    return@addOnSuccessListener
-                }
-                documento.reference.delete()
-                    .addOnSuccessListener {
-                        quitarDeListaLocal(servicio, usuario, contrasena)
-                        mostrarBannerPersonalizado(
-                            titulo = "Credencial eliminada",
-                            mensaje = "Se eliminó \"$servicio\" con éxito",
-                            iconoResId = R.drawable.logo
-                        )
-                        volverALista()
-                    }
-                    .addOnFailureListener {
-                        mostrarBannerPersonalizado(
-                            titulo = "Error de sincronización",
-                            mensaje = "No se pudo eliminar de la nube",
-                            iconoResId = R.drawable.logo
-                        )
-                    }
-            }
-            .addOnFailureListener {
-                mostrarBannerPersonalizado(
-                    titulo = "Error de sincronización",
-                    mensaje = "No se pudo conectar con la nube",
-                    iconoResId = R.drawable.logo
-                )
-            }
+        val credential = VaultRepository.credentialList.firstOrNull {
+            it.serviceName == servicio && it.userOrEmail == usuario && it.password == contrasena
+        } ?: return
+        if (GuestUtils.esInvitado(this)) {
+            quitarDeListaLocal(servicio, usuario, contrasena); volverALista()
+        } else vaultJob { VaultService.delete(credential.id); volverALista() }
     }
 
     private fun quitarDeListaLocal(servicio: String, usuario: String, contrasena: String) {

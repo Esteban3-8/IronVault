@@ -89,6 +89,7 @@ class NuevaCredencialActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_nueva_credencial)
 
         cargarFrecuenciasDeCache()
@@ -287,7 +288,7 @@ class NuevaCredencialActivity : BaseActivity() {
         btnSaveCredential?.setOnClickListener {
             val servicio = etService.text.toString().trim()
             val usuario = etUser.text.toString().trim()
-            val pass = etPassword.text.toString().trim()
+            val pass = etPassword.text.toString()
             val url = etUrl.text.toString().trim()
             val notas = etNotes.text.toString().trim()
 
@@ -320,42 +321,11 @@ class NuevaCredencialActivity : BaseActivity() {
             val userId = Firebase.auth.currentUser?.uid
 
             if (userId != null) {
-                val credMap = hashMapOf(
-                    "serviceName" to servicio,
-                    "userOrEmail" to usuarioFinal,
-                    "password" to pass,
-                    "strengthStatus" to fortalezaFinal,
-                    "url" to url,
-                    "notes" to notas,
-                    "category" to categoriaFinal,
-                    "updatedAt" to momentoGuardado
-                )
-
-                FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(userId)
-                    .collection("credentials")
-                    .add(credMap)
-                    .addOnSuccessListener { documentReference ->
-                        Log.e("IRONVAULT_DEBUG", "¡Guardado exitoso en: ${documentReference.path}")
-                        VaultRepository.addCredential(nuevaCredencial)
-
-                        mostrarBannerPersonalizado(
-                            titulo = "¡Credencial guardada!",
-                            mensaje = "Registrada en la nube con éxito",
-                            iconoResId = R.drawable.logo
-                        )
-
-                        finish()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("IRONVAULT_DEBUG", "Error al guardar: ${e.message}")
-                        mostrarBannerPersonalizado(
-                            titulo = "Error de sincronización",
-                            mensaje = "No se pudo guardar en la nube",
-                            iconoResId = R.drawable.logo
-                        )
-                    }
+                vaultJob {
+                    VaultService.save(nuevaCredencial)
+                    mostrarBannerPersonalizado("Credencial guardada", "Guardada con cifrado de extremo a extremo", R.drawable.logo)
+                    finish()
+                }
             } else {
                 // Invitado: se guarda cifrada en el dispositivo
                 VaultRepository.addCredential(nuevaCredencial)
@@ -375,94 +345,23 @@ class NuevaCredencialActivity : BaseActivity() {
     /** Guarda los contadores en el dispositivo y, si hay cuenta, también en la nube. */
     private fun guardarFrecuenciasEnCache() {
         guardarFrecuenciasLocal()
-
-        // Cuenta con correo: copia en la nube para que sobreviva a reinstalar la app
-        docFrecuencias()?.set(
-            hashMapOf(
-                "counts" to categoryCounts.toMap(),
-                "times" to categoryLastUsedTime.toMap()
-            )
-        )?.addOnFailureListener { e ->
-            Log.e("FRECUENCIAS", "No se pudo guardar en la nube: ${e.message}")
-        }
     }
 
     private fun guardarFrecuenciasLocal() {
-        val editor = prefsFrecuencias().edit()
-
-        val countsString = categoryCounts.entries.joinToString(";") { "${it.key}:${it.value}" }
-        editor.putString("category_counts", countsString)
-
-        val timesString = categoryLastUsedTime.entries.joinToString(";") { "${it.key}:${it.value}" }
-        editor.putString("category_times", timesString)
-
-        editor.apply()
+        // Derived from encrypted credentials.
     }
 
     private fun cargarFrecuenciasDeCache() {
-        val prefs = prefsFrecuencias()
-
-        // Siempre limpiamos: así no se arrastran los contadores de otra sesión
-        categoryCounts.clear()
-        categoryLastUsedTime.clear()
-
-        val countsString = prefs.getString("category_counts", "")
-        if (!countsString.isNullOrEmpty()) {
-            countsString.split(";").forEach { item ->
-                val partes = item.split(":")
-                if (partes.size == 2) {
-                    val cat = partes[0]
-                    val count = partes[1].toIntOrNull() ?: 0
-                    categoryCounts[cat] = count
-                }
-            }
-        }
-
-        val timesString = prefs.getString("category_times", "")
-        if (!timesString.isNullOrEmpty()) {
-            timesString.split(";").forEach { item ->
-                val partes = item.split(":")
-                if (partes.size == 2) {
-                    val cat = partes[0]
-                    val time = partes[1].toLongOrNull() ?: 0L
-                    categoryLastUsedTime[cat] = time
-                }
-            }
+        categoryCounts.clear(); categoryLastUsedTime.clear()
+        VaultRepository.credentialList.forEach {
+            categoryCounts[it.category] = (categoryCounts[it.category] ?: 0) + 1
+            categoryLastUsedTime[it.category] = maxOf(categoryLastUsedTime[it.category] ?: 0L, it.updatedAt)
         }
     }
 
     /** Cuenta con correo: trae los contadores de la nube (así vuelven tras reinstalar). */
     private fun cargarFrecuenciasDeNube() {
-        val doc = docFrecuencias() ?: return
-
-        doc.get()
-            .addOnSuccessListener { snap ->
-                if (!snap.exists()) return@addOnSuccessListener
-
-                val counts = snap.get("counts") as? Map<*, *>
-                val times = snap.get("times") as? Map<*, *>
-
-                if (counts != null) {
-                    categoryCounts.clear()
-                    for ((k, v) in counts) {
-                        val cat = k as? String ?: continue
-                        categoryCounts[cat] = (v as? Number)?.toInt() ?: 0
-                    }
-                }
-                if (times != null) {
-                    categoryLastUsedTime.clear()
-                    for ((k, v) in times) {
-                        val cat = k as? String ?: continue
-                        categoryLastUsedTime[cat] = (v as? Number)?.toLong() ?: 0L
-                    }
-                }
-
-                // Deja también copia local, para cuando no haya internet
-                guardarFrecuenciasLocal()
-            }
-            .addOnFailureListener { e ->
-                Log.e("FRECUENCIAS", "No se pudo leer de la nube: ${e.message}")
-            }
+        // Statistics are computed locally from decrypted records.
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

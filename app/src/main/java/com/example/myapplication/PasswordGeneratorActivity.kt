@@ -38,6 +38,7 @@ class PasswordGeneratorActivity : BaseActivity() { // 👈 Hereda de BaseActivit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_password_generator)
 
         // 1. Botón para regresar con la flecha (si aplica)

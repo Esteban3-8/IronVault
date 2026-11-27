@@ -46,7 +46,7 @@
 
         <!-- Regla: tamaño - margen inicio - margen fin = 26dp efectivos en todos los íconos -->
 
-        <!-- Contraseña principal -->
+        <!-- Contraseña maestra -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMainPassword"
             android:layout_width="match_parent"

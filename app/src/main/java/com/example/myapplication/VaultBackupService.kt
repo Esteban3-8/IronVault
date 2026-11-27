@@ -21,6 +21,35 @@ import java.util.UUID
  * su prueba unitaria independiente.
  */
 object VaultBackupService {
+    fun exportToBytes(credentials: List<Credential>, backupPassword: String): ByteArray {
+        require(backupPassword.length in 15..4096)
+        val salt = VaultCipher.randomBytes(16)
+        val chars = backupPassword.toCharArray()
+        val key = try { VaultCipher.derive(chars, salt) } finally { chars.fill('\u0000') }
+        val plain = CredentialCodec.encode(credentials)
+        val metadata = JSONObject().put("format", "ironvault-backup").put("version", 2)
+            .put("createdAt", isoNow()).put("salt", salt.b64()).put("kdf", "Argon2id")
+            .put("memoryKiB", 65536).put("iterations", 3).put("lanes", 1)
+        return try {
+            JSONObject().put("metadata", metadata.toString()).put("box", VaultCipher.seal(key, plain, metadata.toString().toByteArray()).json())
+                .put("format", "ironvault-backup").put("version", 2).put("createdAt", metadata.getString("createdAt"))
+                .put("encryption", JSONObject().put("algorithm", "AES-256-GCM")).toString().toByteArray()
+        } finally { key.fill(0); plain.fill(0) }
+    }
+    private fun validateV2(json: JSONObject): JSONObject {
+        val metadata = json.getString("metadata")
+        require(metadata.length < 2048)
+        val m = JSONObject(metadata)
+        require(json.getInt("version") == 2 && json.getString("format") == "ironvault-backup")
+        require(json.getString("createdAt") == m.getString("createdAt"))
+        require(json.getJSONObject("encryption").getString("algorithm") == "AES-256-GCM")
+        require(m.getString("format") == "ironvault-backup" && m.getInt("version") == 2)
+        require(m.getString("kdf") == "Argon2id" && m.getInt("memoryKiB") == 65536 && m.getInt("iterations") == 3 && m.getInt("lanes") == 1)
+        require(m.getString("salt").unb64().size == 16)
+        require(json.getJSONObject("box").box().nonce.size == 12)
+        return json
+    }
+
 
     // ─────────────────────────────────────────────────────────────
     //  Modalidades de importación
@@ -56,7 +85,7 @@ object VaultBackupService {
     //  cifra con VaultCryptoService y devuelve los bytes del archivo.
     //  No escribe nada en disco: el llamador decide dónde guardar.
     // ─────────────────────────────────────────────────────────────
-    fun exportToBytes(
+    private fun legacyExportToBytes(
         credentials: List<Credential>,
         backupPassword: String
     ): ByteArray {
@@ -136,6 +165,7 @@ object VaultBackupService {
         if (json.optString("format") != VaultCryptoService.FORMAT)
             throw VaultFormatException("El archivo no es un respaldo de IronVault.")
 
+        if (json.optInt("version") == 2) return validateV2(json)
         val version = json.optInt("version", -1)
         if (version != VaultCryptoService.VERSION)
             throw VaultFormatException("Versión de respaldo incompatible ($version). Solo se admite la versión ${VaultCryptoService.VERSION}.")
@@ -156,6 +186,16 @@ object VaultBackupService {
     //  Devuelve la lista de credenciales del respaldo.
     // ─────────────────────────────────────────────────────────────
     fun decrypt(envelope: JSONObject, backupPassword: String): List<Credential> {
+        if (envelope.getInt("version") == 2) {
+            validateV2(envelope)
+            val text = envelope.getString("metadata"); val m = JSONObject(text)
+            val chars = backupPassword.toCharArray()
+            val key = try { VaultCipher.derive(chars, m.getString("salt").unb64()) } finally { chars.fill('\u0000') }
+            try {
+                val plain = VaultCipher.open(key, envelope.getJSONObject("box").box(), text.toByteArray())
+                return try { CredentialCodec.decode(plain) } finally { plain.fill(0) }
+            } finally { key.fill(0) }
+        }
         val enc       = envelope.getJSONObject("encryption")
         val createdAt = envelope.getString("createdAt")
 
@@ -281,6 +321,7 @@ object VaultBackupService {
             throw VaultFormatException("Los datos del respaldo están corruptos.")
         }
 
+        require(array.length() <= 10000)
         val list = mutableListOf<Credential>()
         for (i in 0 until array.length()) {
             val o = array.getJSONObject(i)
@@ -302,9 +343,9 @@ object VaultBackupService {
         return list
     }
 
-    /** Trunca el campo y elimina caracteres de control para prevenir inyecciones. */
+    /** Reject oversized legacy fields; never alter a stored password. */
     private fun sanitize(value: String, maxLen: Int): String =
-        value.replace(Regex("[\\u0000-\\u001F\\u007F]"), "").take(maxLen)
+        value.also { require(it.length <= maxLen) { "Campo demasiado largo; no se truncará" } }
 
     private fun isoNow(): String =
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)

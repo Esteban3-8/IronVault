@@ -60,6 +60,7 @@ class ImportVaultActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         window.setFlags(
             android.view.WindowManager.LayoutParams.FLAG_SECURE,
             android.view.WindowManager.LayoutParams.FLAG_SECURE
@@ -224,68 +225,24 @@ class ImportVaultActivity : BaseActivity() {
         password: String,
         mode: VaultBackupService.ImportMode
     ) {
-        val progress  = findViewById<ProgressBar>(R.id.progressImport)
-        val btnImport = findViewById<AppCompatButton>(R.id.btnImport)
-        val tvError   = findViewById<TextView>(R.id.tvImportPasswordError)
-
-        btnImport.isEnabled = false
-        btnImport.alpha     = 0.5f
-        progress.visibility = View.VISIBLE
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                // 1. Descifrar y validar estructura
-                val incoming = VaultBackupService.decrypt(envelope, password)
-
-                // 2. Aplicar modalidad
-                val current = VaultRepository.credentialList.toList()
-                val (resultado, resumen) = VaultBackupService.applyImport(current, incoming, mode)
-
-                // 3. Persistir
-                withContext(Dispatchers.Main) {
-                    VaultRepository.credentialList.clear()
-                    VaultRepository.credentialList.addAll(resultado)
-
-                    // Para invitado: guardar en dispositivo
+        val progress = findViewById<ProgressBar>(R.id.progressImport)
+        val btn = findViewById<AppCompatButton>(R.id.btnImport)
+        fun start() {
+            btn.isEnabled = false; progress.visibility = View.VISIBLE
+            vaultJob {
+                try {
+                    val incoming = kotlinx.coroutines.withContext(Dispatchers.Default) { VaultBackupService.decrypt(envelope, password) }
+                    val (result, summary) = VaultBackupService.applyImport(VaultRepository.credentialList.toList(), incoming, mode)
                     if (GuestUtils.esInvitado(this@ImportVaultActivity)) {
-                        GuestStorage.guardar(this@ImportVaultActivity, resultado)
-                    } else {
-                        // Para cuenta Firebase: sincronizar en Firestore
-                        sincronizarFirestore(resultado)
-                    }
-
-                    // Limpiar contraseña de la UI
+                        GuestStorage.guardar(this@ImportVaultActivity, result)
+                        VaultRepository.credentialList.clear(); VaultRepository.credentialList.addAll(result)
+                    } else VaultService.replace(result, "import")
                     findViewById<EditText>(R.id.etImportPassword).text.clear()
-
-                    mostrarResultado(resumen)
-                    progress.visibility = View.GONE
-                    btnImport.isEnabled = true
-                    btnImport.alpha     = 1f
-                }
-            } catch (e: VaultCryptoException) {
-                withContext(Dispatchers.Main) {
-                    progress.visibility = View.GONE
-                    btnImport.isEnabled = true
-                    btnImport.alpha     = 1f
-                    tvError.text = "Contraseña incorrecta o archivo manipulado."
-                    tvError.visibility = View.VISIBLE
-                }
-            } catch (e: VaultFormatException) {
-                withContext(Dispatchers.Main) {
-                    progress.visibility = View.GONE
-                    btnImport.isEnabled = true
-                    btnImport.alpha     = 1f
-                    mostrarBannerPersonalizado("Error de formato", e.message ?: "Archivo inválido.", R.drawable.logo)
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    progress.visibility = View.GONE
-                    btnImport.isEnabled = true
-                    btnImport.alpha     = 1f
-                    mostrarBannerPersonalizado("Error inesperado", "No se pudo completar la importación.", R.drawable.logo)
-                }
+                    mostrarResultado(summary)
+                } finally { btn.isEnabled = true; progress.visibility = View.GONE }
             }
         }
+        if (GuestUtils.esInvitado(this)) start() else confirmMaster("import") { start() }
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -297,34 +254,7 @@ class ImportVaultActivity : BaseActivity() {
     //  proviene de Firebase Auth (no de un secreto local).
     // ─────────────────────────────────────────────────────────────
     private fun sincronizarFirestore(lista: List<Credential>) {
-        val uid = Firebase.auth.currentUser?.uid ?: return
-        val db  = FirebaseFirestore.getInstance()
-        val col = db.collection("users").document(uid).collection("credentials")
-
-        db.runTransaction { tx ->
-            // Leer todos los documentos existentes para eliminarlos
-            // (runTransaction no permite queries dentro; usamos batch delete por lotes)
-        }.addOnSuccessListener {
-            // Borrar todos los existentes y volver a escribir
-            col.get().addOnSuccessListener { snap ->
-                val batch = db.batch()
-                snap.documents.forEach { batch.delete(it.reference) }
-                for (c in lista) {
-                    val ref = col.document()
-                    batch.set(ref, hashMapOf(
-                        "serviceName"    to c.serviceName,
-                        "userOrEmail"    to c.userOrEmail,
-                        "password"       to c.password,
-                        "strengthStatus" to c.strengthStatus,
-                        "url"            to c.url,
-                        "notes"          to c.notes,
-                        "category"       to c.category,
-                        "updatedAt"      to c.updatedAt
-                    ))
-                }
-                batch.commit()
-            }
-        }
+        error("Usar VaultService.replace con autorización maestra")
     }
 
     // ─────────────────────────────────────────────────────────────

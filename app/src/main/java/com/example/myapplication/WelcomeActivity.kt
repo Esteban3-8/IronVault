@@ -7,29 +7,38 @@ import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 
 class WelcomeActivity : BaseActivity() {
+    override fun onResume() {
+        super.onResume()
+        val account = FirebaseAuth.getInstance().currentUser
+        val visibility = if (account != null) android.view.View.VISIBLE else android.view.View.GONE
+        findViewById<TextView>(R.id.welcomeAccount).apply {
+            this.visibility = visibility
+            text = account?.email ?: "Sesión iniciada"
+        }
+        findViewById<TextView>(R.id.welcomeOtherAccount).visibility = visibility
+        findViewById<Button>(R.id.btnRegister).visibility = if (account == null) android.view.View.VISIBLE else android.view.View.GONE
+        findViewById<Button>(R.id.btnLogin).text = if (account != null) "Continuar" else getString(R.string.welcome_btn_login)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
 
-        // ── Verificación de sesión persistente ────────────────────
-        val prefs = getSharedPreferences("settings_prefs", MODE_PRIVATE)
-        val isLoggedIn = prefs.getBoolean("is_logged_in", false)
-
-        if (isLoggedIn) {
-            // Si la sesión está activa, saltamos la bienvenida y vamos directo a la app principal
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-            return
-        }
-
-        // Si no hay sesión activa, cargamos la pantalla de bienvenida con normalidad
+        // Firebase conserva una sola cuenta. Continuar todavía requiere desbloquear la bóveda.
         setContentView(R.layout.activity_welcome)
 
         val btnRegister = findViewById<Button>(R.id.btnRegister)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val txtAbout = findViewById<TextView>(R.id.txtAbout)
         val tvGuestMode = findViewById<TextView>(R.id.tvGuestMode)
+        findViewById<TextView>(R.id.welcomeOtherAccount).apply {
+            setOnClickListener {
+                VaultService.logout()
+                getSharedPreferences("IronVaultPrefs", MODE_PRIVATE).edit().remove("last_email").apply()
+                startActivity(Intent(this@WelcomeActivity, LoginActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                finish()
+            }
+        }
 
         // Ir a Registro
         btnRegister.setOnClickListener {
@@ -48,7 +57,7 @@ class WelcomeActivity : BaseActivity() {
 
         // Modo invitado: cerramos cualquier sesión de Firebase para no mezclar datos
         tvGuestMode.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
+            VaultService.logout()
             startActivity(Intent(this, GuestModeActivity::class.java))
         }
     }

@@ -41,6 +41,7 @@ class ProfileActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
 
         val user = Firebase.auth.currentUser
         if (user == null) {
@@ -602,7 +603,7 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun cerrarSesion() {
-        Firebase.auth.signOut()
+        VaultService.logout()
 
         // La siguiente persona no debe ver estas contraseñas
         VaultRepository.credentialList.clear()

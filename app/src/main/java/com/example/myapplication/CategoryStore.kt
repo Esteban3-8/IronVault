@@ -28,16 +28,34 @@ internal enum class CategoryGroup(val label: String) {
 }
 
 internal class CategoryStore(context: Context) {
+    private val account = FirebaseAuth.getInstance().currentUser?.uid
+    private val legacy = context.getSharedPreferences("vault_categories_${account ?: "guest"}", Context.MODE_PRIVATE)
     private val preferences = context.getSharedPreferences(
-        "vault_categories_${FirebaseAuth.getInstance().currentUser?.uid ?: "guest"}",
+        "vault_categories_v3_${account ?: "guest"}",
         Context.MODE_PRIVATE
     )
 
+    private fun read(): JSONObject {
+        if (account != null) VaultService.requireUnlocked()
+        val stored = preferences.getString("categories", null)
+        if (stored != null) return JSONObject(if (account != null) VaultService.localOpen(stored, "categories") else stored)
+        // Preserve existing local custom categories. Originals remain for supervised cleanup.
+        val data = JSONObject()
+        for ((key, value) in legacy.all) if (value is String) data.put(key, JSONObject(value))
+        write(data)
+        return data
+    }
+
+    private fun write(data: JSONObject) {
+        val encoded = if (account != null) VaultService.localSeal(data.toString(), "categories") else data.toString()
+        check(preferences.edit().putString("categories", encoded).commit()) { "No se pudieron guardar las categorías" }
+    }
+
     fun all(): List<VaultCategory> {
         val categories = defaults.associateByTo(linkedMapOf()) { it.key }
-        for ((key, value) in preferences.all) {
-            val data = (value as? String)?.let { runCatching { JSONObject(it) }.getOrNull() }
-                ?: continue
+        val entries = read()
+        for (key in entries.keys()) {
+            val data = entries.getJSONObject(key)
             if (data.optBoolean("deleted")) {
                 categories.remove(key)
                 continue
@@ -58,11 +76,11 @@ internal class CategoryStore(context: Context) {
             .put("group", category.group.name)
             .put("icon", category.icon)
         category.color?.let { data.put("color", it) }
-        preferences.edit().putString(category.key, data.toString()).apply()
+        write(read().put(category.key, data))
     }
 
     fun delete(key: String) {
-        preferences.edit().putString(key, JSONObject().put("deleted", true).toString()).apply()
+        write(read().put(key, JSONObject().put("deleted", true)))
     }
 
     companion object {

@@ -3,6 +3,26 @@ package com.example.myapplication
 import android.content.Context
 
 object SessionManager {
+    private fun attemptPrefs(context: Context): android.content.SharedPreferences {
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+            ?: error("Inicia sesión nuevamente")
+        val name = java.security.MessageDigest.getInstance("SHA-256").digest(uid.toByteArray())
+            .joinToString("") { "%02x".format(it) }
+        val scoped = context.getSharedPreferences("vault_attempts_$name", Context.MODE_PRIVATE)
+        val legacy = context.getSharedPreferences(PREF_SECURITY, Context.MODE_PRIVATE)
+        if (legacy.contains(KEY_FAILED_ATTEMPTS) || legacy.contains(KEY_LOCK_UNTIL)) {
+            if (scoped.edit().putInt(KEY_FAILED_ATTEMPTS, legacy.getInt(KEY_FAILED_ATTEMPTS, 0))
+                    .putLong(KEY_LOCK_UNTIL, legacy.getLong(KEY_LOCK_UNTIL, 0)).commit()) {
+                legacy.edit().remove(KEY_FAILED_ATTEMPTS).remove(KEY_LOCK_UNTIL).commit()
+            }
+        }
+        return scoped
+    }
+    fun requireAccessAllowed(context: Context) {
+        check(tiempoBloqueoRestanteMs(context) == 0L) { "Espera antes de volver a intentar" }
+    }
+    private fun boot(context: Context) = android.provider.Settings.Global.getInt(
+        context.contentResolver, android.provider.Settings.Global.BOOT_COUNT, -1)
     private const val PREF_SECURITY           = "security_prefs"
     private const val KEY_LAST_BACKGROUND_TIME = "last_background_time"
     private const val KEY_FAILED_ATTEMPTS      = "failed_attempts"
@@ -15,13 +35,12 @@ object SessionManager {
     /** Marca que el usuario ya entró a la bóveda en esta sesión. */
     fun marcarBovedaDesbloqueada(context: Context) {
         context.getSharedPreferences(PREF_SECURITY, Context.MODE_PRIVATE)
-            .edit().putBoolean("vault_unlocked", true).apply()
+            .edit().remove("vault_unlocked").apply()
     }
 
-    /** True si el usuario llegó al Home al menos una vez en esta sesión. */
+    /** El estado depende de la clave en memoria, nunca de una preferencia persistida. */
     fun bovedaEstaDesbloqueada(context: Context): Boolean {
-        return context.getSharedPreferences(PREF_SECURITY, Context.MODE_PRIVATE)
-            .getBoolean("vault_unlocked", false)
+        return VaultService.unlocked
     }
 
     fun registrarSalida(context: Context) {
@@ -61,24 +80,26 @@ object SessionManager {
      *         o 0L si aún no hay bloqueo.
      */
     fun registrarIntentoFallido(context: Context): Long {
-        val prefs = context.getSharedPreferences(PREF_SECURITY, Context.MODE_PRIVATE)
-        val limiteTexto = prefs.getString("attempts", "3 Intentos") ?: "3 Intentos"
+        val prefs = attemptPrefs(context)
+        val limiteTexto = context.getSharedPreferences(PREF_SECURITY, Context.MODE_PRIVATE)
+            .getString("attempts", "3 Intentos") ?: "3 Intentos"
 
         // Si el usuario desactivó el límite de intentos, no hay bloqueo
         val limite = parsearLimiteIntentos(limiteTexto)
         if (limite == -1) return 0L
 
-        val fallidos = prefs.getInt(KEY_FAILED_ATTEMPTS, 0) + 1
+        val fallidos = (prefs.getInt(KEY_FAILED_ATTEMPTS, 0).coerceAtLeast(0).toLong() + 1)
+            .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
         prefs.edit().putInt(KEY_FAILED_ATTEMPTS, fallidos).apply()
 
         // ¿Se llegó exactamente a un múltiplo del límite?
         if (fallidos % limite == 0) {
-            val ciclo = fallidos / limite          // 1, 2, 3 …
-            val baseMs = tiempoBaseMs(limite)
             // Duplica por cada ciclo: base * 2^(ciclo-1), tope 1 hora
-            val bloqueoMs = minOf(baseMs * (1L shl (ciclo - 1)), 60 * 60 * 1000L)
+            val bloqueoMs = AttemptLockPolicy.duration(limite, fallidos)
             val hasta = System.currentTimeMillis() + bloqueoMs
-            prefs.edit().putLong(KEY_LOCK_UNTIL, hasta).apply()
+            prefs.edit().putLong(KEY_LOCK_UNTIL, hasta)
+                .putLong("elapsed_until", android.os.SystemClock.elapsedRealtime() + bloqueoMs)
+                .putInt("boot", boot(context)).putLong("duration", bloqueoMs).apply()
             return bloqueoMs
         }
 
@@ -90,17 +111,23 @@ object SessionManager {
      * Devuelve 0 si no hay bloqueo o ya expiró.
      */
     fun tiempoBloqueoRestanteMs(context: Context): Long {
-        val prefs = context.getSharedPreferences(PREF_SECURITY, Context.MODE_PRIVATE)
+        if (com.google.firebase.auth.FirebaseAuth.getInstance().currentUser == null) return 0L
+        val prefs = attemptPrefs(context)
         val hasta = prefs.getLong(KEY_LOCK_UNTIL, 0L)
-        return maxOf(0L, hasta - System.currentTimeMillis())
+        val sameBoot = boot(context).let { it >= 0 && it == prefs.getInt("boot", -1) }
+        return AttemptLockPolicy.remaining(
+            if (sameBoot) prefs.getLong("elapsed_until", 0) else hasta,
+            if (sameBoot) android.os.SystemClock.elapsedRealtime() else System.currentTimeMillis(),
+            prefs.getLong("duration", 3600000L))
     }
 
     /** Resetea contador e instancia de bloqueo (tras desbloqueo exitoso). */
     fun resetearIntentos(context: Context) {
-        val prefs = context.getSharedPreferences(PREF_SECURITY, Context.MODE_PRIVATE)
+        val prefs = attemptPrefs(context)
         prefs.edit()
             .remove(KEY_FAILED_ATTEMPTS)
             .remove(KEY_LOCK_UNTIL)
+            .remove("elapsed_until").remove("boot").remove("duration")
             .apply()
     }
 
@@ -109,16 +136,7 @@ object SessionManager {
     // ─────────────────────────────────────────────────────────────
 
     private fun convertirTextoAMilisegundos(texto: String): Long {
-        return when (texto) {
-            "15 segundos"         -> 15 * 1000L
-            "30 segundos"         -> 30 * 1000L
-            "1 minuto"            -> 60 * 1000L
-            "3 minutos"           -> 3 * 60 * 1000L
-            "5 minutos"           -> 5 * 60 * 1000L
-            "10 minutos"          -> 10 * 60 * 1000L
-            "Desactivar", "Nunca" -> -1L
-            else                  -> 5 * 60 * 1000L
-        }
+        return VaultTimeoutPolicy.delay(texto)
     }
 
     /** Devuelve el número de intentos permitidos, o -1 si es "Nunca". */
@@ -132,14 +150,4 @@ object SessionManager {
         }
     }
 
-    /**
-     * Tiempo de bloqueo base (primer ciclo) según la tolerancia configurada.
-     * Más tolerante al inicio → penalización base más alta.
-     */
-    private fun tiempoBaseMs(limite: Int): Long = when (limite) {
-        3    -> 30 * 1000L          // 30 s → 1 min → 2 min → … → 1 h
-        5    -> 60 * 1000L          // 1 min → 2 min → …
-        7    -> 2 * 60 * 1000L      // 2 min → 4 min → …
-        else -> 30 * 1000L
-    }
 }

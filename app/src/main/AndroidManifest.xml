@@ -3,15 +3,18 @@
 
     <!-- Permiso necesario para conexión a internet -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <application
         android:name=".IronVaultApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="IronVault"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="false"
         android:theme="@style/Theme.MyApplication">
 
         <!-- Pantalla de carga inicial (Splash) con su tema seguro -->
@@ -59,7 +62,7 @@
         <!-- Pantalla para restablecer contraseña -->
         <activity
             android:name=".ResetPasswordActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <activity

@@ -9,19 +9,20 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 open class BaseActivity : AppCompatActivity() {
-
-    companion object {
-        // Cuántas pantallas de la app están visibles ahora mismo.
-        // Si llega a 0, la app pasó a segundo plano (o se cerró del todo).
-        private var pantallasIniciadas = 0
-    }
+    private var redirectingToUnlock = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
     }
 
     override fun setContentView(layoutResID: Int) {
         super.setContentView(layoutResID)
+        fun preventSavedSecrets(view: android.view.View) {
+            if (view is android.widget.TextView) view.isSaveEnabled = false
+            if (view is ViewGroup) for (i in 0 until view.childCount) preventSavedSecrets(view.getChildAt(i))
+        }
+        findViewById<android.view.View>(android.R.id.content)?.let(::preventSavedSecrets)
         aplicarInsetsAdaptables()
     }
 
@@ -60,44 +61,25 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-
-        // Si no había ninguna pantalla visible, la app viene de segundo plano.
-        // Si ya había una, solo estamos navegando entre pantallas de la app.
-        val veniaDeSegundoPlano = pantallasIniciadas == 0
-        pantallasIniciadas++
-
-        // Invitado: no tiene clave maestra, así que el bloqueo por inactividad no aplica
-        if (GuestUtils.esInvitado(this)) {
-            SessionManager.limpiarSesion(this)
-            return
-        }
-
-        // El bloqueo por inactividad solo se revisa al VOLVER a la app desde segundo plano,
-        // no cada vez que se cambia de pantalla dentro de la app.
-        if (veniaDeSegundoPlano && SessionManager.haExpiradoInactividad(this)) {
-            SessionManager.limpiarSesion(this)
-
-            // Redirige primero a tu pantalla de carga (SplashActivity)
-            val intent = Intent(this, SplashActivity::class.java).apply {
-                putExtra("lock_reason", "auto")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            startActivity(intent)
-            finish()
-        }
+        ensureVaultAccess()
     }
 
-    override fun onStop() {
-        super.onStop()
-
-        pantallasIniciadas--
-        if (pantallasIniciadas <= 0) {
-            pantallasIniciadas = 0
-            // Solo empezar a contar inactividad si el usuario ya entró a la bóveda.
-            // Si está en Login, Registro o Unlock sin haber accedido, no aplica.
-            if (SessionManager.bovedaEstaDesbloqueada(this)) {
-                SessionManager.registrarSalida(this)
-            }
-        }
+    internal fun requiresVault() = !isPublicScreen() && !GuestUtils.esInvitado(this)
+    protected fun ensureVaultAccess(): Boolean {
+        if (!requiresVault() || VaultService.unlocked) return true
+        if (redirectingToUnlock) return false
+        redirectingToUnlock = true
+        startActivity(Intent(this, UnlockVaultActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+        finish()
+        return false
     }
+    override fun onResume() {
+        super.onResume()
+        ensureVaultAccess()
+    }
+    private fun isPublicScreen() = this is VaultAccessActivity || this is SplashActivity ||
+        this is WelcomeActivity || this is LoginActivity || this is RegisterActivity ||
+        this is ForgotPasswordActivity || this is ResetPasswordActivity || this is VerifyCodeActivity ||
+        this is GuestModeActivity || this is BusinessRulesActivity
+
 }

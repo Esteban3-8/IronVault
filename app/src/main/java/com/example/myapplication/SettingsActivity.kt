@@ -43,6 +43,7 @@ class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
 
@@ -93,7 +94,7 @@ class SettingsActivity : BaseActivity() {
         // ── Contraseña principal ──────────────────────────────────
         if (!esInvitado) {
             findViewById<MaterialCardView>(R.id.cardMainPassword).setOnClickListener {
-                startActivity(Intent(this, PrincipalPasswordActivity::class.java))
+                startActivity(Intent(this, ChangeMasterKeyActivity::class.java))
             }
         }
 
@@ -107,10 +108,16 @@ class SettingsActivity : BaseActivity() {
             val sw = findViewById<SwitchCompat>(R.id.switchBiometric)
             sw.setOnCheckedChangeListener { btn, isChecked ->
                 if (!btn.isPressed) return@setOnCheckedChangeListener
+                btn.isPressed = false
                 if (isChecked) mostrarDialogoBiometrico(sw)
                 else {
-                    securityPrefs.edit().putBoolean("biometric_enabled", false).apply()
-                    mostrarBannerPersonalizado("Biometría desactivada", "Autenticación biométrica desactivada", R.drawable.logo)
+                    sw.isChecked = true
+                    confirmMaster("biometric-disable") {
+                        VaultService.consume("biometric-disable")
+                        VaultBiometrics.revoke(this, VaultService.uid); sw.isChecked = false
+                        mostrarBannerPersonalizado("Biometría desactivada", "Acceso biométrico eliminado de este dispositivo", R.drawable.logo)
+                    }
+
                 }
             }
         }
@@ -161,7 +168,7 @@ class SettingsActivity : BaseActivity() {
             dialogView.findViewById<AppCompatButton>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
             dialogView.findViewById<AppCompatButton>(R.id.btnLogoutConfirm).setOnClickListener {
                 prefs.edit().putBoolean("is_logged_in", false).apply()
-                Firebase.auth.signOut()
+                VaultService.logout()
                 VaultRepository.credentialList.clear()
                 getSharedPreferences("IronVaultPermanentCache", MODE_PRIVATE).edit().clear().apply()
                 GuestUtils.marcarInvitado(this, false)
@@ -183,73 +190,18 @@ class SettingsActivity : BaseActivity() {
         advertenciaInvitado: String,
         onConfirmado: () -> Unit
     ) {
-        val esInvitado = GuestUtils.esInvitado(this)
-
-        if (esInvitado && !GuestUtils.tieneClave(this)) {
-            mostrarAdvertenciaInvitado(advertenciaInvitado, onConfirmado)
+        val action = when { subtitulo.contains("exportar") -> "export"; subtitulo.contains("importar") -> "import"; else -> "delete" }
+        if (GuestUtils.esInvitado(this)) {
+            if (!GuestUtils.tieneClave(this)) { mostrarAdvertenciaInvitado(advertenciaInvitado, onConfirmado); return }
+            val input = EditText(this).apply { inputType = 129; isSaveEnabled = false }
+            AlertDialog.Builder(this).setTitle("Clave local").setView(input).setNegativeButton("Cancelar", null)
+                .setPositiveButton("Confirmar") { _, _ ->
+                    val password = input.text.toString(); input.text.clear()
+                    if (GuestUtils.verificarClave(this, password)) onConfirmado()
+                }.show()
             return
         }
-
-        val dialog = BottomSheetDialog(this)
-        val view   = LayoutInflater.from(this).inflate(R.layout.dialog_confirm_master_key, null)
-        dialog.setContentView(view)
-
-        val etInput     = view.findViewById<EditText>(R.id.etMasterKeyInput)
-        val ivToggle    = view.findViewById<ImageView>(R.id.ivToggleMasterKey)
-        val tvError     = view.findViewById<TextView>(R.id.tvMasterKeyError)
-        val tvSub       = view.findViewById<TextView>(R.id.tvConfirmSubtitle)
-        val btnConfirm  = view.findViewById<AppCompatButton>(R.id.btnConfirmMasterKey)
-        val btnCancel   = view.findViewById<MaterialCardView>(R.id.btnCancelMasterKey)
-
-        tvSub.text = if (esInvitado) "Ingresa tu clave local para confirmar\nesta acción." else subtitulo
-
-        var pwdVisible = false
-        ivToggle.setOnClickListener {
-            pwdVisible = !pwdVisible
-            val pos = etInput.selectionStart
-            etInput.transformationMethod = if (pwdVisible)
-                HideReturnsTransformationMethod.getInstance() else PasswordTransformationMethod.getInstance()
-            ivToggle.setImageResource(if (pwdVisible) R.drawable.ojo else R.drawable.ojo_cerrado)
-            etInput.setSelection(pos)
-        }
-
-        btnCancel.setOnClickListener { dialog.dismiss() }
-
-        btnConfirm.setOnClickListener {
-            val clave = etInput.text.toString().trim()
-            if (clave.isEmpty()) {
-                tvError.text = "Ingresa tu contraseña maestra."
-                tvError.visibility = View.VISIBLE
-                return@setOnClickListener
-            }
-            tvError.visibility = View.GONE
-
-            if (esInvitado) {
-                if (GuestUtils.verificarClave(this, clave)) { dialog.dismiss(); onConfirmado() }
-                else { tvError.text = "Contraseña incorrecta."; tvError.visibility = View.VISIBLE }
-                return@setOnClickListener
-            }
-
-            val user = Firebase.auth.currentUser
-            if (user == null || user.email == null) {
-                tvError.text = "Sesión expirada. Reinicia la aplicación."
-                tvError.visibility = View.VISIBLE
-                return@setOnClickListener
-            }
-
-            btnConfirm.isEnabled = false
-            btnConfirm.text = "Verificando..."
-
-            user.reauthenticate(EmailAuthProvider.getCredential(user.email!!, clave))
-                .addOnSuccessListener { dialog.dismiss(); onConfirmado() }
-                .addOnFailureListener {
-                    btnConfirm.isEnabled = true
-                    btnConfirm.text = "Confirmar"
-                    tvError.text = "Contraseña incorrecta."
-                    tvError.visibility = View.VISIBLE
-                }
-        }
-        dialog.show()
+        confirmMaster(action, onConfirmado)
     }
 
     private fun mostrarAdvertenciaInvitado(mensaje: String, onConfirmado: () -> Unit) {
@@ -268,52 +220,46 @@ class SettingsActivity : BaseActivity() {
     // ─────────────────────────────────────────────────────────────
     private fun cargarEstadoBiometrico() {
         findViewById<SwitchCompat>(R.id.switchBiometric).isChecked =
-            securityPrefs.getBoolean("biometric_enabled", false)
+            Firebase.auth.currentUser?.uid?.let { VaultBiometrics.enabled(this, it) } ?: false
     }
 
     private fun mostrarDialogoBiometrico(sw: SwitchCompat) {
-        val dialog = BottomSheetDialog(this)
-        val view   = LayoutInflater.from(this).inflate(R.layout.dialog_biometric, null)
-        dialog.setContentView(view)
-
-        val tvSub = view.findViewById<TextView>(R.id.tvBiometricCountdown)
-        val btnPwd = view.findViewById<MaterialCardView>(R.id.btnUseMasterPassword)
-
-        countDownTimer = object : CountDownTimer(5000, 1000) {
-            override fun onTick(ms: Long) {
-                val s = (ms / 1000).toInt()
-                tvSub.text = "Este diálogo se cerrará en $s segundo${if (s != 1) "s" else ""}"
-            }
-            override fun onFinish() { tvSub.text = "Configurando..."; dialog.dismiss(); activarBiometria("Biometría activada") }
-        }.start()
-
-        btnPwd.setOnClickListener { countDownTimer?.cancel(); dialog.dismiss(); activarBiometria("Configurado con contraseña maestra") }
-        dialog.setOnDismissListener { countDownTimer?.cancel() }
-        dialog.show()
+        sw.isChecked = false
+        val input = EditText(this).apply { inputType = 129; isSaveEnabled = false }
+        AlertDialog.Builder(this).setTitle("Activar biometría")
+            .setMessage("Confirma la contraseña maestra. El sistema pedirá autenticación y una comprobación final.")
+            .setView(input).setNegativeButton("Cancelar", null).setPositiveButton("Continuar") { _, _ ->
+                val chars = input.text.toString().toCharArray(); input.text.clear()
+                vaultJob {
+                    try {
+                        val key = VaultService.verify(chars)
+                        try { VaultBiometrics.enroll(this@SettingsActivity, key,
+                            { sw.isChecked = true; mostrarBannerPersonalizado("Biometría activada", "Configuración verificada", R.drawable.logo) },
+                            { sw.isChecked = false; mostrarBannerPersonalizado("Biometría", it, R.drawable.logo) }) }
+                        finally { key.fill(0) }
+                    } finally { chars.fill('\u0000') }
+                }
+            }.show()
     }
 
     private fun activarBiometria(msg: String) {
-        securityPrefs.edit().putBoolean("biometric_enabled", true).apply()
-        mostrarBannerPersonalizado("Seguridad actualizada", msg, R.drawable.logo)
+        // State is derived from the verified device envelope.
     }
 
     // ─────────────────────────────────────────────────────────────
     //  Eliminar datos
     // ─────────────────────────────────────────────────────────────
     private fun mostrarDialogoBorrar() {
-        val dialog = BottomSheetDialog(this)
-        val view   = LayoutInflater.from(this).inflate(R.layout.dialog_delete_data, null)
-        dialog.setContentView(view)
-        view.findViewById<AppCompatButton>(R.id.btnDeleteConfirm).setOnClickListener {
-            securityPrefs.edit().clear().apply()
-            prefs.edit().clear().apply()
-            mostrarBannerPersonalizado("Datos eliminados", "Se ha borrado toda la información", R.drawable.logo)
-            startActivity(Intent(this, WelcomeActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
-        }
-        view.findViewById<MaterialCardView>(R.id.btnDeleteCancel).setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        AlertDialog.Builder(this).setTitle("Eliminar todas las credenciales")
+            .setMessage("Esta operación es irreversible. La contraseña maestra no se modifica.")
+            .setNegativeButton("Cancelar", null).setPositiveButton("Eliminar") { _, _ ->
+                if (GuestUtils.esInvitado(this)) {
+                    VaultRepository.credentialList.clear(); GuestStorage.guardar(this, emptyList())
+                } else vaultJob {
+                    VaultService.replace(emptyList(), "delete")
+                    mostrarBannerPersonalizado("Datos eliminados", "La bóveda cifrada está vacía", R.drawable.logo)
+                }
+            }.show()
     }
 
     // ─────────────────────────────────────────────────────────────

@@ -103,7 +103,7 @@
                 android:textColor="@color/text_muted"
                 android:textSize="12sp" />
 
-            <!-- Contraseña principal -->
+            <!-- Contraseña maestra -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardMainPassword"
                 android:layout_width="match_parent"

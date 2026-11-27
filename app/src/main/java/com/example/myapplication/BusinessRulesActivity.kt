@@ -6,6 +6,7 @@ import android.widget.ImageView
 class BusinessRulesActivity : BaseActivity() { // 👈 Hereda de BaseActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_business_rules)
 
         // Referencia a la flecha de retroceso (asegúrate de que el ID en tu XML sea btnBack o cámbialo por el que tenga)

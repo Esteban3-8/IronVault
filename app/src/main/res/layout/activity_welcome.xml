@@ -111,6 +111,28 @@
             app:backgroundTint="@null" />
 
         <TextView
+            android:id="@+id/welcomeAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/welcomeOtherAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:fontFamily="@font/inter_bold"
+            android:text="Usar otra cuenta"
+            android:textColor="#C97D3E"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/tvGuestMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

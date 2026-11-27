@@ -15,6 +15,7 @@ class AdministrarCategoriasActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(R.layout.activity_administrar_categorias)
         list = findViewById(R.id.manageCategoryList)
         search = findViewById(R.id.etSearch)

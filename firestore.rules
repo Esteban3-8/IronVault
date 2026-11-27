@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    match /users/{uid} {
+      allow read: if owner(uid);
+      allow create: if owner(uid) && request.resource.data.keys().hasOnly(['email','fullName','completedRegistration','verified'])
+        && request.resource.data.verified == false;
+      allow update: if owner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fullName']);
+      allow delete: if false;
+      match /vault/{id} {
+        allow read: if owner(uid) && id == 'active';
+        // ALL writes require the independently signed server protocol, including first creation.
+        allow write: if false;
+      }
+      match /migration/{id} {
+        allow read: if owner(uid) && id == 'approval';
+        allow write: if false;
+      }
+      match /credentials/{id} {
+        // Migration reads require the independently approved device signature at the server.
+        allow read: if false;
+        allow write: if false;
+      }
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

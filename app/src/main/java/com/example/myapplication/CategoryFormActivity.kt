@@ -13,6 +13,7 @@ abstract class CategoryFormActivity(private val layout: Int) : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
         setContentView(layout)
 
         val store = CategoryStore(this)

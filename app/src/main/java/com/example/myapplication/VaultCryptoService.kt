@@ -107,6 +107,7 @@ object VaultCryptoService {
         val nonce      = db64(nonceB64)
         val ciphertext = db64(ciphertextB64)
         val authTag    = db64(authTagB64)
+        require(salt.size == 16 && nonce.size == 12 && authTag.size == 16)
         val key        = deriveKey(password, salt)
 
         // AES-GCM espera ciphertext || authTag en un único buffer
@@ -137,7 +138,7 @@ object VaultCryptoService {
             throw VaultCryptoException("Algoritmo desconocido: '$algorithm'.")
         if (kdf != KDF)
             throw VaultCryptoException("KDF desconocido: '$kdf'.")
-        if (iters < MIN_KDF_ITERS || iters > MAX_KDF_ITERS)
+        if (iters != KDF_ITERS)
             throw VaultCryptoException("Número de iteraciones KDF fuera de los límites seguros ($iters).")
     }
 

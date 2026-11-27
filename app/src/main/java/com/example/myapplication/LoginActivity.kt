@@ -17,14 +17,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Firebase
 
 class LoginActivity : BaseActivity() {
+    private var signingIn = false
 
     private var isPasswordVisible = true // Inicia visible por defecto
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!ensureVaultAccess()) return
 
         // 0. Verificación automática si ya hay una sesión activa en Firebase
         if (Firebase.auth.currentUser != null) {
+            GuestUtils.marcarInvitado(this, false)
             val intent = Intent(this, UnlockVaultActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -82,8 +85,9 @@ class LoginActivity : BaseActivity() {
 
         // 3. Botón "Continuar" con autenticación de Firebase y validaciones por banner superior
         btnContinue.setOnClickListener {
+            if (signingIn) return@setOnClickListener
             val email = etEmail.text.toString().trim()
-            val password = etPassword.text.toString().trim()
+            val password = etPassword.text.toString()
 
             // Validación del correo
             if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -126,21 +130,23 @@ class LoginActivity : BaseActivity() {
             }
             editor.apply()
 
-            Log.d("LOGIN_DEBUG", "Intentando iniciar sesión con el correo: $email")
+
 
             // ¿Venía del modo invitado? Se revisa ANTES de iniciar sesión
             val eraInvitado = GuestUtils.esInvitado(this)
 
             // Autenticación segura con Firebase Auth
+            signingIn = true
+            btnContinue.isEnabled = false
             Firebase.auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener { result ->
+                    signingIn = false
+                    if (isFinishing || isDestroyed) return@addOnSuccessListener
+                    etPassword.text.clear()
                     // El resto de la app lee el correo de aquí
                     sharedPreferences.edit().putString("user_email", email).apply()
 
-                    // ── GUARDAR SESIÓN PERSISTENTE PARA WELCOMEACTIVITY ──
-                    val settingsPrefs = getSharedPreferences("settings_prefs", MODE_PRIVATE)
-                    settingsPrefs.edit().putBoolean("is_logged_in", true).apply()
-                    // ----------------------------------------------------
+                    // Firebase conserva su propia sesión; ninguna preferencia desbloquea la bóveda.
 
                     val uid = result.user?.uid
 
@@ -156,6 +162,9 @@ class LoginActivity : BaseActivity() {
                     }
                 }
                 .addOnFailureListener {
+                    signingIn = false
+                    if (isFinishing || isDestroyed) return@addOnFailureListener
+                    btnContinue.isEnabled = true
                     // Banner superior de error
                     mostrarBannerPersonalizado(
                         titulo = "Error de acceso",
@@ -183,68 +192,13 @@ class LoginActivity : BaseActivity() {
      * Solo borra la copia local si la subida salió bien.
      */
     private fun subirCredencialesDeInvitado(uid: String, alTerminar: () -> Unit) {
-        val locales = GuestStorage.cargar(this)
-
-        // Nada que subir: solo limpiamos la marca de invitado
-        if (locales.isEmpty()) {
-            GuestUtils.marcarInvitado(this, false)
-            mostrarBannerPersonalizado(
-                titulo = "¡Bienvenido!",
-                mensaje = "¡Inicio de sesión exitoso!",
-                iconoResId = R.drawable.logo
-            )
-            alTerminar()
-            return
-        }
-
-        val db = FirebaseFirestore.getInstance()
-        val coleccion = db.collection("users").document(uid).collection("credentials")
-        val lote = db.batch()
-
-        for (c in locales) {
-            lote.set(
-                coleccion.document(),
-                hashMapOf(
-                    "serviceName" to c.serviceName,
-                    "userOrEmail" to c.userOrEmail,
-                    "password" to c.password,
-                    "strengthStatus" to c.strengthStatus,
-                    "url" to c.url,
-                    "notes" to c.notes,
-                    "category" to c.category,
-                    "updatedAt" to c.updatedAt
-                )
-            )
-        }
-
-        lote.commit()
-            .addOnSuccessListener {
-                // Subidas con éxito: ahora sí se borra la copia local del invitado
-                GuestStorage.guardar(this, emptyList())
-                GuestUtils.marcarInvitado(this, false)
-                VaultRepository.credentialList.clear()
-
-                mostrarBannerPersonalizado(
-                    titulo = "Credenciales migradas",
-                    mensaje = "Las del modo invitado ya están en tu cuenta",
-                    iconoResId = R.drawable.logo
-                )
-                alTerminar()
-            }
-            .addOnFailureListener { e ->
-                Log.e("LOGIN_DEBUG", "No se pudo subir lo del invitado: ${e.message}")
-                // No se borra nada local
-                GuestUtils.marcarInvitado(this, false)
-                mostrarBannerPersonalizado(
-                    titulo = "Sesión iniciada",
-                    mensaje = "No se pudieron subir las del invitado; siguen en este dispositivo",
-                    iconoResId = R.drawable.logo
-                )
-                alTerminar()
-            }
+        GuestUtils.marcarInvitado(this, false)
+        mostrarBannerPersonalizado("Datos locales conservados", "Exporta la bóveda de invitado e impórtala después de desbloquear la cuenta.", R.drawable.logo)
+        alTerminar()
     }
 
     private fun irAlDesbloqueo() {
+        GuestUtils.marcarInvitado(this, false)
         val intent = Intent(this, UnlockVaultActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
