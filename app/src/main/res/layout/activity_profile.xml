@@ -535,34 +535,5 @@
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
-        <!-- Acciones -->
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnChangePassword"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_secondary_button"
-            android:fontFamily="sans-serif-medium"
-            android:text="Cambiar contraseña"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            app:backgroundTint="@null" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnLogout"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="24dp"
-            android:background="@drawable/bg_warning_border"
-            android:fontFamily="sans-serif-medium"
-            android:text="Cerrar sesión"
-            android:textAllCaps="false"
-            android:textColor="#E26B6B"
-            android:textSize="14sp"
-            app:backgroundTint="@null" />
-
     </LinearLayout>
 </ScrollView>

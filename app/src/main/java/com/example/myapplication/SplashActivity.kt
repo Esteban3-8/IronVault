@@ -6,6 +6,10 @@ import android.os.Looper
 import android.os.SystemClock
 
 class SplashActivity : BaseActivity() {
+    private companion object {
+        const val STARTUP_DISPLAY_MS = 650L
+    }
+
     private val handler = Handler(Looper.getMainLooper())
     private var startedAt = 0L
     private val showWelcome = Runnable {
@@ -26,7 +30,8 @@ class SplashActivity : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
-        handler.postDelayed(showWelcome, (3000L - (SystemClock.elapsedRealtime() - startedAt)).coerceAtLeast(0))
+        val remaining = STARTUP_DISPLAY_MS - (SystemClock.elapsedRealtime() - startedAt)
+        handler.postDelayed(showWelcome, remaining.coerceAtLeast(0))
     }
 
     override fun onStop() {

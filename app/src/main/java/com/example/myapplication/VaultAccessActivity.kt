@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.EmailAuthProvider
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
 open class VaultAccessActivity : BaseActivity() {
@@ -61,6 +62,17 @@ open class VaultAccessActivity : BaseActivity() {
         findViewById<Button>(R.id.accessSubmit).setOnClickListener { submit() }
         findViewById<Button>(R.id.accessBiometric).setOnClickListener { biometric() }
         findViewById<ImageButton>(R.id.accessFingerprint).setOnClickListener { biometric() }
+
+        val form = findViewById<View>(R.id.accessForm)
+        val loading = findViewById<View>(R.id.accessLoading)
+        if (changing) {
+            message.setText(R.string.vault_loading)
+        } else {
+            loading.findViewById<TextView>(R.id.loadingStatus).setText(R.string.vault_loading)
+            form.visibility = View.GONE
+            loading.visibility = View.VISIBLE
+        }
+
         vaultJob {
             setBusy(true)
             try {
@@ -77,9 +89,15 @@ open class VaultAccessActivity : BaseActivity() {
                 }
                 configure()
                 ready = true
+            } catch (e: CancellationException) {
+                throw e
             } catch (_: Exception) {
                 message.text = "No se pudo comprobar la bóveda. Revisa tu conexión y vuelve a abrir esta pantalla. No se ha creado ni modificado ninguna bóveda."
-            } finally { setBusy(false) }
+            } finally {
+                loading.visibility = View.GONE
+                form.visibility = View.VISIBLE
+                setBusy(false)
+            }
         }
     }
     private fun configure() {

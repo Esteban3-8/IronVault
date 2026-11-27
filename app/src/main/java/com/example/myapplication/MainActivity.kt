@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -25,16 +24,6 @@ class MainActivity : BaseActivity() {
 
     private var estaExpandido = true
 
-    // Variables de Paginación (10 por página)
-    private var paginaActual = 0
-    private val elementosPorPagina = 10
-    private var listaActualMostrada: List<Credential> = listOf()
-
-    // Controles de paginación en la posición superior
-    private var tvAnterior: TextView? = null
-    private var tvPaginaInfo: TextView? = null
-    private var tvSiguiente: TextView? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!ensureVaultAccess()) return
@@ -45,11 +34,6 @@ class MainActivity : BaseActivity() {
         containerCredentials = findViewById(R.id.containerCredentials)
         progressBarLoading = findViewById(R.id.progressBarLoading)
         etSearch = findViewById(R.id.etSearch)
-
-        // Vincular los controles de paginación
-        tvAnterior = findViewById(R.id.tvAnterior)
-        tvPaginaInfo = findViewById(R.id.tvPaginaInfo)
-        tvSiguiente = findViewById(R.id.tvSiguiente)
 
         val headerEstadoGeneral = findViewById<LinearLayout>(R.id.headerEstadoGeneral)
         val layoutSubcontadores = findViewById<LinearLayout>(R.id.layoutSubcontadores)
@@ -70,51 +54,27 @@ class MainActivity : BaseActivity() {
         val btnRepetidas = findViewById<LinearLayout>(R.id.btnRepetidas)
 
         btnSeguras?.setOnClickListener {
-            paginaActual = 0
-            listaActualMostrada = VaultRepository.credentialList.filter {
+            mostrarCredenciales(VaultRepository.credentialList.filter {
                 it.strengthStatus.contains("Segura", true) || it.strengthStatus.contains("Alta", true)
-            }
-            mostrarCredencialesPaginadas()
+            })
         }
 
         btnDebiles?.setOnClickListener {
-            paginaActual = 0
-            listaActualMostrada = VaultRepository.credentialList.filter {
+            mostrarCredenciales(VaultRepository.credentialList.filter {
                 it.strengthStatus.contains("Débil", true)
-            }
-            mostrarCredencialesPaginadas()
+            })
         }
 
         btnMedias?.setOnClickListener {
-            paginaActual = 0
-            listaActualMostrada = VaultRepository.credentialList.filter {
+            mostrarCredenciales(VaultRepository.credentialList.filter {
                 it.strengthStatus.contains("Media", true)
-            }
-            mostrarCredencialesPaginadas()
+            })
         }
 
         btnRepetidas?.setOnClickListener {
-            paginaActual = 0
-            listaActualMostrada = VaultRepository.credentialList.filter {
+            mostrarCredenciales(VaultRepository.credentialList.filter {
                 it.strengthStatus.contains("Repetida", true)
-            }
-            mostrarCredencialesPaginadas()
-        }
-
-        // Configurar acciones de los botones de página
-        tvAnterior?.setOnClickListener {
-            if (paginaActual > 0) {
-                paginaActual--
-                mostrarCredencialesPaginadas()
-            }
-        }
-
-        tvSiguiente?.setOnClickListener {
-            val maxPaginas = if (listaActualMostrada.isNotEmpty()) (listaActualMostrada.size - 1) / elementosPorPagina else 0
-            if (paginaActual < maxPaginas) {
-                paginaActual++
-                mostrarCredencialesPaginadas()
-            }
+            })
         }
 
         etSearch.addTextChangedListener(object : TextWatcher {
@@ -154,50 +114,10 @@ class MainActivity : BaseActivity() {
         // ── Invitado: siempre se carga desde el dispositivo (no hay Firebase) ──
         if (GuestUtils.esInvitado(this)) {
             VaultRepository.cargarDeInvitado(this)
-            listaActualMostrada = VaultRepository.credentialList
-            calcularYMostrarEstadisticas(VaultRepository.credentialList)
-            paginaActual = 0
-            mostrarCredencialesPaginadas()
-            progressBarLoading.visibility = View.GONE
-            return
         }
 
-        if (VaultRepository.credentialList.isEmpty()) {
-            val credsLocales = cargarCredencialesDeCache()
-            if (credsLocales.isNotEmpty()) {
-                VaultRepository.credentialList.clear()
-                VaultRepository.credentialList.addAll(credsLocales)
-                listaActualMostrada = VaultRepository.credentialList
-                calcularYMostrarEstadisticas(VaultRepository.credentialList)
-                paginaActual = 0
-                mostrarCredencialesPaginadas()
-                progressBarLoading.visibility = View.GONE
-            }
-        } else {
-            listaActualMostrada = VaultRepository.credentialList
-            calcularYMostrarEstadisticas(VaultRepository.credentialList)
-            paginaActual = 0
-            mostrarCredencialesPaginadas()
-        }
-
-        cargarListaCredenciales()
-    }
-
-    // El caché guarda 9 campos (id al inicio + los 8 campos originales)
-    private fun guardarCredencialesEnCache(lista: List<Credential>) {
-        // No plaintext cache.
-    }
-
-    // Retrocompatible: si el caché tiene 8 campos (sin id) genera uno nuevo automáticamente
-    private fun cargarCredencialesDeCache(): List<Credential> {
-        return emptyList()
-    }
-
-    private fun cargarListaCredenciales() {
-        if (!GuestUtils.esInvitado(this) && !VaultService.unlocked) return
-        listaActualMostrada = VaultRepository.credentialList
         calcularYMostrarEstadisticas(VaultRepository.credentialList)
-        mostrarCredencialesPaginadas()
+        filtrarCredenciales(etSearch.text.toString())
         progressBarLoading.visibility = View.GONE
     }
 
@@ -217,88 +137,71 @@ class MainActivity : BaseActivity() {
     }
 
     private fun filtrarCredenciales(query: String) {
-        listaActualMostrada = if (query.isEmpty()) {
-            VaultRepository.credentialList
-        } else {
-            VaultRepository.credentialList.filter {
-                it.serviceName.contains(query, true) || it.userOrEmail.contains(query, true)
-            }
+        val credenciales = VaultRepository.credentialList
+        val resultados = if (query.isEmpty()) credenciales else credenciales.filter {
+            it.serviceName.contains(query, true) || it.userOrEmail.contains(query, true)
         }
-        paginaActual = 0
-        mostrarCredencialesPaginadas()
+        mostrarCredenciales(resultados)
     }
 
-    private fun mostrarCredencialesPaginadas() {
+    private fun mostrarCredenciales(credenciales: List<Credential>) {
         if (!::containerCredentials.isInitialized) return
         containerCredentials.removeAllViews()
         val inflater = LayoutInflater.from(this)
 
-        val inicio = paginaActual * elementosPorPagina
-        val fin = minOf(inicio + elementosPorPagina, listaActualMostrada.size)
+        for (cred in credenciales) {
+        val itemView = inflater.inflate(R.layout.item_credential, containerCredentials, false)
 
-        if (inicio < listaActualMostrada.size) {
-            val subLista = listaActualMostrada.subList(inicio, fin)
+        val tvInitial = itemView.findViewById<TextView>(R.id.tvServiceInitial)
+        val tvName = itemView.findViewById<TextView>(R.id.tvServiceName)
+        val tvUser = itemView.findViewById<TextView>(R.id.tvServiceUser)
+        val tvStatus = itemView.findViewById<TextView>(R.id.tvStatusText)
+        val vDot = itemView.findViewById<MaterialCardView>(R.id.vStatusDot)
 
-            for (cred in subLista) {
-                val itemView = inflater.inflate(R.layout.item_credential, containerCredentials, false)
+        tvName.text = cred.serviceName
+        tvUser.text = cred.userOrEmail
+        tvInitial.text = if (cred.serviceName.isNotEmpty()) cred.serviceName.substring(0, 1).uppercase() else "C"
+        tvStatus.text = cred.strengthStatus
 
-                val tvInitial = itemView.findViewById<TextView>(R.id.tvServiceInitial)
-                val tvName = itemView.findViewById<TextView>(R.id.tvServiceName)
-                val tvUser = itemView.findViewById<TextView>(R.id.tvServiceUser)
-                val tvStatus = itemView.findViewById<TextView>(R.id.tvStatusText)
-                val vDot = itemView.findViewById<MaterialCardView>(R.id.vStatusDot)
-
-                tvName.text = cred.serviceName
-                tvUser.text = cred.userOrEmail
-                tvInitial.text = if (cred.serviceName.isNotEmpty()) cred.serviceName.substring(0, 1).uppercase() else "C"
-                tvStatus.text = cred.strengthStatus
-
-                when {
-                    cred.strengthStatus.contains("Repetida", true) -> {
-                        tvStatus.setTextColor(Color.parseColor("#9B9B9B"))
-                        vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
-                    }
-                    cred.strengthStatus.contains("Segura", true) || cred.strengthStatus.contains("Alta", true) -> {
-                        tvStatus.setTextColor(Color.parseColor("#71C77D"))
-                        vDot?.setCardBackgroundColor(Color.parseColor("#71C77D"))
-                    }
-                    cred.strengthStatus.contains("Débil", true) -> {
-                        tvStatus.setTextColor(Color.parseColor("#E26B6B"))
-                        vDot?.setCardBackgroundColor(Color.parseColor("#E26B6B"))
-                    }
-                    cred.strengthStatus.contains("Media", true) -> {
-                        tvStatus.setTextColor(Color.parseColor("#E5C158"))
-                        vDot?.setCardBackgroundColor(Color.parseColor("#E5C158"))
-                    }
-                    else -> {
-                        tvStatus.setTextColor(Color.parseColor("#9B9B9B"))
-                        vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
-                    }
-                }
-
-                itemView.setOnClickListener {
-                    val intent = Intent(this, CredentialDetailActivity::class.java).apply {
-                        putExtra("serviceName", cred.serviceName)
-                        putExtra("userOrEmail", cred.userOrEmail)
-                        putExtra("credential_id", cred.id)
-                        putExtra("strengthStatus", cred.strengthStatus)
-                        putExtra("url", cred.url)
-                        putExtra("notes", cred.notes)
-                        putExtra("category", cred.category)
-                        putExtra("updatedAt", cred.updatedAt)
-                    }
-                    startActivity(intent)
-                }
-
-                containerCredentials.addView(itemView)
+        when {
+            cred.strengthStatus.contains("Repetida", true) -> {
+                tvStatus.setTextColor(Color.parseColor("#9B9B9B"))
+                vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
+            }
+            cred.strengthStatus.contains("Segura", true) || cred.strengthStatus.contains("Alta", true) -> {
+                tvStatus.setTextColor(Color.parseColor("#71C77D"))
+                vDot?.setCardBackgroundColor(Color.parseColor("#71C77D"))
+            }
+            cred.strengthStatus.contains("Débil", true) -> {
+                tvStatus.setTextColor(Color.parseColor("#E26B6B"))
+                vDot?.setCardBackgroundColor(Color.parseColor("#E26B6B"))
+            }
+            cred.strengthStatus.contains("Media", true) -> {
+                tvStatus.setTextColor(Color.parseColor("#E5C158"))
+                vDot?.setCardBackgroundColor(Color.parseColor("#E5C158"))
+            }
+            else -> {
+                tvStatus.setTextColor(Color.parseColor("#9B9B9B"))
+                vDot?.setCardBackgroundColor(Color.parseColor("#9B9B9B"))
             }
         }
 
-        val totalPaginas = if (listaActualMostrada.isNotEmpty()) (listaActualMostrada.size - 1) / elementosPorPagina + 1 else 1
-        tvPaginaInfo?.text = "Pág ${paginaActual + 1}/$totalPaginas"
+        itemView.setOnClickListener {
+            val intent = Intent(this, CredentialDetailActivity::class.java).apply {
+                putExtra("serviceName", cred.serviceName)
+                putExtra("userOrEmail", cred.userOrEmail)
+                putExtra("credential_id", cred.id)
+                putExtra("strengthStatus", cred.strengthStatus)
+                putExtra("url", cred.url)
+                putExtra("notes", cred.notes)
+                putExtra("category", cred.category)
+                putExtra("updatedAt", cred.updatedAt)
+            }
+            startActivity(intent)
+        }
 
-        tvAnterior?.alpha = if (paginaActual > 0) 1.0f else 0.3f
-        tvSiguiente?.alpha = if (paginaActual < totalPaginas - 1) 1.0f else 0.3f
+            containerCredentials.addView(itemView)
+        }
     }
 
     private fun configurarAvatarInicial() {

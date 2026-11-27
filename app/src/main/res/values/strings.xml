@@ -53,7 +53,8 @@
     <string name="splash_iron">Iron</string>
     <string name="splash_vault">Vault</string>
     <string name="splash_unlocking">Iniciando IronVault…</string>
-    <string name="splash_version">IronVault v1.0.0</string>
+    <string name="vault_loading">Comprobando tu bóveda…</string>
+    <string name="vault_processing">Procesando tu solicitud…</string>
 
     <!-- Login -->
     <string name="login_title">Iniciar sesión</string>
@@ -136,8 +137,6 @@
     <string name="main_search_hint">Buscar contraseña</string>
     <string name="main_general_state">ESTADO GENERAL</string>
     <string name="main_your_passwords">Tus contraseñas</string>
-    <string name="main_prev">◀ Ant</string>
-    <string name="main_next">Sig ▶</string>
 
     <!-- Security -->
     <string name="security_title">Seguridad</string>

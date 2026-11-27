@@ -1,13 +1,11 @@
 package com.example.myapplication
 
 import android.app.Dialog
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.text.InputType
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.Window
@@ -17,7 +15,6 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.userProfileChangeRequest
@@ -56,7 +53,7 @@ class ProfileActivity : BaseActivity() {
         tvInitial = findViewById(R.id.tvProfileInitial)
         tvName = findViewById(R.id.tvProfileName)
 
-        emailActual = user.email ?: ""
+        emailActual = user.email.orEmpty()
         findViewById<TextView>(R.id.tvProfileEmail).text = emailActual
 
         nombreActual = user.displayName ?: ""
@@ -87,18 +84,6 @@ class ProfileActivity : BaseActivity() {
 
         // ── Acciones ──
         findViewById<TextView>(R.id.tvEditName).setOnClickListener { mostrarDialogoNombre(user) }
-
-        findViewById<AppCompatButton>(R.id.btnChangePassword).setOnClickListener {
-            mostrarDialogoCambiarContrasena(user)
-        }
-
-        findViewById<AppCompatButton>(R.id.btnLogout).setOnClickListener {
-            mostrarConfirmacion(
-                titulo = "Cerrar sesión",
-                mensaje = "Se cerrará tu sesión y se quitarán las contraseñas guardadas en este dispositivo. Seguirán en tu cuenta.",
-                textoConfirmar = "Cerrar sesión"
-            ) { cerrarSesion() }
-        }
     }
 
     override fun onResume() {
@@ -348,202 +333,6 @@ class ProfileActivity : BaseActivity() {
         return dialog
     }
 
-    private fun crearCampoContrasena(hintTexto: String, margenArribaDp: Int): EditText {
-        return EditText(this).apply {
-            hint = hintTexto
-            setHintTextColor(Color.parseColor("#7A808C"))
-            setTextColor(Color.WHITE)
-            textSize = 14f
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setPadding(dp(14), dp(12), dp(14), dp(12))
-            background = GradientDrawable().apply {
-                setColor(Color.parseColor("#14151A"))
-                cornerRadius = dp(12).toFloat()
-                setStroke(dp(1), Color.parseColor("#2C303B"))
-            }
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply {
-                topMargin = dp(margenArribaDp)
-            }
-        }
-    }
-
-    private fun mostrarDialogoCambiarContrasena(user: FirebaseUser) {
-        val esPassword = user.providerData.any { it.providerId == "password" }
-        if (!esPassword || emailActual.isBlank()) {
-            mostrarBannerPersonalizado(
-                titulo = "No disponible",
-                mensaje = "Esta cuenta no usa contraseña directa en IronVault.",
-                iconoResId = R.drawable.logo
-            )
-            return
-        }
-
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(20), dp(20), dp(18))
-            background = GradientDrawable().apply {
-                setColor(Color.parseColor("#1B1D22"))
-                cornerRadius = dp(20).toFloat()
-                setStroke(dp(1), Color.parseColor("#2C303B"))
-            }
-        }
-
-        root.addView(TextView(this).apply {
-            text = "Cambiar contraseña"
-            setTextColor(Color.WHITE)
-            textSize = 18f
-            typeface = android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL)
-        })
-
-        root.addView(TextView(this).apply {
-            text = "Ingresa tu contraseña actual y escribe la nueva aquí mismo."
-            setTextColor(Color.parseColor("#9A9A9A"))
-            textSize = 13f
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply {
-                topMargin = dp(6)
-            }
-        })
-
-        val etActual = crearCampoContrasena("Contraseña actual", 14)
-        val etNueva = crearCampoContrasena("Nueva contraseña (mín. 6 caracteres)", 10)
-        val etConfirmar = crearCampoContrasena("Confirmar nueva contraseña", 10)
-
-        root.addView(etActual)
-        root.addView(etNueva)
-        root.addView(etConfirmar)
-
-        val filaBotones = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.END
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply {
-                topMargin = dp(18)
-            }
-        }
-
-        val btnCancelar = TextView(this).apply {
-            text = "Cancelar"
-            setTextColor(Color.parseColor("#9A9A9A"))
-            textSize = 14f
-            gravity = Gravity.CENTER
-            setPadding(dp(16), dp(10), dp(16), dp(10))
-            setOnClickListener { dialog.dismiss() }
-        }
-
-        val btnGuardar = AppCompatButton(this).apply {
-            text = "Guardar"
-            setTextColor(Color.parseColor("#14151A"))
-            textSize = 14f
-            isAllCaps = false
-            background = GradientDrawable().apply {
-                setColor(Color.parseColor("#E8873E"))
-                cornerRadius = dp(12).toFloat()
-            }
-            setPadding(dp(20), dp(10), dp(20), dp(10))
-            setOnClickListener {
-                val passActual = etActual.text.toString()
-                val passNueva = etNueva.text.toString()
-                val passConfirmar = etConfirmar.text.toString()
-
-                if (passActual.isEmpty() || passNueva.isEmpty() || passConfirmar.isEmpty()) {
-                    mostrarBannerPersonalizado(
-                        titulo = "Campos incompletos",
-                        mensaje = "Completa la contraseña actual y la nueva",
-                        iconoResId = R.drawable.logo
-                    )
-                    return@setOnClickListener
-                }
-                if (passNueva.length < 6) {
-                    mostrarBannerPersonalizado(
-                        titulo = "Contraseña muy corta",
-                        mensaje = "Usa al menos 6 caracteres",
-                        iconoResId = R.drawable.logo
-                    )
-                    return@setOnClickListener
-                }
-                if (passNueva != passConfirmar) {
-                    mostrarBannerPersonalizado(
-                        titulo = "No coinciden",
-                        mensaje = "La nueva contraseña y su confirmación no son iguales",
-                        iconoResId = R.drawable.logo
-                    )
-                    return@setOnClickListener
-                }
-
-                val credential = EmailAuthProvider.getCredential(emailActual, passActual)
-                user.reauthenticate(credential)
-                    .addOnSuccessListener {
-                        user.updatePassword(passNueva)
-                            .addOnSuccessListener {
-                                dialog.dismiss()
-                                mostrarBannerPersonalizado(
-                                    titulo = "Contraseña actualizada",
-                                    mensaje = "Cambiaste la contraseña de tu cuenta",
-                                    iconoResId = R.drawable.logo
-                                )
-                            }
-                            .addOnFailureListener { e ->
-                                mostrarBannerPersonalizado(
-                                    titulo = "Error al cambiar",
-                                    mensaje = e.localizedMessage ?: "No se pudo actualizar la contraseña",
-                                    iconoResId = R.drawable.logo
-                                )
-                            }
-                    }
-                    .addOnFailureListener {
-                        mostrarBannerPersonalizado(
-                            titulo = "Contraseña incorrecta",
-                            mensaje = "La contraseña actual no coincide",
-                            iconoResId = R.drawable.logo
-                        )
-                    }
-            }
-        }
-
-        filaBotones.addView(btnCancelar)
-        filaBotones.addView(btnGuardar)
-        root.addView(filaBotones)
-
-        dialog.setContentView(root)
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.9).toInt(),
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.show()
-    }
-
-    private fun mostrarConfirmacion(
-        titulo: String,
-        mensaje: String,
-        textoConfirmar: String,
-        alConfirmar: () -> Unit
-    ) {
-        val dialog = crearDialogo(R.layout.dialog_confirm_action)
-        dialog.findViewById<TextView>(R.id.tvActionTitle).text = titulo
-        dialog.findViewById<TextView>(R.id.tvActionMessage).text = mensaje
-        dialog.findViewById<AppCompatButton>(R.id.btnActionConfirm).apply {
-            text = textoConfirmar
-            setOnClickListener {
-                dialog.dismiss()
-                alConfirmar()
-            }
-        }
-        dialog.findViewById<TextView>(R.id.btnActionCancel).setOnClickListener { dialog.dismiss() }
-        dialog.show()
-    }
-
     private fun mostrarDialogoNombre(user: FirebaseUser) {
         val dialog = crearDialogo(R.layout.dialog_edit_name)
         val etNombre = dialog.findViewById<EditText>(R.id.etDialogName)
@@ -600,24 +389,5 @@ class ProfileActivity : BaseActivity() {
                     iconoResId = R.drawable.logo
                 )
             }
-    }
-
-    private fun cerrarSesion() {
-        VaultService.logout()
-
-        // La siguiente persona no debe ver estas contraseñas
-        VaultRepository.credentialList.clear()
-        getSharedPreferences("IronVaultPermanentCache", MODE_PRIVATE).edit().clear().apply()
-        getSharedPreferences("settings_prefs", MODE_PRIVATE)
-            .edit().putBoolean("is_logged_in", false).apply()
-
-        // No tocamos GuestStorage: si en este dispositivo hubo un invitado, sus datos siguen ahí
-        GuestUtils.marcarInvitado(this, false)
-        SessionManager.limpiarSesion(this)
-
-        val intent = Intent(this, WelcomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
     }
 }

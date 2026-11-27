@@ -1,68 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"
-    android:background="#121417">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:gravity="center_horizontal" android:padding="24dp">
-        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <ImageView android:layout_width="match_parent" android:layout_height="72dp"
-                android:layout_marginHorizontal="48dp" android:scaleType="fitCenter"
-                android:src="@drawable/logo" android:contentDescription="IronVault" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main">
 
-            <ImageButton
-                android:id="@+id/accessBack"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="start|center_vertical"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/action_back"
-                android:src="@drawable/ic_arrow_back"
+    <ScrollView
+        android:id="@+id/accessForm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="center_horizontal" android:padding="24dp">
+            <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <ImageView android:layout_width="match_parent" android:layout_height="72dp"
+                    android:layout_marginHorizontal="48dp" android:scaleType="fitCenter"
+                    android:src="@drawable/logo" android:contentDescription="IronVault" />
+
+                <ImageButton
+                    android:id="@+id/accessBack"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/action_back"
+                    android:src="@drawable/ic_arrow_back"
+                    android:visibility="gone" />
+            </FrameLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="IronVault"
+                android:textSize="24sp" android:fontFamily="@font/inter_bold" android:textColor="#E8873E" />
+            <TextView android:id="@+id/accessTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" android:text="Desbloquear bóveda" android:textSize="24sp" android:fontFamily="@font/inter_bold" android:textColor="@color/text_primary" android:gravity="center" />
+            <TextView android:id="@+id/accessMessage" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="Bóveda bloqueada. Verifica tu identidad para acceder de forma segura a tus contraseñas."
+                android:fontFamily="sans-serif" android:textSize="15sp" android:lineSpacingExtra="3dp" android:textColor="@color/text_soft" android:accessibilityLiveRegion="polite" />
+            <ImageButton android:id="@+id/accessFingerprint" android:layout_width="96dp" android:layout_height="96dp"
+                android:layout_marginTop="20dp" android:src="@drawable/ic_biometric_secure" android:background="@drawable/bg_biometric_circle"
+                android:visibility="gone" android:padding="20dp" android:scaleType="fitCenter" android:contentDescription="Iniciar autenticación biométrica" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/accessBiometric" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
+                android:visibility="gone" android:text="Desbloquear con biometría" android:layout_marginTop="16dp" android:background="@drawable/bg_secondary_button" android:backgroundTint="@null" android:textColor="#FFFFFF" android:textAllCaps="false" android:fontFamily="sans-serif-medium" />
+            <TextView android:id="@+id/accessPasswordLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Usar contraseña maestra"
+                android:layout_marginTop="24dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessPassword" android:visibility="gone" />
+            <EditText android:id="@+id/accessPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
+                android:textColor="@color/text_primary" android:visibility="gone" />
+            <TextView android:id="@+id/accessNewPasswordLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vault_master_new_password"
+                android:layout_marginTop="16dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessNewPassword" android:visibility="gone" />
+            <EditText android:id="@+id/accessNewPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
+                android:textColor="@color/text_primary" android:visibility="gone" />
+            <TextView android:id="@+id/accessConfirmLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vault_master_confirm_password"
+                android:layout_marginTop="16dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessConfirm" android:visibility="gone" />
+            <EditText android:id="@+id/accessConfirm" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
+                android:textColor="@color/text_primary" android:visibility="gone" />
+            <TextView android:id="@+id/accessAccountPasswordLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vault_master_account_password"
+                android:layout_marginTop="16dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessAccountPassword" android:visibility="gone" />
+            <EditText android:id="@+id/accessAccountPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
+                android:textColor="@color/text_primary" android:visibility="gone" />
+            <androidx.appcompat.widget.AppCompatCheckBox android:id="@+id/accessAcknowledgement" android:button="@drawable/custom_checkbox" app:buttonTint="@null" android:buttonTint="@null" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Entiendo que mi contraseña maestra no es recuperable. Los administradores y soporte no pueden recuperarla ni restablecerla. Si pierdo mis accesos válidos, puedo perder mis datos permanentemente."
+                android:layout_marginTop="24dp" android:paddingStart="12dp" android:paddingEnd="0dp" android:gravity="start|top"
+                android:fontFamily="sans-serif" android:textSize="14sp" android:lineSpacingExtra="3dp" android:textColor="@color/text_soft" android:minHeight="48dp" android:visibility="gone" />
+            <TextView android:id="@+id/accessLockout" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:textColor="#C97D3E" android:textSize="13sp"
+                android:fontFamily="sans-serif-medium" android:gravity="center" android:visibility="gone" />
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/accessProgress"
+                style="@style/Widget.IronVault.LoadingIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/vault_processing"
                 android:visibility="gone" />
-        </FrameLayout>
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="IronVault"
-            android:textSize="24sp" android:fontFamily="@font/inter_bold" android:textColor="#E8873E" />
-        <TextView android:id="@+id/accessTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="24dp" android:text="Desbloquear bóveda" android:textSize="24sp" android:fontFamily="@font/inter_bold" android:textColor="@color/text_primary" android:gravity="center" />
-        <TextView android:id="@+id/accessMessage" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" android:text="Bóveda bloqueada. Verifica tu identidad para acceder de forma segura a tus contraseñas."
-            android:fontFamily="sans-serif" android:textSize="15sp" android:lineSpacingExtra="3dp" android:textColor="@color/text_soft" android:accessibilityLiveRegion="polite" />
-        <ImageButton android:id="@+id/accessFingerprint" android:layout_width="96dp" android:layout_height="96dp"
-            android:layout_marginTop="20dp" android:src="@drawable/ic_biometric_secure" android:background="@drawable/bg_biometric_circle"
-            android:visibility="gone" android:padding="20dp" android:scaleType="fitCenter" android:contentDescription="Iniciar autenticación biométrica" />
-        <androidx.appcompat.widget.AppCompatButton android:id="@+id/accessBiometric" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
-            android:visibility="gone" android:text="Desbloquear con biometría" android:layout_marginTop="16dp" android:background="@drawable/bg_secondary_button" android:backgroundTint="@null" android:textColor="#FFFFFF" android:textAllCaps="false" android:fontFamily="sans-serif-medium" />
-        <TextView android:id="@+id/accessPasswordLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Usar contraseña maestra"
-            android:layout_marginTop="24dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessPassword" android:visibility="gone" />
-        <EditText android:id="@+id/accessPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="@color/text_primary" android:visibility="gone" />
-        <TextView android:id="@+id/accessNewPasswordLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vault_master_new_password"
-            android:layout_marginTop="16dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessNewPassword" android:visibility="gone" />
-        <EditText android:id="@+id/accessNewPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="@color/text_primary" android:visibility="gone" />
-        <TextView android:id="@+id/accessConfirmLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vault_master_confirm_password"
-            android:layout_marginTop="16dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessConfirm" android:visibility="gone" />
-        <EditText android:id="@+id/accessConfirm" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="@color/text_primary" android:visibility="gone" />
-        <TextView android:id="@+id/accessAccountPasswordLabel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vault_master_account_password"
-            android:layout_marginTop="16dp" android:fontFamily="sans-serif-medium" android:textSize="14sp" android:textColor="@color/text_primary" android:labelFor="@id/accessAccountPassword" android:visibility="gone" />
-        <EditText android:id="@+id/accessAccountPassword" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" android:paddingHorizontal="18dp" android:paddingVertical="12dp" android:background="@drawable/bg_input_dark" android:backgroundTint="@null" android:fontFamily="sans-serif-medium" android:textSize="16sp" android:minHeight="56dp" android:inputType="textPassword" android:saveEnabled="false"
-            android:textColor="@color/text_primary" android:visibility="gone" />
-        <androidx.appcompat.widget.AppCompatCheckBox android:id="@+id/accessAcknowledgement" android:button="@drawable/custom_checkbox" app:buttonTint="@null" android:buttonTint="@null" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Entiendo que mi contraseña maestra no es recuperable. Los administradores y soporte no pueden recuperarla ni restablecerla. Si pierdo mis accesos válidos, puedo perder mis datos permanentemente."
-            android:layout_marginTop="24dp" android:paddingStart="12dp" android:paddingEnd="0dp" android:gravity="start|top"
-            android:fontFamily="sans-serif" android:textSize="14sp" android:lineSpacingExtra="3dp" android:textColor="@color/text_soft" android:minHeight="48dp" android:visibility="gone" />
-        <TextView android:id="@+id/accessLockout" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" android:textColor="#C97D3E" android:textSize="13sp"
-            android:fontFamily="sans-serif-medium" android:gravity="center" android:visibility="gone" />
-        <ProgressBar android:id="@+id/accessProgress" android:layout_width="40dp" android:layout_height="40dp" android:visibility="gone" />
-        <androidx.appcompat.widget.AppCompatButton android:id="@+id/accessSubmit" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
-            android:paddingHorizontal="16dp" android:paddingVertical="12dp" android:singleLine="false"
-            android:text="Desbloquear bóveda" android:layout_marginTop="20dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@null" android:textColor="#23202A" android:textSize="14.5sp" android:textAllCaps="false" android:fontFamily="sans-serif-medium" />
-        <androidx.appcompat.widget.AppCompatButton android:id="@+id/accessSignOut" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Cerrar sesión" android:minHeight="54dp" android:layout_marginTop="12dp" android:background="@drawable/bg_secondary_button" android:backgroundTint="@null" android:textColor="#FFFFFF" android:textAllCaps="false" android:fontFamily="sans-serif-medium"
-            android:paddingHorizontal="16dp" android:paddingVertical="12dp" android:singleLine="false" />
-    </LinearLayout>
-</ScrollView>
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/accessSubmit" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
+                android:paddingHorizontal="16dp" android:paddingVertical="12dp" android:singleLine="false"
+                android:text="Desbloquear bóveda" android:layout_marginTop="20dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@null" android:textColor="#23202A" android:textSize="14.5sp" android:textAllCaps="false" android:fontFamily="sans-serif-medium" />
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/accessSignOut" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Cerrar sesión" android:minHeight="54dp" android:layout_marginTop="12dp" android:background="@drawable/bg_secondary_button" android:backgroundTint="@null" android:textColor="#FFFFFF" android:textAllCaps="false" android:fontFamily="sans-serif-medium"
+                android:paddingHorizontal="16dp" android:paddingVertical="12dp" android:singleLine="false" />
+        </LinearLayout>
+    </ScrollView>
+
+    <include
+        android:id="@+id/accessLoading"
+        layout="@layout/activity_splash"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

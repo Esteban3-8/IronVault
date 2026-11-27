@@ -1,11 +1,27 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Base.Theme.MyApplication" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowBackground">#000000</item>
+        <item name="android:windowBackground">@color/bg_main</item>
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
 
-    <style name="Theme.App.Starting" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowBackground">#000000</item>
+    <style name="Base.Theme.IronVault.Starting" parent="Theme.MyApplication">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:statusBarColor">@color/bg_main</item>
+        <item name="android:navigationBarColor">@color/bg_main</item>
+    </style>
+
+    <style name="Theme.App.Starting" parent="Base.Theme.IronVault.Starting">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
+    <style name="Widget.IronVault.LoadingIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
+        <item name="android:indeterminate">true</item>
+        <item name="indeterminateAnimationType">disjoint</item>
+        <item name="indicatorColor">@color/orange_primary</item>
+        <item name="trackColor">@color/border_color</item>
+        <item name="trackThickness">6dp</item>
+        <item name="trackCornerRadius">3dp</item>
     </style>
 </resources>
