@@ -8,39 +8,38 @@
     android:background="@color/bg_main"
     tools:context=".SecurityActivity">
 
+    <TextView
+        android:id="@+id/tvSecurityTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/inter_bold"
+        android:text="@string/security_title"
+        android:textColor="@color/text_primary"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:clipToPadding="false"
         android:paddingBottom="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSecurityTitle"
         app:layout_constraintBottom_toTopOf="@id/bottomNavContainer">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tvSecurityTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/security_title"
-                android:textColor="@color/text_primary"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/inter_bold"
-                android:layout_marginTop="32dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardLock"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:layout_marginTop="16dp"
                 app:cardBackgroundColor="@color/bg_dark_card"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
@@ -48,7 +47,7 @@
                 app:strokeWidth="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvSecurityTitle">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/ivSecurityLock"
@@ -76,13 +75,14 @@
                 android:id="@+id/tvProtectedSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="20dp"
                 android:gravity="center"
                 android:text="@string/security_vault_subtitle"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif-medium"
-                android:lineSpacingExtra="2dp"
+                android:lineSpacingExtra="3dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvProtectedTitle" />
@@ -110,7 +110,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/label_configuration"
                 android:textColor="@color/text_muted"
@@ -123,12 +123,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginEnd="20dp"
-                app:cardBackgroundColor="@color/bg_dark_card"
+                app:cardBackgroundColor="@color/bg_option_card"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/border_color"
+                app:strokeColor="@color/border_option_card"
                 app:strokeWidth="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -229,7 +229,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="4dp"
                             android:fontFamily="sans-serif-medium"
                             android:text="@string/security_auto_lock_sub"
                             android:textColor="@color/text_muted"
@@ -308,7 +308,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="4dp"
                             android:fontFamily="sans-serif-medium"
                             android:text="@string/security_attempts_sub"
                             android:textColor="@color/text_muted"
@@ -352,7 +352,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="14dp">
+                    android:padding="16dp">
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="40dp"
@@ -387,7 +387,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="4dp"
                             android:fontFamily="sans-serif-medium"
                             android:text="@string/security_history_sub"
                             android:textColor="@color/text_muted"
@@ -405,7 +405,7 @@
                 android:id="@+id/tvLastUnlock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/security_last_unlock"
                 android:textColor="@color/text_muted"

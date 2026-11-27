@@ -44,6 +44,12 @@ open class VaultAccessActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_vault_access)
+        findViewById<ImageButton>(R.id.accessBack).apply {
+            if (changing) {
+                visibility = View.VISIBLE
+                setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+            }
+        }
         message = findViewById(R.id.accessMessage)
         findViewById<Button>(R.id.accessSignOut).setOnClickListener {
             VaultService.logout(); startActivity(Intent(this, WelcomeActivity::class.java)
@@ -78,7 +84,7 @@ open class VaultAccessActivity : BaseActivity() {
     }
     private fun configure() {
         val setup = create || changing
-        listOf(R.id.accessNewPassword, R.id.accessConfirm, R.id.accessAccountPassword, R.id.accessAcknowledgement)
+        listOf(R.id.accessNewPassword, R.id.accessNewPasswordLabel, R.id.accessConfirm, R.id.accessConfirmLabel, R.id.accessAcknowledgement)
             .forEach { findViewById<View>(it).visibility = if (setup) View.VISIBLE else View.GONE }
         field(R.id.accessPassword).visibility = if (create) View.GONE else View.VISIBLE
         findViewById<TextView>(R.id.accessPasswordLabel).apply {
@@ -86,10 +92,18 @@ open class VaultAccessActivity : BaseActivity() {
             text = if (changing) "Contraseña maestra actual" else "Usar contraseña maestra"
         }
         val passwordProvider = FirebaseAuth.getInstance().currentUser!!.providerData.any { it.providerId == "password" }
-        if (!passwordProvider) field(R.id.accessAccountPassword).visibility = View.GONE
+        val accountPasswordVisibility = if (setup && passwordProvider) View.VISIBLE else View.GONE
+        field(R.id.accessAccountPassword).visibility = accountPasswordVisibility
+        findViewById<View>(R.id.accessAccountPasswordLabel).visibility = accountPasswordVisibility
         findViewById<TextView>(R.id.accessTitle).text = when { changing -> "Cambiar contraseña maestra"; create -> "Crear tu bóveda"; else -> "Desbloquear bóveda" }
         findViewById<Button>(R.id.accessSubmit).text = when { changing -> "Cambiar contraseña maestra"; create -> "Crear bóveda cifrada"; else -> "Desbloquear bóveda" }
-        if (setup) message.text = "Tu contraseña de inicio de sesión te permite entrar a tu cuenta. Crea una contraseña maestra diferente para proteger tu bóveda: mínimo 8 caracteres; recomendamos una frase de 15 o más. Repítela para confirmar. También te pedimos repetir tu contraseña de inicio de sesión para comprobar que sean distintas; no estás creando una tercera contraseña. Tu contraseña maestra no es recuperable."
+        if (setup) {
+            message.setText(R.string.vault_master_password_requirements)
+            if (passwordProvider) {
+                message.append("\n\n")
+                message.append(getString(R.string.vault_master_account_password_note))
+            }
+        }
         if (migration) message.text = "Migración autorizada: establece una contraseña maestra NUEVA e independiente. Se comprobarán todos los registros antes de activar el cifrado. Los originales se conservarán para una retirada supervisada. Esta migración no revierte exposiciones anteriores."
         val bio = !setup && VaultBiometrics.enabled(this, VaultService.uid)
         listOf(R.id.accessBiometric, R.id.accessFingerprint).forEach { findViewById<View>(it).visibility = if (bio) View.VISIBLE else View.GONE }

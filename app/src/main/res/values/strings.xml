@@ -10,6 +10,7 @@
     <string name="action_confirm">Confirmar</string>
     <string name="action_continue">Continuar</string>
     <string name="action_close">Cerrar</string>
+    <string name="action_back">Volver</string>
     <string name="action_send">Enviar</string>
     <string name="action_select">Seleccionar</string>
     <string name="label_configuration">Configuración</string>
@@ -112,6 +113,11 @@
     <string name="master_min_chars">Mínimo 6 caracteres</string>
     <string name="master_btn">Crear bóveda</string>
     <string name="master_footer">Si la olvidas, no podremos recuperarla.</string>
+    <string name="vault_master_password_requirements">Usa al menos 8 caracteres para tu nueva contraseña maestra. Recomendamos una frase de 15 caracteres o más.</string>
+    <string name="vault_master_account_password_note">Vuelve a ingresar la contraseña de inicio de sesión para comprobar que sea distinta de la nueva contraseña maestra.</string>
+    <string name="vault_master_new_password">Nueva contraseña maestra</string>
+    <string name="vault_master_confirm_password">Confirma la nueva contraseña maestra</string>
+    <string name="vault_master_account_password">Contraseña de inicio de sesión</string>
 
     <!-- Change master key -->
     <string name="change_key_title">Cambiar clave maestra</string>

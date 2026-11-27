@@ -203,7 +203,7 @@ class NuevaCredencialActivity : BaseActivity() {
             val categories = CategoryStore(this).all()
             val byKey = categories.associateBy { it.key }
             val fallback = byKey.getValue(CategoryStore.FALLBACK)
-            bindCategoryOption(dialog, rowOther, fallback, frequent = true)
+            bindCategoryOption(dialog, rowOther, fallback, frequent = false)
 
             val frequent = categoryCounts.entries
                 .filter { it.key != fallback.key && it.value >= 3 }
